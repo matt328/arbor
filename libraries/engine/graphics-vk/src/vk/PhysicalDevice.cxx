@@ -1,0 +1,202 @@
+#include "PhysicalDevice.hpp"
+#include "Device.hpp"
+#include "ErrorUtils.hpp"
+#include "DeviceOptions.hpp"
+#include "Surface.hpp"
+
+namespace arb {
+
+PhysicalDevice::PhysicalDevice(VkPhysicalDevice handle) : vkPhysicalDevice{handle} {
+  Log->trace("Constructed PhysicalDevice");
+  vkGetPhysicalDeviceProperties(vkPhysicalDevice, &properties);
+  Log->info("Using GPU: {} (API version {}.{}.{}), Driver version {}, Vendor ID: {}, Device ID: "
+            "{}, Type: {}",
+            properties.deviceName,
+            VK_VERSION_MAJOR(properties.apiVersion),
+            VK_VERSION_MINOR(properties.apiVersion),
+            VK_VERSION_PATCH(properties.apiVersion),
+            properties.driverVersion,
+            properties.vendorID,
+            properties.deviceID,
+            static_cast<int>(properties.deviceType));
+}
+
+PhysicalDevice::~PhysicalDevice() {
+  Log->trace("Destroyed PhysicalDevice");
+}
+
+auto PhysicalDevice::createDevice(const Surface& surface) -> std::shared_ptr<Device> {
+  // Features
+  auto* featureChain = FeatureChain{}.root();
+
+  // Queue Families
+  auto queueFamilies = findQueueFamilies(surface);
+  logQueueFamilyIndices(queueFamilies);
+  auto queueCreateInfos = std::vector<VkDeviceQueueCreateInfo>{};
+  getQueueCreateInfo(queueCreateInfos, queueFamilies);
+
+  VkDeviceCreateInfo deviceCreateInfo{};
+  deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+  deviceCreateInfo.pNext = featureChain;
+  deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+  deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
+
+  auto requiredExtensions = DeviceOptions::RequiredExtensions;
+  deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(requiredExtensions.size());
+  deviceCreateInfo.ppEnabledExtensionNames = requiredExtensions.data();
+
+  // 6. Create the logical device
+  VkDevice vkDevice = nullptr;
+  checkVk(vkCreateDevice(vkPhysicalDevice, &deviceCreateInfo, nullptr, &vkDevice),
+          "Failed to create logical device");
+
+  return std::make_shared<Device>(vkDevice, this);
+}
+
+auto PhysicalDevice::handle() const -> VkPhysicalDevice {
+  return vkPhysicalDevice;
+}
+
+auto PhysicalDevice::findQueueFamilies(const Surface& surface) -> QueueFamilyIndices {
+  QueueFamilyIndices queueFamilyIndices{};
+
+  uint32_t familyCount = 0;
+  vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &familyCount, nullptr);
+  auto queueFamilies = std::vector<VkQueueFamilyProperties>(familyCount);
+  vkGetPhysicalDeviceQueueFamilyProperties(vkPhysicalDevice, &familyCount, queueFamilies.data());
+
+  std::optional<uint32_t> graphicsFamilyIndex;
+  std::optional<uint32_t> computeFamilyIndex;
+  std::optional<uint32_t> transferFamilyIndex;
+
+  for (uint32_t i = 0; i < queueFamilies.size(); i++) {
+    const auto& queueFamily = queueFamilies[i];
+    if ((queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) != 0u) {
+      if (!queueFamilyIndices.graphicsFamily.has_value()) {
+        queueFamilyIndices.graphicsFamily = i;
+        queueFamilyIndices.graphicsFamilyCount = queueFamily.queueCount;
+        queueFamilyIndices.graphicsFamilyPriorities.assign(queueFamily.queueCount, 0.f);
+        queueFamilyIndices.graphicsFamilyPriorities[0] = 1.f;
+        graphicsFamilyIndex = i;
+      }
+    }
+
+    VkBool32 supported{};
+    checkVk(vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, i, surface, &supported),
+            "vkGetPhysicalDeviceSurfaceSupportKHR");
+    if (supported != 0u) {
+      if (!queueFamilyIndices.presentFamily.has_value()) {
+        queueFamilyIndices.presentFamily = i;
+        queueFamilyIndices.presentFamilyCount = queueFamily.queueCount;
+        queueFamilyIndices.presentFamilyPriorities.assign(queueFamily.queueCount, 0.f);
+        queueFamilyIndices.presentFamilyPriorities[0] = 1.f;
+      }
+    }
+
+    if (((queueFamily.queueFlags & VK_QUEUE_COMPUTE_BIT) != 0u) &&
+        ((queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0u)) {
+      if (!queueFamilyIndices.computeFamily.has_value()) {
+        queueFamilyIndices.computeFamily = i;
+        queueFamilyIndices.computeFamilyCount = queueFamily.queueCount;
+        queueFamilyIndices.computeFamilyPriorities.assign(queueFamily.queueCount, 0.f);
+        queueFamilyIndices.computeFamilyPriorities[0] = 1.f;
+        computeFamilyIndex = i;
+      }
+    }
+
+    if (((queueFamily.queueFlags & VK_QUEUE_TRANSFER_BIT) != 0u) &&
+        ((queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0u) &&
+        ((queueFamily.queueFlags & VK_QUEUE_COMPUTE_BIT) == 0u)) {
+      if (!queueFamilyIndices.transferFamily.has_value()) {
+        queueFamilyIndices.transferFamily = i;
+        queueFamilyIndices.transferFamilyCount = queueFamily.queueCount;
+        queueFamilyIndices.transferFamilyPriorities.assign(queueFamily.queueCount, 0.f);
+        queueFamilyIndices.transferFamilyPriorities[0] = 1.f;
+        transferFamilyIndex = i;
+      }
+    }
+  }
+
+  // Fallbacks
+  if (!queueFamilyIndices.computeFamily.has_value() && graphicsFamilyIndex.has_value()) {
+    queueFamilyIndices.computeFamily = graphicsFamilyIndex;
+    queueFamilyIndices.computeFamilyCount = queueFamilyIndices.graphicsFamilyCount;
+    queueFamilyIndices.computeFamilyPriorities = queueFamilyIndices.graphicsFamilyPriorities;
+  }
+
+  if (!queueFamilyIndices.transferFamily.has_value() && graphicsFamilyIndex.has_value()) {
+    queueFamilyIndices.transferFamily = graphicsFamilyIndex;
+    queueFamilyIndices.transferFamilyCount = queueFamilyIndices.graphicsFamilyCount;
+    queueFamilyIndices.transferFamilyPriorities = queueFamilyIndices.graphicsFamilyPriorities;
+  }
+
+  return queueFamilyIndices;
+}
+
+auto PhysicalDevice::getQueueCreateInfo(std::vector<VkDeviceQueueCreateInfo>& queueCreateInfo,
+                                        const QueueFamilyIndices& queueFamilyIndices) -> void {
+  std::unordered_set<uint32_t> usedQueueFamilies;
+
+  // Graphics Queue(s)
+  if (queueFamilyIndices.graphicsFamily.has_value() &&
+      queueFamilyIndices.graphicsFamilyCount.has_value()) {
+    const uint32_t index = queueFamilyIndices.graphicsFamily.value();
+    usedQueueFamilies.insert(index);
+
+    const auto graphicsFamilyCreateInfo = VkDeviceQueueCreateInfo{
+        .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+        .queueFamilyIndex = index,
+        .queueCount = queueFamilyIndices.graphicsFamilyCount.value(),
+        .pQueuePriorities = queueFamilyIndices.graphicsFamilyPriorities.data()};
+    queueCreateInfo.push_back(graphicsFamilyCreateInfo);
+  }
+
+  // Present Queue(s) — only if different from graphics
+  if (queueFamilyIndices.presentFamily.has_value() &&
+      queueFamilyIndices.presentFamilyCount.has_value()) {
+    const uint32_t index = queueFamilyIndices.presentFamily.value();
+    if (!usedQueueFamilies.contains(index)) {
+      Log->trace("Device supports separate present queue");
+
+      usedQueueFamilies.insert(index);
+      const auto presentFamilyCreateInfo = VkDeviceQueueCreateInfo{
+          .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+          .queueFamilyIndex = index,
+          .queueCount = queueFamilyIndices.presentFamilyCount.value(),
+          .pQueuePriorities = queueFamilyIndices.presentFamilyPriorities.data()};
+      queueCreateInfo.push_back(presentFamilyCreateInfo);
+    }
+  }
+
+  // Transfer Queue(s) — only if different from already used
+  if (queueFamilyIndices.transferFamily.has_value() &&
+      queueFamilyIndices.transferFamilyCount.has_value()) {
+    const uint32_t index = queueFamilyIndices.transferFamily.value();
+    if (!usedQueueFamilies.contains(index)) {
+      usedQueueFamilies.insert(index);
+      const auto transferFamilyCreateInfo = VkDeviceQueueCreateInfo{
+          .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+          .queueFamilyIndex = index,
+          .queueCount = queueFamilyIndices.transferFamilyCount.value(),
+          .pQueuePriorities = queueFamilyIndices.transferFamilyPriorities.data()};
+      queueCreateInfo.push_back(transferFamilyCreateInfo);
+    }
+  }
+
+  // Compute Queue(s) — only if different from already used
+  if (queueFamilyIndices.computeFamily.has_value() &&
+      queueFamilyIndices.computeFamilyCount.has_value()) {
+    const uint32_t index = queueFamilyIndices.computeFamily.value();
+    if (!usedQueueFamilies.contains(index)) {
+      usedQueueFamilies.insert(index);
+      const auto computeFamilyCreateInfo = VkDeviceQueueCreateInfo{
+          .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+          .queueFamilyIndex = index,
+          .queueCount = queueFamilyIndices.computeFamilyCount.value(),
+          .pQueuePriorities = queueFamilyIndices.computeFamilyPriorities.data()};
+      queueCreateInfo.push_back(computeFamilyCreateInfo);
+    }
+  }
+}
+
+}

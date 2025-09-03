@@ -1,0 +1,145 @@
+{
+  "version": 5,
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_CXX_STANDARD": "23",
+        "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+        "CMAKE_CXX_EXTENSIONS": "OFF",
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_CXX_FLAGS": "-stdlib=libstdc++",
+        "CMAKE_EXE_LINKER_FLAGS": "-stdlib=libstdc++ -fuse-ld=lld",
+        "CMAKE_CXX_FLAGS_INIT": "-stdlib=libstdc++",
+        "CMAKE_EXE_LINKER_FLAGS_INIT": "-stdlib=libstdc++"
+      }
+    },
+    {
+      "name": "debug",
+      "inherits": "base",
+      "displayName": "Debug",
+      "description": "Standard Debug config for local development",
+      "binaryDir": "build/debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS": "-Wall -g -Wextra -Weffc++ -Wno-unused-parameter -Wdeprecated-declarations -O0",
+        "CMAKE_C_FLAGS": "-Wall -g -Wextra -Weffc++ -Wdeprecated-declarations -O0"
+      }
+    },
+    {
+      "name": "debug-coverage",
+      "inherits": "base",
+      "displayName": "Debug[coverage]",
+      "description": "Debug config for test coverage",
+      "binaryDir": "build/debug-coverage",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS": "-Wall -Wextra -Weffc++",
+        "CMAKE_C_FLAGS": "-Wall -Wextra -Weffc++",
+        "CODE_COVERAGE": "ON"
+      }
+    },
+    {
+      "name": "release",
+      "inherits": "base",
+      "displayName": "Release",
+      "description": "Optimized Release",
+      "binaryDir": "build/release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_FLAGS": "-O3 -flto -march=native -stdlib=libstdc++",
+        "CMAKE_C_FLAGS": "-O3 -flto -march=native -stdlib=libstdc++"
+      }
+    },
+    {
+      "name": "windows-msvc-debug",
+      "displayName": "MSVC Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/msvc-debug",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "cacheVariables": {
+        "CMAKE_PREFIX_PATH": "C:/Qt/6.9.1/msvc2022_64",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/install/${presetName}",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_COMPILER": "clang-cl.exe",
+        "CMAKE_CXX_COMPILER": "clang-cl.exe",
+        "CMAKE_CXX_STANDARD": "23",
+        "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+        "CMAKE_CXX_EXTENSIONS": "OFF",
+        "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreadedDebugDLL",
+        "CMAKE_C_FLAGS": "/D_SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS /EHsc",
+        "CMAKE_CXX_FLAGS": "/D_SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS /EHsc"
+      }
+    },
+    {
+      "name": "windows-vs-debug",
+      "displayName": "VS Debug",
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/build/vs-debug",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_COMPILER": "cl.exe",
+        "CMAKE_CXX_COMPILER": "cl.exe",
+        "CMAKE_CXX_STANDARD": "23",
+        "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+        "CMAKE_CXX_EXTENSIONS": "OFF",
+        "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreadedDebugDLL",
+        "CMAKE_C_FLAGS": "/D_SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS /EHsc",
+        "CMAKE_CXX_FLAGS": "/D_SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS /EHsc"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "debug",
+      "displayName": "Debug Build",
+      "configurePreset": "debug",
+      "configuration": "Debug",
+      "jobs": 18,
+      "targets": [
+        "testarea"
+      ]
+    },
+    {
+      "name": "debug-coverage",
+      "displayName": "Debug Build With Coverage",
+      "configurePreset": "debug-coverage",
+      "jobs": 18,
+      "targets": [
+        "testarea"
+      ]
+    },
+    {
+      "name": "release",
+      "displayName": "Release Build",
+      "configurePreset": "release",
+      "configuration": "Release",
+      "jobs": 18,
+      "targets": [
+        "testarea"
+      ]
+    },
+    {
+      "name": "msvc-debug",
+      "displayName": "MSVC Debug Build",
+      "configurePreset": "windows-msvc-debug",
+      "configuration": "Debug",
+      "jobs": 12,
+      "targets": [
+        "testarea"
+      ]
+    }
+  ]
+}

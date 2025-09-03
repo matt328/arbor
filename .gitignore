@@ -1,0 +1,29 @@
+build
+bin
+.cache
+cmake-build-debug
+vcpkg_installed
+imgui.ini
+deps/*
+cmake-build-debug-coverage/*
+/cmake-build-debug-coverage/
+vendor/imgui/*
+/triton.cap
+
+# Ignore all .idea files by default
+.idea/
+
+# Allow specific files that are project-wide settings
+!.idea/codeStyles/
+!.idea/modules.xml
+!.idea/vcs.xml
+
+# Ignore user-specific files
+.idea/workspace.xml
+.idea/editor.xml
+.idea/misc.xml
+logs/
+.vs/
+
+vendor/build/**
+vendor/bin/**

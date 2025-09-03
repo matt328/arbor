@@ -1,0 +1,8 @@
+{
+  "clangd.arguments": [
+    "--clang-tidy",
+    "--header-insertion=never",
+    "--compile-commands-dir=${workspaceFolder}/build/msvc-debug",
+    "--query-driver=**"
+  ]
+}
