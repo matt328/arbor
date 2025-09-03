@@ -4,12 +4,15 @@
 
 namespace arb {
 
+class Surface;
+class PhysicalDevice;
+
 class Instance : public NonCopyableMovable {
 public:
   Instance(const GraphicsOptions& newOptions);
   ~Instance();
 
-  auto enumeratePhysicalDevices() -> std::vector<VkPhysicalDevice>;
+  auto enumeratePhysicalDevices(const Surface& surface) -> std::vector<PhysicalDevice>;
   [[nodiscard]] auto getHandle() const -> VkInstance;
   operator VkInstance() const {
     return vkInstance;

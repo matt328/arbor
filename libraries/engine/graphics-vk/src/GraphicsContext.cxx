@@ -22,10 +22,13 @@ GraphicsContext::GraphicsContext(std::shared_ptr<IEventQueue> newEventQueue,
       surface{vulkanInstance, newWindowHandle.get<HWND>()} {
   Log->trace("Creating GraphicsContext");
 
-  auto physicalDevices = vulkanInstance->enumeratePhysicalDevices();
-  Log->trace("Found {} physical devices", physicalDevices.size());
-
-  physicalDevice = PhysicalDevice{selectPhysicalDevice(physicalDevices)};
+  auto allPhysicalDevices = vulkanInstance->enumeratePhysicalDevices(surface);
+  for (const auto& candidate : allPhysicalDevices) {
+    if (candidate.isSuitable(surface)) {
+      physicalDevice = candidate;
+      break;
+    }
+  }
 
   device = physicalDevice.createDevice(surface);
 
@@ -57,16 +60,6 @@ auto GraphicsContext::run(std::stop_token token) -> void {
       std::this_thread::sleep_until(nextTick);
     }
   }
-}
-
-auto GraphicsContext::selectPhysicalDevice(const std::vector<VkPhysicalDevice>& physicalDevices)
-    -> VkPhysicalDevice {
-  for (const auto& device : physicalDevices) {
-    if (DeviceOptions::supports(device, surface)) {
-      return device;
-    }
-  }
-  throw std::runtime_error("Failed to find a Physical Device");
 }
 
 }

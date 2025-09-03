@@ -1,10 +1,30 @@
 #include "PhysicalDevice.hpp"
 #include "Device.hpp"
+#include "DeviceFeatures.hpp"
 #include "ErrorUtils.hpp"
-#include "DeviceOptions.hpp"
 #include "Surface.hpp"
 
 namespace arb {
+
+DeviceFeatures PhysicalDevice::RequiredFeatures = [] {
+  DeviceFeatures features;
+  features.features2.features.samplerAnisotropy = VK_TRUE;
+
+  features.vk12.drawIndirectCount = VK_TRUE;
+  features.vk12.bufferDeviceAddress = VK_TRUE;
+  features.vk12.descriptorBindingPartiallyBound = VK_TRUE;
+  features.vk12.runtimeDescriptorArray = VK_TRUE;
+  features.vk12.descriptorIndexing = VK_TRUE;
+
+  features.drawParams.shaderDrawParameters = VK_TRUE;
+
+  features.dynamicRendering.dynamicRendering = VK_TRUE;
+  features.extDyn.extendedDynamicState = VK_TRUE;
+
+  features.sync2.synchronization2 = VK_TRUE;
+
+  return features;
+}();
 
 PhysicalDevice::PhysicalDevice(VkPhysicalDevice handle) : vkPhysicalDevice{handle} {
   Log->trace("Constructed PhysicalDevice");
@@ -25,23 +45,102 @@ PhysicalDevice::~PhysicalDevice() {
   Log->trace("Destroyed PhysicalDevice");
 }
 
+auto PhysicalDevice::isSuitable(const Surface& surface) const -> bool {
+  return supportsExtensions() && supportsFeatures() && findQueueFamilies(surface).isComplete();
+  return true;
+}
+
+auto PhysicalDevice::supportsExtensions() const -> bool {
+  uint32_t extCount = 0;
+  vkEnumerateDeviceExtensionProperties(vkPhysicalDevice, nullptr, &extCount, nullptr);
+  std::vector<VkExtensionProperties> available(extCount);
+  vkEnumerateDeviceExtensionProperties(vkPhysicalDevice, nullptr, &extCount, available.data());
+
+  auto properties = VkPhysicalDeviceProperties{};
+  vkGetPhysicalDeviceProperties(vkPhysicalDevice, &properties);
+  auto* deviceName = properties.deviceName;
+
+  for (const auto* req : RequiredExtensions) {
+    auto found = std::ranges::any_of(available, [&](const VkExtensionProperties& ext) {
+      return std::strcmp(ext.extensionName, req) == 0;
+    });
+    if (!found) {
+      Log->warn("Device {}, Required Extension {} not present", deviceName, req);
+      return false;
+    }
+  }
+  return true;
+}
+
+auto PhysicalDevice::supportsFeatures() const -> bool {
+  DeviceFeatures supported;
+  vkGetPhysicalDeviceFeatures2(vkPhysicalDevice, &supported.features2);
+  // Core features
+  checkFeature("samplerAnisotropy",
+               PhysicalDevice::RequiredFeatures.features2.features,
+               supported.features2.features,
+               &VkPhysicalDeviceFeatures::samplerAnisotropy);
+  // Vulkan 1.2 Features
+  checkFeature("drawIndirectCount",
+               PhysicalDevice::RequiredFeatures.vk12,
+               supported.vk12,
+               &VkPhysicalDeviceVulkan12Features::drawIndirectCount);
+  checkFeature("bufferDeviceAddress",
+               PhysicalDevice::RequiredFeatures.vk12,
+               supported.vk12,
+               &VkPhysicalDeviceVulkan12Features::bufferDeviceAddress);
+  checkFeature("descriptorBindingPartiallyBound",
+               PhysicalDevice::RequiredFeatures.vk12,
+               supported.vk12,
+               &VkPhysicalDeviceVulkan12Features::descriptorBindingPartiallyBound);
+  checkFeature("runtimeDescriptorArray",
+               PhysicalDevice::RequiredFeatures.vk12,
+               supported.vk12,
+               &VkPhysicalDeviceVulkan12Features::runtimeDescriptorArray);
+  checkFeature("descriptorIndexing",
+               PhysicalDevice::RequiredFeatures.vk12,
+               supported.vk12,
+               &VkPhysicalDeviceVulkan12Features::descriptorIndexing);
+  // Shader Draw Parameters
+  checkFeature("shaderDrawParameters",
+               PhysicalDevice::RequiredFeatures.drawParams,
+               supported.drawParams,
+               &VkPhysicalDeviceShaderDrawParametersFeatures::shaderDrawParameters);
+  // Dynamic Rendering
+  checkFeature("dynamicRendering",
+               PhysicalDevice::RequiredFeatures.dynamicRendering,
+               supported.dynamicRendering,
+               &VkPhysicalDeviceDynamicRenderingFeaturesKHR::dynamicRendering);
+  // Extended Dynamic State
+  checkFeature("extendedDynamicState",
+               PhysicalDevice::RequiredFeatures.extDyn,
+               supported.extDyn,
+               &VkPhysicalDeviceExtendedDynamicStateFeaturesEXT::extendedDynamicState);
+  // Synchronization 2
+  checkFeature("synchronization2",
+               PhysicalDevice::RequiredFeatures.sync2,
+               supported.sync2,
+               &VkPhysicalDeviceSynchronization2Features::synchronization2);
+
+  return true;
+}
+
 auto PhysicalDevice::createDevice(const Surface& surface) -> std::shared_ptr<Device> {
-  // Features
-  auto* featureChain = FeatureChain{}.root();
 
   // Queue Families
   auto queueFamilies = findQueueFamilies(surface);
   logQueueFamilyIndices(queueFamilies);
+
   auto queueCreateInfos = std::vector<VkDeviceQueueCreateInfo>{};
   getQueueCreateInfo(queueCreateInfos, queueFamilies);
 
   VkDeviceCreateInfo deviceCreateInfo{};
   deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-  deviceCreateInfo.pNext = featureChain;
+  deviceCreateInfo.pNext = &RequiredFeatures.features2;
   deviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
   deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
 
-  auto requiredExtensions = DeviceOptions::RequiredExtensions;
+  auto requiredExtensions = RequiredExtensions;
   deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(requiredExtensions.size());
   deviceCreateInfo.ppEnabledExtensionNames = requiredExtensions.data();
 
@@ -57,7 +156,7 @@ auto PhysicalDevice::handle() const -> VkPhysicalDevice {
   return vkPhysicalDevice;
 }
 
-auto PhysicalDevice::findQueueFamilies(const Surface& surface) -> QueueFamilyIndices {
+auto PhysicalDevice::findQueueFamilies(const Surface& surface) const -> QueueFamilyIndices {
   QueueFamilyIndices queueFamilyIndices{};
 
   uint32_t familyCount = 0;

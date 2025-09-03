@@ -1,6 +1,7 @@
 #include "Instance.hpp"
 #include "ErrorUtils.hpp"
 #include "GraphicsOptions.hpp"
+#include "PhysicalDevice.hpp"
 
 namespace arb {
 
@@ -77,7 +78,7 @@ Instance::~Instance() {
   }
 }
 
-auto Instance::enumeratePhysicalDevices() -> std::vector<VkPhysicalDevice> {
+auto Instance::enumeratePhysicalDevices(const Surface& surface) -> std::vector<PhysicalDevice> {
   uint32_t deviceCount = 0;
   checkVk(vkEnumeratePhysicalDevices(vkInstance, &deviceCount, nullptr),
           "vkEnumeratePhysicalDevices(count)");
@@ -90,7 +91,12 @@ auto Instance::enumeratePhysicalDevices() -> std::vector<VkPhysicalDevice> {
   checkVk(vkEnumeratePhysicalDevices(vkInstance, &deviceCount, handles.data()),
           "vkEnumeratePhysicalDevices(devices)");
 
-  return handles;
+  auto physicalDevices = std::vector<PhysicalDevice>{};
+  for (auto* const handle : handles) {
+    physicalDevices.emplace_back(handle);
+  }
+
+  return physicalDevices;
 }
 
 auto Instance::getInstanceExtensions() const -> std::vector<const char*> {

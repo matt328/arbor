@@ -3,7 +3,6 @@
 #include "IGraphicsContext.hpp"
 #include "bk/NativeWindowHandle.hpp"
 #include "vk/Instance.hpp"
-#include "vk/DeviceOptions.hpp"
 #include "vk/PhysicalDevice.hpp"
 #include "vk/Surface.hpp"
 
@@ -22,15 +21,12 @@ public:
 
 private:
   GraphicsOptions options;
-  DeviceOptions deviceOptions{};
   std::shared_ptr<Instance> vulkanInstance;
   Surface surface;
   PhysicalDevice physicalDevice;
   std::shared_ptr<Device> device;
 
   std::shared_ptr<IEventQueue> eventQueue;
-
-  auto selectPhysicalDevice(const std::vector<VkPhysicalDevice>& physicalDevices)
-      -> VkPhysicalDevice;
 };
+
 }

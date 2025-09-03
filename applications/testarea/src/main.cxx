@@ -18,7 +18,7 @@ auto main() -> int {
 
   using namespace std::chrono;
   auto start = steady_clock::now();
-  auto end = start + seconds(5);
+  auto end = start + seconds(3);
 
   try {
     while (steady_clock::now() < end) {
