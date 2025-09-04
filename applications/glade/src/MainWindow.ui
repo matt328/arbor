@@ -89,7 +89,7 @@
          <number>-1</number>
         </property>
        </widget>
-       <widget class="gld::QtVulkanWidget" name="displayWidget" native="true">
+       <widget class="QWidget" name="displayWidget" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>1</horstretch>
@@ -107,14 +107,6 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>gld::QtVulkanWidget</class>
-   <extends>QWidget</extends>
-   <header>QtVulkanWidget.hpp</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

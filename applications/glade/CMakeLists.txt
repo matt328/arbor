@@ -6,7 +6,6 @@ set(PROJECT_SOURCES
   src/main.cxx
   src/MainWindow.cxx
   src/MainWindow.hpp
-  src/QtVulkanWidget.cxx
   src/ActionController.cxx
 
   src/widget-frame/WindowBar.cxx

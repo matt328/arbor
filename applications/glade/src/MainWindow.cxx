@@ -1,11 +1,10 @@
 #include "MainWindow.hpp"
 
 #include "bk/Logger.hpp"
+#include "commands/ImportModelCommand.hpp"
 #include "ui_MainWindow.h"
 
 #include "dialogs/ModelDialog.hpp"
-
-#include "QtVulkanWidget.hpp"
 
 #include <QWKWidgets/widgetwindowagent.h>
 
@@ -32,7 +31,6 @@ MainWindow::MainWindow(QWidget* parent)
 
   setupActions();
   installWindowAgent();
-  // assetAdapter = new gld::AssetAdapter(eventQueue, this);
 
   auto* assetsPanel = new gld::AssetsPanel(actionManager->assetActions, this);
 
@@ -40,11 +38,12 @@ MainWindow::MainWindow(QWidget* parent)
   ui->tabWidget->addTab(assetsPanel, "Assets");
   ui->tabWidget->addTab(new QTextEdit("Tool 3"), "Asset Tool");
 
-  auto wid = ui->displayWidget->getHandle();
   auto handle = bk::NativeWindowHandle{};
-  handle.set<WId>(wid);
+  handle.set<WId>(ui->displayWidget->winId());
+
   context = arb::makeEngineContext(handle);
   auto eventQueue = context->getEventQueue();
+  assetAdapter = new gld::AssetAdapter(eventQueue, this);
 }
 
 MainWindow::~MainWindow() {
@@ -64,17 +63,15 @@ auto MainWindow::showEvent(QShowEvent* event) -> void {
 auto MainWindow::setupActions() -> void {
   auto* dialog = new gld::ModelDialog(this);
   connect(actionManager->assetActions.importModel, &QAction::triggered, dialog, &QDialog::exec);
-  // connect(dialog,
-  //         &gld::ModelDialog::acceptedWithDetails,
-  //         this,
-  //         [this](const gld::ImportModelDetails& details) {
-  //           undoStack->push(new gld::ImportModelCommand(assetAdapter, details));
-  //         });
+  connect(dialog,
+          &gld::ModelDialog::acceptedWithDetails,
+          this,
+          [this](const gld::ImportModelDetails& details) {
+            undoStack->push(new gld::ImportModelCommand(assetAdapter, details));
+          });
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {
-  eventQueue.reset();
-  context.reset();
   auto settings = QSettings{};
   settings.setValue("geometry", saveGeometry());
   settings.setValue("windowState", saveState());
@@ -301,10 +298,6 @@ auto MainWindow::installWindowAgent() -> void {
   windowAgent->setWindowAttribute(tr("dwm-blur"), true);
   setProperty("custom-style", true);
   style()->polish(this);
-}
-
-auto MainWindow::getWindowContext() -> gld::QtVulkanWidget* {
-  return ui->displayWidget;
 }
 
 void MainWindow::loadStyleSheet(Theme theme) {

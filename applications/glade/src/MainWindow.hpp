@@ -1,6 +1,5 @@
 #pragma once
 
-#include "QtVulkanWidget.hpp"
 #include "actions/ActionManager.hpp"
 #include "IEventQueue.hpp"
 #include "IEngineContext.hpp"
@@ -33,8 +32,6 @@ public:
   };
   Q_ENUM(Theme)
 
-  auto getWindowContext() -> gld::QtVulkanWidget*;
-
 Q_SIGNALS:
   void themeChanged();
 
@@ -52,15 +49,13 @@ private:
 
   QUndoStack* undoStack;
 
-  // gld::AssetAdapter* assetAdapter;
-
-  std::shared_ptr<arb::IEventQueue> eventQueue;
-
   Theme currentTheme{};
 
   QWK::WidgetWindowAgent* windowAgent;
 
   std::shared_ptr<arb::IEngineContext> context;
+  std::shared_ptr<arb::IEventQueue> eventQueue;
+  gld::AssetAdapter* assetAdapter;
 
   std::unique_ptr<gld::ActionManager> actionManager;
 };
