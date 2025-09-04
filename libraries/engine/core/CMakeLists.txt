@@ -1,7 +1,6 @@
 project("core")
 
 set(core_SRC
-  src/Placeholder.cxx
   src/EngineContext.cxx
 )
 

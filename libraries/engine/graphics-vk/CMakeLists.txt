@@ -1,12 +1,11 @@
 project("graphics-vk")
 
 set(graphicsvk_SRC
-  src/GraphicsContext.cxx
-
-  src/vk/Instance.cxx
-  src/vk/PhysicalDevice.cxx
-  src/vk/Device.cxx
-  src/vk/Surface.cxx
+  src/core/CoreContext.cxx
+  src/core/Instance.cxx
+  src/core/PhysicalDevice.cxx
+  src/core/Device.cxx
+  src/core/Surface.cxx
 )
 
 add_library(${PROJECT_NAME} STATIC ${graphicsvk_SRC})

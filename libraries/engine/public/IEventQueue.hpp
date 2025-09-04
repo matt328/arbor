@@ -37,6 +37,4 @@ public:
   }
 };
 
-auto makeEventQueue() -> std::shared_ptr<IEventQueue>;
-
 }
