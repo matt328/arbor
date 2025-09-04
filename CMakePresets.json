@@ -109,7 +109,8 @@
       "configuration": "Debug",
       "jobs": 18,
       "targets": [
-        "testarea"
+        "testarea",
+        "Glade"
       ]
     },
     {
@@ -118,7 +119,8 @@
       "configurePreset": "debug-coverage",
       "jobs": 18,
       "targets": [
-        "testarea"
+        "testarea",
+        "Glade"
       ]
     },
     {
@@ -128,7 +130,8 @@
       "configuration": "Release",
       "jobs": 18,
       "targets": [
-        "testarea"
+        "testarea",
+        "Glade"
       ]
     },
     {
@@ -138,7 +141,8 @@
       "configuration": "Debug",
       "jobs": 12,
       "targets": [
-        "testarea"
+        "testarea",
+        "Glade"
       ]
     }
   ]

@@ -1,0 +1,82 @@
+#version 450
+#extension GL_EXT_buffer_reference : enable
+#extension GL_EXT_buffer_reference_uvec2 : enable
+#extension GL_EXT_shader_explicit_arithmetic_types_int64 : enable
+
+layout(local_size_x = 16, local_size_y = 1, local_size_z = 1) in;
+
+struct GpuBufferEntry {
+  uint indexCount;
+  uint firstIndex;
+  uint vertexOffset;
+  uint instanceCount;
+  uint firstInstance;
+  uint padding;
+};
+
+struct DrawCommand {
+  uint indexCount; // number of indices
+  uint instanceCount;
+  uint firstIndex;   // Number of the index
+  uint vertexOffset; // in number of vertices
+  uint firstInstance;
+};
+
+layout(push_constant) uniform PushConstants {
+  uint64_t drawCommandBufferAddress;
+  uint64_t gpuBufferEntryBufferAddress;
+  uint64_t objectDataBufferAddress;
+  uint64_t countBufferAddress;
+  uint64_t objectDataIndexBufferAddress;
+  uint objectCount;
+}
+pc;
+
+layout(buffer_reference, std430) buffer DrawCommandBuffer {
+  DrawCommand commands[];
+};
+
+layout(buffer_reference, std430) buffer GpuBufferEntryBuffer {
+  GpuBufferEntry instanceData[];
+};
+
+layout(buffer_reference, std430) buffer CountBuffer {
+  uint count;
+};
+
+layout(buffer_reference, std430) buffer ObjectDataIndexBuffer {
+  uint index[];
+};
+
+void main() {
+  if (gl_GlobalInvocationID.x >= pc.objectCount) {
+    return;
+  }
+
+  CountBuffer countBuffer = CountBuffer(pc.countBufferAddress);
+
+  if (gl_GlobalInvocationID.x == 0) {
+    countBuffer.count = 0;
+  }
+
+  uint index = gl_GlobalInvocationID.x;
+
+  // Access the buffers via push constant device addresses
+  DrawCommandBuffer drawCommands = DrawCommandBuffer(pc.drawCommandBufferAddress);
+  GpuBufferEntryBuffer gpuBufferEntryData = GpuBufferEntryBuffer(pc.gpuBufferEntryBufferAddress);
+  ObjectDataIndexBuffer dataIndexBuffer = ObjectDataIndexBuffer(pc.objectDataIndexBufferAddress);
+
+  GpuBufferEntry data = gpuBufferEntryData.instanceData[index];
+
+  // Populate indirect draw command
+  drawCommands.commands[index].firstInstance = data.firstInstance;
+  drawCommands.commands[index].instanceCount = data.instanceCount;
+  drawCommands.commands[index].firstIndex = data.firstIndex;
+  drawCommands.commands[index].indexCount = data.indexCount;
+  drawCommands.commands[index].vertexOffset = data.vertexOffset;
+
+  uint currentCount = atomicAdd(countBuffer.count, 1);
+
+  // This buffer sits parallel to the
+  dataIndexBuffer.index[index] = currentCount;
+}

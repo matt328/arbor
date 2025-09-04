@@ -13,6 +13,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
 
+list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/vendor/bin/QWindowKit")
+
 add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
 
 set(SPDLOG_VERSION v1.15.3)
@@ -23,3 +25,5 @@ include(dependencies)
 add_subdirectory(libraries/base-kit)
 add_subdirectory(libraries/engine)
 add_subdirectory(applications/testarea)
+add_subdirectory(assets)
+add_subdirectory(applications/glade)

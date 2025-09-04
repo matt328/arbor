@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/">
+        <file>window-bar/close.svg</file>
+        <file>window-bar/fullscreen.svg</file>
+        <file>window-bar/maximize.svg</file>
+        <file>window-bar/minimize.svg</file>
+        <file>window-bar/restore.svg</file>
+        <file>window-bar/more-line.svg</file>
+        <file>window-bar/pin.svg</file>
+        <file>window-bar/pin-fill.svg</file>
+        <file>styles/dark-style.qss</file>
+        <file>styles/light-style.qss</file>
+        <file>app/gladev1.png</file>
+        <file>app/model.svg</file>
+        <file>app/skeleton.svg</file>
+        <file>app/animation.svg</file>
+        <file>app/undo.svg</file>
+        <file>app/redo.svg</file>
+    </qresource>
+</RCC>

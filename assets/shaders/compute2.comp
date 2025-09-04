@@ -1,0 +1,127 @@
+#version 460
+#extension GL_EXT_nonuniform_qualifier : require
+#extension GL_EXT_buffer_reference : require
+#extension GL_EXT_scalar_block_layout : require
+#extension GL_EXT_shader_explicit_arithmetic_types_int64 : enable
+
+#define INVALID_OFFSET 0xFFFFFFFFu
+
+#define ObjectDataSize 24
+#define GeometryRegionSize 24
+#define IndirectCommandSize 16
+
+layout(buffer_reference, scalar) buffer GpuObjectDataBuffer {
+  uint positionIndex;
+  uint rotationIndex;
+  uint scaleIndex;
+  uint geometryRegionId;
+  uint materialId;
+  uint animationId;
+};
+
+layout(buffer_reference, scalar) buffer GpuPositionDataBuffer {
+  vec3 position;
+};
+
+layout(buffer_reference, scalar) buffer GpuRotationDataBuffer {
+  vec4 position;
+};
+
+layout(buffer_reference, scalar) buffer GpuScaleDataBuffer {
+  vec3 scale;
+};
+
+layout(buffer_reference, scalar) buffer GpuGeometryRegionDataBuffer {
+  uint indexCount;
+  uint indexOffset;
+  uint positionOffset;
+  uint colorOffset;
+  uint texCoordOffset;
+  uint normalOffset;
+};
+
+layout(buffer_reference, scalar) buffer GpuIndexDataBuffer {
+  uint index;
+};
+
+layout(buffer_reference, scalar) buffer GpuVertexPositionDataBuffer {
+  vec3 position;
+};
+
+layout(buffer_reference, scalar) buffer GpuIndirectCommandBuffer {
+  uint vertexCount;
+  uint instanceCount;
+  uint firstVertex;
+  uint firstInstance;
+};
+
+layout(buffer_reference, scalar) buffer GpuIndirectCountBuffer {
+  uint count;
+};
+
+layout(buffer_reference, scalar) buffer ResourceTable {
+  uint64_t objectDataBufferAddress;
+  uint64_t objectPositionsAddress;
+  uint64_t objectRotationsAddress;
+  uint64_t objectScalesAddress;
+  uint64_t regionBufferAddress;
+  uint64_t indexBufferAddress;
+  uint64_t positionBufferAddress;
+  uint64_t colorBufferAddress;
+  uint64_t texCoordBufferAddress;
+  uint64_t normalBufferAddress;
+  uint64_t animationBufferAddress;
+  uint64_t materialBufferAddress;
+  uint64_t indirectCommandAddress;
+  uint64_t indirectCountAddress;
+};
+
+layout(buffer_reference, scalar) buffer FrameDataBuffer {
+  mat4 view;
+  mat4 projection;
+  vec4 cameraPosition;
+  float time;
+  uint maxObjects;
+  float _pad0;
+  float _pad1;
+};
+
+layout(push_constant) uniform PushConstants {
+  uint64_t resourceTableAddress;
+  uint64_t frameDataAddress;
+}
+pushConstants;
+
+layout(local_size_x = 64) in;
+
+void main() {
+
+  ResourceTable resourceTable = ResourceTable(pushConstants.resourceTableAddress);
+  FrameDataBuffer frameData = FrameDataBuffer(pushConstants.frameDataAddress);
+
+  uint idx = gl_GlobalInvocationID.x;
+  if (idx >= frameData.maxObjects)
+    return;
+
+  GpuIndirectCountBuffer outCount = GpuIndirectCountBuffer(resourceTable.indirectCountAddress);
+
+  if (idx == 0) {
+    outCount.count = 0;
+  }
+
+  GpuObjectDataBuffer objectData =
+      GpuObjectDataBuffer(resourceTable.objectDataBufferAddress + idx * ObjectDataSize);
+
+  GpuGeometryRegionDataBuffer geomData = GpuGeometryRegionDataBuffer(
+      resourceTable.regionBufferAddress + objectData.geometryRegionId * GeometryRegionSize);
+
+  GpuIndirectCommandBuffer outCmd =
+      GpuIndirectCommandBuffer(resourceTable.indirectCommandAddress + idx * IndirectCommandSize);
+
+  outCmd.vertexCount = geomData.indexCount;
+  outCmd.instanceCount = 1;
+  outCmd.firstVertex = geomData.indexOffset;
+  outCmd.firstInstance = idx;
+
+  atomicAdd(outCount.count, 1);
+}
