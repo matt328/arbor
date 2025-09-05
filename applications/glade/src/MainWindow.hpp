@@ -1,8 +1,8 @@
 #pragma once
 
 #include "actions/ActionManager.hpp"
-#include "IEventQueue.hpp"
-#include "IEngineContext.hpp"
+#include "bk/IEventQueue.hpp"
+#include "engine/base/IEngineContext.hpp"
 
 namespace gld {
 class AssetAdapter;
@@ -54,7 +54,7 @@ private:
   QWK::WidgetWindowAgent* windowAgent;
 
   std::shared_ptr<arb::IEngineContext> context;
-  std::shared_ptr<arb::IEventQueue> eventQueue;
+  std::shared_ptr<bk::IEventQueue> eventQueue;
   gld::AssetAdapter* assetAdapter;
 
   std::unique_ptr<gld::ActionManager> actionManager;

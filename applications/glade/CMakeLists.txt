@@ -55,7 +55,7 @@ target_link_libraries(${PROJECT_NAME}
   Qt${QT_VERSION_MAJOR}::Svg
   QWindowKit::Widgets
   base-kit
-  engine
+  engine::base
 )
 
 target_compile_definitions(${PROJECT_NAME}

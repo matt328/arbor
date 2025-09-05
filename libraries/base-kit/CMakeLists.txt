@@ -16,6 +16,7 @@ target_precompile_headers(${PROJECT_NAME}
   <cereal/archives/binary.hpp>
   <cereal/types/unordered_map.hpp>
   <cereal/types/string.hpp>
+  <deque>
   <filesystem>
   <fstream>
   <string_view>

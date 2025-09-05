@@ -10,7 +10,7 @@ add_executable(${PROJECT_NAME} ${testarea_SRC})
 target_link_libraries(${PROJECT_NAME}
   PRIVATE
   base-kit
-  engine
+  engine:base
 )
 
 target_compile_definitions(${PROJECT_NAME}

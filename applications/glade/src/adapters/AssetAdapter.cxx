@@ -3,7 +3,7 @@
 
 namespace gld {
 
-AssetAdapter::AssetAdapter(std::shared_ptr<arb::IEventQueue> newEventQueue, QObject* parent)
+AssetAdapter::AssetAdapter(std::shared_ptr<bk::IEventQueue> newEventQueue, QObject* parent)
     : eventQueue{std::move(newEventQueue)}, QObject{parent} {
 }
 

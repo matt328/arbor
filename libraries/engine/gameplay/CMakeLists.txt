@@ -26,10 +26,10 @@ target_precompile_headers(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
   PUBLIC
   base-kit
-  api
-  engine
+  engine::base
 )
 
 target_include_directories(${PROJECT_NAME}
   PUBLIC
+  include
 )

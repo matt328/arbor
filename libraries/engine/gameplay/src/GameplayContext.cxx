@@ -1,14 +1,14 @@
 #include "GameplayContext.hpp"
-#include "IEventQueue.hpp"
+#include "bk/IEventQueue.hpp"
 
 namespace arb {
 
-auto makeGameplayContext(std::shared_ptr<IEventQueue> newEventQueue)
+auto makeGameplayContext(std::shared_ptr<bk::IEventQueue> newEventQueue)
     -> std::unique_ptr<IGameplayContext> {
   return std::make_unique<GameplayContext>(std::move(newEventQueue));
 }
 
-GameplayContext::GameplayContext(std::shared_ptr<IEventQueue> newEventQueue)
+GameplayContext::GameplayContext(std::shared_ptr<bk::IEventQueue> newEventQueue)
     : eventQueue{std::move(newEventQueue)} {
   Log->trace("Creating GameplayContext");
 }
