@@ -17,6 +17,10 @@ list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/vendor/bin/QWindowKit")
 
 add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
 
+if(WIN32)
+  add_compile_definitions(NOMINMAX)
+endif()
+
 set(SPDLOG_VERSION v1.15.3)
 set(CEREAL_VERSION v1.3.2)
 

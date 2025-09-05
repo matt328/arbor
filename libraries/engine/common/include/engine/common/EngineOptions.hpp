@@ -2,7 +2,7 @@
 
 namespace arb {
 
-struct GraphicsOptions {
+struct EngineOptions {
   struct Size {
     uint32_t width;
     uint32_t height;

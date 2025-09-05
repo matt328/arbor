@@ -6,7 +6,7 @@
 namespace arb {
 class EngineContext : public IEngineContext {
 public:
-  EngineContext(bk::NativeWindowHandle newWindowHandle);
+  EngineContext(bk::NativeWindowHandle newWindowHandle, EngineOptions engineOptions);
   ~EngineContext();
 
   [[nodiscard]] auto getEventQueue() const -> std::shared_ptr<bk::IEventQueue> override;

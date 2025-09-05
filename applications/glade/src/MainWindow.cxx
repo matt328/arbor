@@ -2,6 +2,7 @@
 
 #include "bk/Logger.hpp"
 #include "commands/ImportModelCommand.hpp"
+#include "engine/common/EngineOptions.hpp"
 #include "ui_MainWindow.h"
 
 #include "dialogs/ModelDialog.hpp"
@@ -14,6 +15,7 @@
 #include "widget-frame/WindowButton.hpp"
 
 #include "bk/NativeWindowHandle.hpp"
+#include "engine/base/ResizeEvent.hpp"
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent),
@@ -41,8 +43,21 @@ MainWindow::MainWindow(QWidget* parent)
   auto handle = bk::NativeWindowHandle{};
   handle.set<WId>(ui->displayWidget->winId());
 
-  context = arb::makeEngineContext(handle);
+  const auto options = arb::EngineOptions{
+      .debugEnabled = true,
+      .initialSize = {.width = static_cast<uint32_t>(ui->displayWidget->width()),
+                      .height = static_cast<uint32_t>(ui->displayWidget->height())},
+  };
+
+  context = arb::makeEngineContext(handle, options);
   auto eventQueue = context->getEventQueue();
+
+  connect(ui->displayWidget, &gld::DisplayWidget::resized, this, [&](QSize size) {
+    eventQueue->emitEvent<arb::ResizeEvent>(
+        arb::ResizeEvent{.width = static_cast<uint32_t>(size.width()),
+                         .height = static_cast<uint32_t>(size.height())});
+  });
+
   assetAdapter = new gld::AssetAdapter(eventQueue, this);
 }
 

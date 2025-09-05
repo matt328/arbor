@@ -5,7 +5,7 @@ project(Glade VERSION 0.0.1 LANGUAGES CXX)
 set(PROJECT_SOURCES
   src/main.cxx
   src/MainWindow.cxx
-  src/MainWindow.hpp
+  src/DisplayWidget.cxx
   src/ActionController.cxx
 
   src/widget-frame/WindowBar.cxx
@@ -56,6 +56,7 @@ target_link_libraries(${PROJECT_NAME}
   QWindowKit::Widgets
   base-kit
   engine::base
+  engine::common
 )
 
 target_compile_definitions(${PROJECT_NAME}
@@ -65,7 +66,7 @@ target_compile_definitions(${PROJECT_NAME}
   GLM_ENABLE_EXPERIMENTAL
   TRACY_NO_EXIT
   TRACY_CALLSTACK=5
-  VK_USE_PLATFORM_WIN32_KHR=1
+  NOMINMAX
 )
 
 target_precompile_headers(${PROJECT_NAME}

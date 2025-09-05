@@ -8,6 +8,7 @@ set(vulkan_SRC
   core/src/Instance.cxx
   core/src/PhysicalDevice.cxx
   core/src/Surface.cxx
+  core/src/Swapchain.cxx
 )
 
 add_library(${PROJECT_NAME} STATIC ${vulkan_SRC})
@@ -23,6 +24,7 @@ target_precompile_headers(${PROJECT_NAME}
   PUBLIC
   <filesystem>
   <fstream>
+  <limits>
   <string_view>
   <string>
 

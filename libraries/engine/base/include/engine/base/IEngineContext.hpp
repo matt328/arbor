@@ -2,6 +2,7 @@
 
 #include "bk/NativeWindowHandle.hpp"
 #include "bk/IEventQueue.hpp"
+#include "engine/common/EngineOptions.hpp"
 
 namespace arb {
 
@@ -11,6 +12,7 @@ public:
   virtual auto update() -> void = 0;
 };
 
-auto makeEngineContext(bk::NativeWindowHandle windowHandle) -> std::shared_ptr<IEngineContext>;
+auto makeEngineContext(bk::NativeWindowHandle windowHandle, EngineOptions engineOptions)
+    -> std::shared_ptr<IEngineContext>;
 
 }

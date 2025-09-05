@@ -3,9 +3,10 @@
 #include "graphics/base/IGraphicsContext.hpp"
 #include "graphics/common/GraphicsOptions.hpp"
 #include "bk/EventQueue2.hpp"
+#include "engine/common/EngineOptions.hpp"
 
 namespace arb {
-EngineContext::EngineContext(bk::NativeWindowHandle newWindowHandle)
+EngineContext::EngineContext(bk::NativeWindowHandle newWindowHandle, EngineOptions engineOptions)
     : windowHandle{newWindowHandle} {
   Log->trace("Creating EngineContext");
 
@@ -23,12 +24,17 @@ EngineContext::EngineContext(bk::NativeWindowHandle newWindowHandle)
     }
   });
 
-  graphicsThread = std::jthread([this](std::stop_token token) {
+  graphicsThread = std::jthread([this, &engineOptions](std::stop_token token) {
     try {
       InitLogger("Graphics");
       Log->trace("Graphics Thread Started");
-      auto graphicsContext =
-          makeGraphicsContext(eventQueue, GraphicsOptions{.debugEnabled = true}, windowHandle);
+      EngineOptions::Size size = engineOptions.initialSize;
+      auto graphicsContext = makeGraphicsContext(
+          eventQueue,
+          GraphicsOptions{.debugEnabled = engineOptions.debugEnabled,
+                          .initialSize = {.width = engineOptions.initialSize.width,
+                                          .height = engineOptions.initialSize.height}},
+          windowHandle);
       graphicsContext->run(token);
     } catch (const std::exception& e) {
       engineError = std::current_exception();
@@ -60,8 +66,9 @@ auto EngineContext::getEventQueue() const -> std::shared_ptr<bk::IEventQueue> {
   return eventQueue;
 }
 
-auto makeEngineContext(bk::NativeWindowHandle newWindowHandle) -> std::shared_ptr<IEngineContext> {
-  return std::make_shared<EngineContext>(newWindowHandle);
+auto makeEngineContext(bk::NativeWindowHandle newWindowHandle, EngineOptions engineOptions)
+    -> std::shared_ptr<IEngineContext> {
+  return std::make_shared<EngineContext>(newWindowHandle, engineOptions);
 }
 
 }

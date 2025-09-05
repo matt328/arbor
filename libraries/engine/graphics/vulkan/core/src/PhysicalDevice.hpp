@@ -8,6 +8,12 @@ namespace arb {
 class Device;
 class Surface;
 
+struct SwapchainSupportDetails {
+  VkSurfaceCapabilitiesKHR capabilities;
+  std::vector<VkSurfaceFormatKHR> formats;
+  std::vector<VkPresentModeKHR> presentModes;
+};
+
 static constexpr auto RequiredExtensions =
     std::to_array<const char*>({VK_KHR_SWAPCHAIN_EXTENSION_NAME,
                                 VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME,
@@ -36,12 +42,13 @@ public:
   [[nodiscard]] auto isSuitable(const Surface& surface) const -> bool;
   auto createDevice(const Surface& surface) -> std::shared_ptr<Device>;
   [[nodiscard]] auto handle() const -> VkPhysicalDevice;
+  [[nodiscard]] auto findQueueFamilies(const Surface* surface) const -> QueueFamilyIndices;
+  [[nodiscard]] auto querySwapchainSupport(const Surface* surface) const -> SwapchainSupportDetails;
 
 private:
   VkPhysicalDevice vkPhysicalDevice{VK_NULL_HANDLE};
   VkPhysicalDeviceProperties properties{};
 
-  [[nodiscard]] auto findQueueFamilies(const Surface& surface) const -> QueueFamilyIndices;
   auto getQueueCreateInfo(std::vector<VkDeviceQueueCreateInfo>& queueCreateInfos,
                           const QueueFamilyIndices& queueFamilyIndices) -> void;
   [[nodiscard]] auto supportsExtensions() const -> bool;

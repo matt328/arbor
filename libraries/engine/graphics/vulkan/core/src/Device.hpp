@@ -9,6 +9,8 @@ public:
   Device(VkDevice newDevice, PhysicalDevice* newPhysicalDevice);
   ~Device();
 
+  auto waitIdle() -> void;
+
 private:
   VkDevice vkDevice;
   const PhysicalDevice* physicalDevice;

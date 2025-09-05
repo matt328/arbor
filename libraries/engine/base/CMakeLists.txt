@@ -24,6 +24,7 @@ target_link_libraries(${PROJECT_NAME}
   gameplay
   graphics::base
   base-kit
+  engine::common
 )
 
 target_include_directories(${PROJECT_NAME}

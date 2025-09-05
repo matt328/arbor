@@ -14,4 +14,8 @@ Device::~Device() {
   }
 }
 
+auto Device::waitIdle() -> void {
+  vkDeviceWaitIdle(vkDevice);
+}
+
 }

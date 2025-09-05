@@ -46,7 +46,7 @@ PhysicalDevice::~PhysicalDevice() {
 }
 
 auto PhysicalDevice::isSuitable(const Surface& surface) const -> bool {
-  return supportsExtensions() && supportsFeatures() && findQueueFamilies(surface).isComplete();
+  return supportsExtensions() && supportsFeatures() && findQueueFamilies(&surface).isComplete();
   return true;
 }
 
@@ -128,7 +128,7 @@ auto PhysicalDevice::supportsFeatures() const -> bool {
 auto PhysicalDevice::createDevice(const Surface& surface) -> std::shared_ptr<Device> {
 
   // Queue Families
-  auto queueFamilies = findQueueFamilies(surface);
+  auto queueFamilies = findQueueFamilies(&surface);
   logQueueFamilyIndices(queueFamilies);
 
   auto queueCreateInfos = std::vector<VkDeviceQueueCreateInfo>{};
@@ -156,7 +156,32 @@ auto PhysicalDevice::handle() const -> VkPhysicalDevice {
   return vkPhysicalDevice;
 }
 
-auto PhysicalDevice::findQueueFamilies(const Surface& surface) const -> QueueFamilyIndices {
+[[nodiscard]] auto PhysicalDevice::querySwapchainSupport(const Surface* surface) const
+    -> SwapchainSupportDetails {
+  auto capabilities = VkSurfaceCapabilitiesKHR{};
+  checkVk(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vkPhysicalDevice, *surface, &capabilities),
+          "vkGetPhysicalDeviceSurfaceCapabilitiesKHR");
+
+  uint32_t formatCount;
+  checkVk(vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice, *surface, &formatCount, nullptr),
+          "vkGetPhysicalDeviceSurfaceFormatsKHR(count)");
+  auto surfaceFormats = std::vector<VkSurfaceFormatKHR>{};
+  checkVk(vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice,
+                                               *surface,
+                                               &formatCount,
+                                               surfaceFormats.data()),
+          "vkGetPhysicalDeviceSurfaceFormatsKHR(data)");
+  uint32_t presentModeCount;
+  vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice, *surface, &presentModeCount, nullptr);
+  std::vector<VkPresentModeKHR> presentModes(presentModeCount);
+  vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice,
+                                            *surface,
+                                            &presentModeCount,
+                                            presentModes.data());
+  return {.capabilities = capabilities, .formats = surfaceFormats, .presentModes = presentModes};
+}
+
+auto PhysicalDevice::findQueueFamilies(const Surface* surface) const -> QueueFamilyIndices {
   QueueFamilyIndices queueFamilyIndices{};
 
   uint32_t familyCount = 0;
@@ -181,7 +206,7 @@ auto PhysicalDevice::findQueueFamilies(const Surface& surface) const -> QueueFam
     }
 
     VkBool32 supported{};
-    checkVk(vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, i, surface, &supported),
+    checkVk(vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, i, *surface, &supported),
             "vkGetPhysicalDeviceSurfaceSupportKHR");
     if (supported != 0u) {
       if (!queueFamilyIndices.presentFamily.has_value()) {

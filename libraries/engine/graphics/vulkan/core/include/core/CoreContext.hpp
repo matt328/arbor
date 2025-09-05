@@ -10,6 +10,7 @@
 namespace arb {
 
 class Device;
+class Swapchain;
 
 class CoreContext {
 public:
@@ -24,6 +25,7 @@ private:
   Surface surface;
   PhysicalDevice physicalDevice;
   std::shared_ptr<Device> device;
+  std::shared_ptr<Swapchain> swapchain;
 
   std::shared_ptr<bk::IEventQueue> eventQueue;
 };

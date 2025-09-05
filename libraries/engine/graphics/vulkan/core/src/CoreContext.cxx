@@ -1,8 +1,8 @@
 #include "core/CoreContext.hpp"
 #include "bk/IEventQueue.hpp"
 #include "Instance.hpp"
+#include "Swapchain.hpp"
 #include "graphics/common/GraphicsOptions.hpp"
-#include "bk/IEventQueue.hpp"
 
 namespace arb {
 
@@ -24,6 +24,8 @@ CoreContext::CoreContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
   }
 
   device = physicalDevice.createDevice(surface);
+
+  swapchain = std::make_shared<Swapchain>(&physicalDevice, &surface, device, options.initialSize);
 }
 
 CoreContext::~CoreContext() {
