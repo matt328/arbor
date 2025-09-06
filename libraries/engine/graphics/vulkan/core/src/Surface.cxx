@@ -4,19 +4,20 @@
 
 namespace arb {
 
-Surface::Surface(std::shared_ptr<Instance> newInstance, void* hwnd)
-    : instance{std::move(newInstance)} {
+Surface::Surface(VkInstance newInstance, void* hwnd) : instance{newInstance} {
   const auto createInfo = VkWin32SurfaceCreateInfoKHR{
       .sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR,
       .hinstance = GetModuleHandle(nullptr),
       .hwnd = static_cast<HWND>(hwnd),
   };
-  checkVk(vkCreateWin32SurfaceKHR(*instance, &createInfo, nullptr, &vkSurface),
+  Log->trace("Creating Surface");
+  checkVk(vkCreateWin32SurfaceKHR(instance, &createInfo, nullptr, &vkSurface),
           "createWin32SurfaceKHR");
 }
 
 Surface::~Surface() {
-  vkDestroySurfaceKHR(*instance, vkSurface, nullptr);
+  Log->trace("Destroying Surface");
+  vkDestroySurfaceKHR(instance, vkSurface, nullptr);
 }
 
 }

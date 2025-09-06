@@ -12,7 +12,7 @@ namespace arb {
 class Device;
 class Swapchain;
 
-class CoreContext {
+class CoreContext : NonCopyableMovable {
 public:
   CoreContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
               const GraphicsOptions& newOptions,
@@ -21,11 +21,11 @@ public:
 
 private:
   GraphicsOptions options;
-  std::shared_ptr<Instance> vulkanInstance;
+  Instance vulkanInstance;
   Surface surface;
   PhysicalDevice physicalDevice;
   std::shared_ptr<Device> device;
-  std::shared_ptr<Swapchain> swapchain;
+  std::unique_ptr<Swapchain> swapchain;
 
   std::shared_ptr<bk::IEventQueue> eventQueue;
 };

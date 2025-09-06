@@ -67,6 +67,7 @@ target_compile_definitions(${PROJECT_NAME}
   TRACY_NO_EXIT
   TRACY_CALLSTACK=5
   NOMINMAX
+  DEBUG
 )
 
 target_precompile_headers(${PROJECT_NAME}

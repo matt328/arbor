@@ -11,6 +11,10 @@ public:
 
   auto waitIdle() -> void;
 
+  operator VkDevice() const {
+    return vkDevice;
+  }
+
 private:
   VkDevice vkDevice;
   const PhysicalDevice* physicalDevice;

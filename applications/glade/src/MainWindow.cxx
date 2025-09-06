@@ -50,15 +50,15 @@ MainWindow::MainWindow(QWidget* parent)
   };
 
   context = arb::makeEngineContext(handle, options);
-  auto eventQueue = context->getEventQueue();
+  eventQueue = context->getEventQueue();
+
+  assetAdapter = new gld::AssetAdapter(eventQueue, this);
 
   connect(ui->displayWidget, &gld::DisplayWidget::resized, this, [&](QSize size) {
     eventQueue->emitEvent<arb::ResizeEvent>(
         arb::ResizeEvent{.width = static_cast<uint32_t>(size.width()),
                          .height = static_cast<uint32_t>(size.height())});
   });
-
-  assetAdapter = new gld::AssetAdapter(eventQueue, this);
 }
 
 MainWindow::~MainWindow() {

@@ -36,6 +36,7 @@ target_link_libraries(${PROJECT_NAME}
   base-kit
   graphics::base
   graphics::common
+  engine::common
   ${Vulkan_LIBRARIES}
 )
 
@@ -49,4 +50,6 @@ target_include_directories(${PROJECT_NAME}
   runtime/include
   core/include
   core/src
+  common/include
+  common/src
 )

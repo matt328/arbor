@@ -7,10 +7,27 @@ namespace arb {
 class Surface;
 class PhysicalDevice;
 
-class Instance : public NonCopyableMovable {
+class Instance : public NonCopyable {
 public:
   Instance(const GraphicsOptions& newOptions);
   ~Instance();
+
+  Instance(Instance&& other) noexcept
+      : vkInstance(other.vkInstance), debugMessenger(other.debugMessenger) {
+    other.vkInstance = VK_NULL_HANDLE;
+    other.debugMessenger = VK_NULL_HANDLE;
+  }
+
+  auto operator=(Instance&& other) noexcept -> Instance& {
+    if (this != &other) {
+      cleanup();
+      vkInstance = other.vkInstance;
+      debugMessenger = other.debugMessenger;
+      other.vkInstance = VK_NULL_HANDLE;
+      other.debugMessenger = VK_NULL_HANDLE;
+    }
+    return *this;
+  }
 
   auto enumeratePhysicalDevices(const Surface& surface) -> std::vector<PhysicalDevice>;
   [[nodiscard]] auto getHandle() const -> VkInstance;
@@ -32,6 +49,13 @@ private:
                 VkDebugUtilsMessageTypeFlagsEXT type,
                 const VkDebugUtilsMessengerCallbackDataEXT* callbackData,
                 void* userData) -> VkBool32;
+
+  void cleanup() {
+    if (vkInstance != VK_NULL_HANDLE) {
+      vkDestroyInstance(vkInstance, nullptr);
+      vkInstance = VK_NULL_HANDLE;
+    }
+  }
 };
 
 }

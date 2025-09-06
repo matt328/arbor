@@ -165,7 +165,7 @@ auto PhysicalDevice::handle() const -> VkPhysicalDevice {
   uint32_t formatCount;
   checkVk(vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice, *surface, &formatCount, nullptr),
           "vkGetPhysicalDeviceSurfaceFormatsKHR(count)");
-  auto surfaceFormats = std::vector<VkSurfaceFormatKHR>{};
+  auto surfaceFormats = std::vector<VkSurfaceFormatKHR>{formatCount};
   checkVk(vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice,
                                                *surface,
                                                &formatCount,

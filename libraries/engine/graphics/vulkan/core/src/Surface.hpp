@@ -6,7 +6,7 @@ class Instance;
 
 class Surface : NonCopyableMovable {
 public:
-  Surface(std::shared_ptr<Instance> newInstance, void* hwnd);
+  Surface(VkInstance newInstance, void* hwnd);
   ~Surface();
 
   operator VkSurfaceKHR() const {
@@ -15,7 +15,7 @@ public:
 
 private:
   VkSurfaceKHR vkSurface{};
-  std::shared_ptr<Instance> instance;
+  VkInstance instance;
 };
 
 }
