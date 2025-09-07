@@ -17,6 +17,15 @@ endif()
 set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS ON CACHE INTERNAL "" FORCE)
 
+# glm
+FetchContent_Declare(
+  glm
+  GIT_REPOSITORY https://github.com/g-truc/glm.git
+  GIT_TAG ${GLM_VERSION}
+  SYSTEM
+)
+FetchContent_MakeAvailable(glm)
+
 # spdlog
 set(SPDLOG_USE_STD_FORMAT ON)
 set(SPDLOG_BUILD_SHARED OFF)

@@ -23,7 +23,6 @@ target_link_libraries(${PROJECT_NAME}
   PUBLIC
   gameplay
   graphics::base
-  base-kit
   engine::common
 )
 

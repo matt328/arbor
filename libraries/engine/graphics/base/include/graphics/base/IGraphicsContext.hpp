@@ -1,5 +1,7 @@
 #pragma once
 
+#include "engine/common/SimState.hpp"
+#include "engine/common/TripleBuffer.hpp"
 #include "graphics/common/GraphicsOptions.hpp"
 #include "bk/IEventQueue.hpp"
 #include "bk/NativeWindowHandle.hpp"
@@ -13,6 +15,7 @@ public:
 };
 
 auto makeGraphicsContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
+                         IStateBuffer<SimState>& newSimStateBuffer,
                          const GraphicsOptions& newOptions,
                          bk::NativeWindowHandle newWindowHandle)
     -> std::unique_ptr<IGraphicsContext>;

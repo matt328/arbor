@@ -4,6 +4,7 @@
 #include "graphics/common/GraphicsOptions.hpp"
 #include "bk/EventQueue2.hpp"
 #include "engine/common/EngineOptions.hpp"
+#include "engine/common/TripleBuffer.hpp"
 
 namespace arb {
 EngineContext::EngineContext(bk::NativeWindowHandle newWindowHandle, EngineOptions engineOptions)
@@ -11,6 +12,7 @@ EngineContext::EngineContext(bk::NativeWindowHandle newWindowHandle, EngineOptio
   Log->trace("Creating EngineContext");
 
   eventQueue = std::make_shared<bk::EventQueue>();
+  simStateBuffer = std::make_unique<TripleBuffer<SimState>>();
 
   gameThread = std::jthread([this](std::stop_token token) {
     try {
@@ -31,9 +33,12 @@ EngineContext::EngineContext(bk::NativeWindowHandle newWindowHandle, EngineOptio
       EngineOptions::Size size = engineOptions.initialSize;
       auto graphicsContext = makeGraphicsContext(
           eventQueue,
+          *simStateBuffer,
           GraphicsOptions{.debugEnabled = engineOptions.debugEnabled,
                           .initialSize = {.width = engineOptions.initialSize.width,
-                                          .height = engineOptions.initialSize.height}},
+                                          .height = engineOptions.initialSize.height},
+                          .framesInFlight = 3},
+
           windowHandle);
       graphicsContext->run(token);
     } catch (const std::exception& e) {
@@ -67,8 +72,8 @@ auto EngineContext::getEventQueue() const -> std::shared_ptr<bk::IEventQueue> {
 }
 
 auto makeEngineContext(bk::NativeWindowHandle newWindowHandle, EngineOptions engineOptions)
-    -> std::shared_ptr<IEngineContext> {
-  return std::make_shared<EngineContext>(newWindowHandle, engineOptions);
+    -> std::unique_ptr<IEngineContext> {
+  return std::make_unique<EngineContext>(newWindowHandle, engineOptions);
 }
 
 }

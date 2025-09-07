@@ -11,6 +11,11 @@ struct VulkanObjectType<VkSemaphore> {
 };
 
 template <>
+struct VulkanObjectType<VkFence> {
+  static constexpr VkObjectType value = VK_OBJECT_TYPE_FENCE;
+};
+
+template <>
 struct VulkanObjectType<VkBuffer> {
   static constexpr VkObjectType value = VK_OBJECT_TYPE_BUFFER;
 };

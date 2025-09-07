@@ -49,6 +49,7 @@ MainWindow::MainWindow(QWidget* parent)
                       .height = static_cast<uint32_t>(ui->displayWidget->height())},
   };
 
+  // Make EngineContext a unique_ptr
   context = arb::makeEngineContext(handle, options);
   eventQueue = context->getEventQueue();
 

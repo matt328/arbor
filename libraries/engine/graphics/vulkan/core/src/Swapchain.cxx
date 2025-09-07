@@ -1,10 +1,10 @@
-#include "Swapchain.hpp"
-#include "Device.hpp"
+#include "core/Swapchain.hpp"
+#include "core/Device.hpp"
 #include "ErrorUtils.hpp"
 #include "PhysicalDevice.hpp"
 #include "Surface.hpp"
-#include "ImageView.hpp"
-#include "Semaphore.hpp"
+#include "common/ImageView.hpp"
+#include "common/Semaphore.hpp"
 #include "bk/IEventQueue.hpp"
 #include "engine/common/EngineEvents.hpp"
 
@@ -29,6 +29,29 @@ Swapchain::~Swapchain() {
   if (currentSwapchain != VK_NULL_HANDLE) {
     vkDestroySwapchainKHR(device, currentSwapchain, nullptr);
   }
+}
+
+auto Swapchain::acquireNextImage(const Semaphore& semaphore)
+    -> std::variant<uint32_t, ImageAcquireResult> {
+  uint32_t imageIndex{};
+  auto result = vkAcquireNextImageKHR(device,
+                                      currentSwapchain,
+                                      UINT64_MAX,
+                                      semaphore,
+                                      VK_NULL_HANDLE,
+                                      &imageIndex);
+  if (result == VK_SUCCESS) {
+    return imageIndex;
+  }
+
+  if (result == VK_SUBOPTIMAL_KHR || result == VK_ERROR_OUT_OF_DATE_KHR) {
+    return ImageAcquireResult::NeedsResize;
+  }
+
+  return ImageAcquireResult::Error;
+}
+
+auto Swapchain::recreate() -> void {
 }
 
 auto Swapchain::createSwapchain() -> void {

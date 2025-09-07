@@ -19,6 +19,14 @@ public:
               bk::NativeWindowHandle newWindowHandle);
   ~CoreContext();
 
+  [[nodiscard]] auto getDevice() const -> Device& {
+    return *device;
+  }
+
+  [[nodiscard]] auto getSwapchain() const -> Swapchain& {
+    return *swapchain;
+  }
+
 private:
   GraphicsOptions options;
   Instance vulkanInstance;

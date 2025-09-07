@@ -1,4 +1,4 @@
-#include "Device.hpp"
+#include "core/Device.hpp"
 
 namespace arb {
 

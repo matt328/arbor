@@ -1,15 +1,22 @@
 #include "vulkan/base/VulkanContext.hpp"
 #include "bk/IEventQueue.hpp"
 #include "core/CoreContext.hpp"
+#include "engine/common/SimState.hpp"
+#include "renderer/RenderContext.hpp"
 
 namespace arb {
 
 VulkanContext::VulkanContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
+                             IStateBuffer<SimState>& simStateBuffer,
                              const GraphicsOptions& newOptions,
                              bk::NativeWindowHandle newWindowHandle)
     : eventQueue{std::move(newEventQueue)} {
-  Log->trace("Constructing VulkanContext");
+  Log->trace("Creating VulkanContext");
   coreContext = std::make_shared<CoreContext>(eventQueue, newOptions, newWindowHandle);
+  renderContext = std::make_unique<RenderContext>(newOptions,
+                                                  coreContext->getDevice(),
+                                                  coreContext->getSwapchain(),
+                                                  simStateBuffer);
 }
 
 VulkanContext::~VulkanContext() {
@@ -39,10 +46,14 @@ auto VulkanContext::run(std::stop_token token) -> void {
 }
 
 auto makeGraphicsContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
+                         IStateBuffer<SimState>& newSimStateBuffer,
                          const GraphicsOptions& newOptions,
                          bk::NativeWindowHandle newWindowHandle)
     -> std::unique_ptr<IGraphicsContext> {
-  return std::make_unique<VulkanContext>(std::move(newEventQueue), newOptions, newWindowHandle);
+  return std::make_unique<VulkanContext>(std::move(newEventQueue),
+                                         newSimStateBuffer,
+                                         newOptions,
+                                         newWindowHandle);
 }
 
 }

@@ -1,14 +1,14 @@
 project("vulkan")
 
+add_subdirectory(core)
+
 set(vulkan_SRC
   base/src/VulkanContext.cxx
 
-  core/src/CoreContext.cxx
-  core/src/Device.cxx
-  core/src/Instance.cxx
-  core/src/PhysicalDevice.cxx
-  core/src/Surface.cxx
-  core/src/Swapchain.cxx
+  renderer/src/FrameManager.cxx
+  renderer/src/RenderContext.cxx
+  renderer/src/Frame.cxx
+  renderer/src/PerFrameUploader.cxx
 )
 
 add_library(${PROJECT_NAME} STATIC ${vulkan_SRC})
@@ -27,17 +27,24 @@ target_precompile_headers(${PROJECT_NAME}
   <limits>
   <string_view>
   <string>
+  <variant>
+
+  <glm/glm.hpp>
+  <glm/ext/matrix_clip_space.hpp>
+  <glm/gtc/quaternion.hpp>
 
   <vulkan/vulkan.h>
 )
 
 target_link_libraries(${PROJECT_NAME}
   PUBLIC
-  base-kit
+  glm
   graphics::base
   graphics::common
   engine::common
   ${Vulkan_LIBRARIES}
+  PRIVATE
+  vulkan::core
 )
 
 target_include_directories(${PROJECT_NAME}
@@ -48,8 +55,6 @@ target_include_directories(${PROJECT_NAME}
   base/src
   renderer/include
   runtime/include
-  core/include
-  core/src
   common/include
   common/src
 )

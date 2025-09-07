@@ -1,6 +1,7 @@
 #pragma once
 
 #include "graphics/common/GraphicsOptions.hpp"
+#include "common/ImageAcquireResult.hpp"
 
 namespace bk {
 class IEventQueue;
@@ -22,6 +23,10 @@ public:
             std::shared_ptr<bk::IEventQueue> newEventQueue,
             GraphicsOptions::Size initialSize);
   ~Swapchain();
+
+  auto acquireNextImage(const Semaphore& semaphore) -> std::variant<uint32_t, ImageAcquireResult>;
+
+  auto recreate() -> void;
 
 private:
   PhysicalDevice* physicalDevice;

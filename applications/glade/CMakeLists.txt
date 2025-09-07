@@ -54,7 +54,6 @@ target_link_libraries(${PROJECT_NAME}
   Qt${QT_VERSION_MAJOR}::Widgets
   Qt${QT_VERSION_MAJOR}::Svg
   QWindowKit::Widgets
-  base-kit
   engine::base
   engine::common
 )
@@ -141,6 +140,12 @@ target_include_directories(${PROJECT_NAME}
   .
   src
 )
+
+get_target_property(dirs engine::common INTERFACE_INCLUDE_DIRECTORIES)
+message(STATUS "engine::common include dirs: ${dirs}")
+
+get_target_property(dirs base-kit INTERFACE_INCLUDE_DIRECTORIES)
+message(STATUS "base::kit include dirs: ${dirs}")
 
 set(QT_PLUGINS_DIR "C:/Qt/6.9.1/msvc2022_64/plugins/")
 

@@ -53,7 +53,7 @@ private:
 
   QWK::WidgetWindowAgent* windowAgent;
 
-  std::shared_ptr<arb::IEngineContext> context;
+  std::unique_ptr<arb::IEngineContext> context;
   std::shared_ptr<bk::IEventQueue> eventQueue;
   gld::AssetAdapter* assetAdapter;
 

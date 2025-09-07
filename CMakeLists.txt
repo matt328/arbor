@@ -23,6 +23,7 @@ endif()
 
 set(SPDLOG_VERSION v1.15.3)
 set(CEREAL_VERSION v1.3.2)
+set(GLM_VERSION 1.0.1)
 
 include(dependencies)
 

@@ -10,9 +10,10 @@ class IEngineContext : public NonCopyableMovable {
 public:
   [[nodiscard]] virtual auto getEventQueue() const -> std::shared_ptr<bk::IEventQueue> = 0;
   virtual auto update() -> void = 0;
+  virtual ~IEngineContext() = default;
 };
 
 auto makeEngineContext(bk::NativeWindowHandle windowHandle, EngineOptions engineOptions)
-    -> std::shared_ptr<IEngineContext>;
+    -> std::unique_ptr<IEngineContext>;
 
 }
