@@ -1,5 +1,5 @@
 #include "PhysicalDevice.hpp"
-#include "Device.hpp"
+#include "core/Device.hpp"
 #include "DeviceFeatures.hpp"
 #include "ErrorUtils.hpp"
 #include "Surface.hpp"

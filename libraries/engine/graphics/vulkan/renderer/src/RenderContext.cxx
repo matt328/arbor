@@ -1,8 +1,10 @@
 #include "renderer/RenderContext.hpp"
-#include "FrameManager.hpp"
+
 #include "graphics/common/GraphicsOptions.hpp"
-#include "Device.hpp"
-#include "Swapchain.hpp"
+#include "core/Device.hpp"
+#include "core/Swapchain.hpp"
+
+#include "FrameManager.hpp"
 #include "PerFrameUploader.hpp"
 
 namespace arb {

@@ -1,9 +1,11 @@
 #include "FrameManager.hpp"
 
-#include "Frame.hpp"
-#include "graphics/common/GraphicsOptions.hpp"
 #include "core/Device.hpp"
 #include "core/Swapchain.hpp"
+
+#include "graphics/common/GraphicsOptions.hpp"
+
+#include "Frame.hpp"
 
 namespace arb {
 FrameManager::FrameManager(const GraphicsOptions& graphicsOptions,

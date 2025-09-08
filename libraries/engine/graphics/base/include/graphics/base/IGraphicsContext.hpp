@@ -1,7 +1,7 @@
 #pragma once
 
+#include "engine/common/IStateBuffer.hpp"
 #include "engine/common/SimState.hpp"
-#include "engine/common/TripleBuffer.hpp"
 #include "graphics/common/GraphicsOptions.hpp"
 #include "bk/IEventQueue.hpp"
 #include "bk/NativeWindowHandle.hpp"

@@ -1,23 +1,16 @@
-project("vulkan-core")
+project("vulkan-renderer")
 
-set(vulkancore_SRC
-  src/CoreContext.cxx
-  src/Device.cxx
-  src/Instance.cxx
-  src/PhysicalDevice.cxx
-  src/Surface.cxx
-  src/Swapchain.cxx
+set(vulkanrenderer_SRC
+  src/Frame.cxx
+  src/FrameManager.cxx
+  src/PerFrameUploader.cxx
+  src/RenderContext.cxx
 )
 
-add_library(${PROJECT_NAME} STATIC ${vulkancore_SRC})
-add_library(vulkan::core ALIAS ${PROJECT_NAME})
+add_library(${PROJECT_NAME} STATIC ${vulkanrenderer_SRC})
+add_library(vulkan::renderer ALIAS ${PROJECT_NAME})
 
 find_package(Vulkan REQUIRED)
-
-target_compile_definitions(${PROJECT_NAME}
-  PRIVATE
-  VK_USE_PLATFORM_WIN32_KHR
-)
 
 target_precompile_headers(${PROJECT_NAME}
   PUBLIC
@@ -43,6 +36,7 @@ target_link_libraries(${PROJECT_NAME}
   PUBLIC
   base-kit
   vulkan::common
+  vulkan::core
   graphics::common
   engine::common
   ${Vulkan_LIBRARIES}

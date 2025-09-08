@@ -24,19 +24,19 @@ auto PerFrameUploader::collectGeometryDetails(SimState& state) -> void {
   materialCache.clear();
 
   for (size_t i = 0; i < state.objectMetadata.size(); ++i) {
-    auto regionHandle = geometryHandleMapper->toInternal(state.stateHandles[i].geometryHandle);
-    auto regionData = geometryAllocator->getRegionData(*regionHandle);
+    // auto regionHandle = geometryHandleMapper->toInternal(state.stateHandles[i].geometryHandle);
+    // auto regionData = geometryAllocator->getRegionData(*regionHandle);
 
-    geometryRegionCache.push_back(regionData);
+    // geometryRegionCache.push_back(regionData);
 
-    state.objectMetadata[i].geometryRegionId = geometryRegionCache.size() - 1;
+    // state.objectMetadata[i].geometryRegionId = geometryRegionCache.size() - 1;
 
-    if (state.stateHandles[i].textureHandle) {
-      auto textureHandle = textureHandleMapper->toInternal(*state.stateHandles[i].textureHandle);
-      auto textureId = textureArena->getTextureIndex(*textureHandle);
-      materialCache.push_back(
-          gpu::Material{.baseColor = {1.f, 0.f, 0.f, 1.f}, .albedoTextureId = textureId});
-    }
+    // if (state.stateHandles[i].textureHandle) {
+    //   auto textureHandle = textureHandleMapper->toInternal(*state.stateHandles[i].textureHandle);
+    //   auto textureId = textureArena->getTextureIndex(*textureHandle);
+    //   materialCache.push_back(
+    //       gpu::Material{.baseColor = {1.f, 0.f, 0.f, 1.f}, .albedoTextureId = textureId});
+    // }
   }
 }
 

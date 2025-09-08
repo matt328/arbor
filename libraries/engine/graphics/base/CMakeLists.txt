@@ -22,7 +22,9 @@ target_precompile_headers(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
   PUBLIC
   base-kit
-  vulkan
+  graphics::common
+  engine::common
+  vulkan::base
 )
 
 target_include_directories(${PROJECT_NAME}

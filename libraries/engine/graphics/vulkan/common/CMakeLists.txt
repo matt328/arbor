@@ -1,0 +1,30 @@
+project("vulkan-common")
+
+set(vulkancommon_SRC
+  src/Placeholder.cxx
+)
+
+add_library(${PROJECT_NAME} STATIC ${vulkancommon_SRC})
+add_library(vulkan::common ALIAS ${PROJECT_NAME})
+
+find_package(Vulkan REQUIRED)
+
+target_precompile_headers(${PROJECT_NAME}
+  PUBLIC
+
+  <string_view>
+
+  <vulkan/vulkan.h>
+)
+
+target_include_directories(${PROJECT_NAME}
+  PUBLIC
+  include
+  ${Vulkan_INCLUDE_DIRS}
+  PRIVATE
+  src
+)
+
+target_link_libraries(${PROJECT_NAME}
+  PUBLIC
+)
