@@ -1,11 +1,16 @@
 #include "core/CoreContext.hpp"
+
+#include "bk/Logger.hpp"
+#include "bk/IEventQueue.hpp"
+
+#include "graphics/common/GraphicsOptions.hpp"
+
 #include "core/Swapchain.hpp"
 #include "core/Device.hpp"
+
 #include "PhysicalDevice.hpp"
 #include "Surface.hpp"
-#include "bk/IEventQueue.hpp"
 #include "Instance.hpp"
-#include "graphics/common/GraphicsOptions.hpp"
 
 namespace arb {
 
@@ -13,7 +18,7 @@ CoreContext::CoreContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
                          const GraphicsOptions& newOptions,
                          bk::NativeWindowHandle newWindowHandle)
     : options{newOptions}, eventQueue{std::move(newEventQueue)} {
-  Log->trace("Creating CoreContext");
+  Log::trace("Creating CoreContext");
 
   vulkanInstance = std::make_unique<Instance>(newOptions);
   surface = std::make_unique<Surface>(*vulkanInstance, newWindowHandle.get<HWND>());
@@ -36,7 +41,7 @@ CoreContext::CoreContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
 }
 
 CoreContext::~CoreContext() {
-  Log->trace("Destroying CoreContext");
+  Log::trace("Destroying CoreContext");
 }
 
 }

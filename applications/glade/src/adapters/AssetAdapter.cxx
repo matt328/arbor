@@ -1,4 +1,7 @@
 #include "AssetAdapter.hpp"
+
+#include "bk/Logger.hpp"
+
 #include "ImportModelDetails.hpp"
 
 namespace gld {
@@ -8,13 +11,13 @@ AssetAdapter::AssetAdapter(std::shared_ptr<bk::IEventQueue> newEventQueue, QObje
 }
 
 auto AssetAdapter::importModel(const ImportModelDetails& details) -> void {
-  Log->trace("adapter importing model details: filename={}, id={}",
+  Log::trace("adapter importing model details: filename={}, id={}",
              details.filename.toStdString(),
              details.identifier.toStdString());
 }
 
 auto AssetAdapter::removeModel(uint32_t id) -> void {
-  Log->trace("adapter removing model with id={}", id);
+  Log::trace("adapter removing model with id={}", id);
 }
 
 }

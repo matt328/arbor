@@ -2,6 +2,7 @@
 
 #include "graphics/common/GraphicsOptions.hpp"
 #include "common/ImageAcquireResult.hpp"
+#include "bk/NonCopyMove.hpp"
 
 namespace bk {
 class IEventQueue;

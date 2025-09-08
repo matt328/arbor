@@ -1,14 +1,16 @@
 #include "PerFrameUploader.hpp"
 
+#include "bk/Logger.hpp"
+
 namespace arb {
 
 PerFrameUploader::PerFrameUploader(IStateBuffer<SimState>& newStateBuffer)
     : stateBuffer(newStateBuffer) {
-  Log->trace("Constructing PerFrameUploader");
+  Log::trace("Constructing PerFrameUploader");
 }
 
 PerFrameUploader::~PerFrameUploader() {
-  Log->trace("Destroying PerFrameUploader");
+  Log::trace("Destroying PerFrameUploader");
 }
 
 auto PerFrameUploader::upload() -> void {

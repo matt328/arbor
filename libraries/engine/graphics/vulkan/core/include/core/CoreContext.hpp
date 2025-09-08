@@ -2,6 +2,8 @@
 
 #include "bk/IEventQueue.hpp"
 #include "bk/NativeWindowHandle.hpp"
+#include "bk/NonCopyMove.hpp"
+
 #include "graphics/common/GraphicsOptions.hpp"
 
 namespace arb {

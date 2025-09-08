@@ -1,6 +1,10 @@
 #pragma once
 
+#include "bk/Logger.hpp"
+
 #include "IStateBuffer.hpp"
+
+#include <array>
 
 namespace arb {
 
@@ -46,7 +50,7 @@ public:
       }
       std::this_thread::sleep_for(std::chrono::microseconds(DefaultSleep));
     }
-    Log->warn("Couldn't checkout for read after {} retries, returning nullopt", maxRetries);
+    Log::warn("Couldn't checkout for read after {} retries, returning nullopt", maxRetries);
     return std::nullopt;
   }
 

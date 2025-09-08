@@ -1,6 +1,9 @@
 #pragma once
 
 #include "IEventQueue.hpp"
+#include <mutex>
+#include <deque>
+#include "Logger.hpp"
 
 namespace bk {
 
@@ -16,10 +19,10 @@ struct ThreadLocalData {
 class EventQueue : public IEventQueue {
 public:
   EventQueue() {
-    Log->trace("Constructing EventQueue");
+    Log::trace("Constructing EventQueue");
   }
   ~EventQueue() {
-    Log->trace("Destroying EventQueue");
+    Log::trace("Destroying EventQueue");
   }
 
   void emitErased(std::type_index type,

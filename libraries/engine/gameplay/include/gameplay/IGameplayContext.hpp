@@ -1,6 +1,8 @@
 #pragma once
 
 #include "bk/IEventQueue.hpp"
+#include "bk/NonCopyMove.hpp"
+
 namespace arb {
 
 class IGameplayContext : public NonCopyableMovable {

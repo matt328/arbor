@@ -1,4 +1,6 @@
 #include "GameplayContext.hpp"
+
+#include "bk/Logger.hpp"
 #include "bk/IEventQueue.hpp"
 
 namespace arb {
@@ -10,15 +12,15 @@ auto makeGameplayContext(std::shared_ptr<bk::IEventQueue> newEventQueue)
 
 GameplayContext::GameplayContext(std::shared_ptr<bk::IEventQueue> newEventQueue)
     : eventQueue{std::move(newEventQueue)} {
-  Log->trace("Creating GameplayContext");
+  Log::trace("Creating GameplayContext");
 }
 
 GameplayContext::~GameplayContext() {
-  Log->trace("Destroying GameplayContext");
+  Log::trace("Destroying GameplayContext");
 }
 
 auto GameplayContext::run(std::stop_token token) -> void {
-  Log->trace("GameplayContext::run()");
+  Log::trace("GameplayContext::run()");
   using clock = std::chrono::steady_clock;
   constexpr int targetHz = 2;
   constexpr auto timestep = std::chrono::nanoseconds(1'000'000'000 / targetHz);
@@ -27,7 +29,7 @@ auto GameplayContext::run(std::stop_token token) -> void {
   while (!token.stop_requested()) {
     auto now = clock::now();
     if (now >= nextTick) {
-      Log->trace("tick()");
+      Log::trace("tick()");
       eventQueue->dispatchPending();
       nextTick += timestep;
       if (now > nextTick + timestep * 10) {

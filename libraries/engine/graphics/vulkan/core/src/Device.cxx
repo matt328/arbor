@@ -1,16 +1,18 @@
 #include "core/Device.hpp"
 
+#include "bk/Logger.hpp"
+
 namespace arb {
 
 Device::Device(VkDevice newDevice, PhysicalDevice* newPhysicalDevice)
     : vkDevice{newDevice}, physicalDevice{newPhysicalDevice} {
-  Log->trace("Creating Device");
+  Log::trace("Creating Device");
 }
 
 Device::~Device() {
   if (vkDevice != nullptr) {
     vkDestroyDevice(vkDevice, nullptr);
-    Log->trace("Destroyed Device");
+    Log::trace("Destroyed Device");
   }
 }
 

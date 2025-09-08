@@ -2,6 +2,7 @@
 
 #include "bk/NativeWindowHandle.hpp"
 #include "bk/IEventQueue.hpp"
+#include "bk/NonCopyMove.hpp"
 #include "engine/common/EngineOptions.hpp"
 
 namespace arb {

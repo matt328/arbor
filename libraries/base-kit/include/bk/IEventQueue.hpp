@@ -1,5 +1,10 @@
 #pragma once
 
+#include <typeindex>
+#include <memory>
+#include <string>
+#include <functional>
+
 namespace bk {
 
 class IEventQueue {

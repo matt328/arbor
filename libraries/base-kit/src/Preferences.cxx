@@ -1,5 +1,13 @@
 #include "bk/Preferences.hpp"
 
+#include "bk/Logger.hpp"
+
+#include <fstream>
+
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/unordered_map.hpp>
+#include <cereal/types/string.hpp>
+
 namespace bk {
 
 Preferences::Preferences(std::filesystem::path newPath) : path{std::move(newPath)} {
@@ -13,7 +21,7 @@ Preferences::Preferences(std::filesystem::path newPath) : path{std::move(newPath
       cereal::BinaryOutputArchive output(o);
       output(preferencesData);
     } else {
-      Log->warn("Failed to create preferences file");
+      Log::warn("Failed to create preferences file");
     }
   }
 
@@ -23,12 +31,12 @@ Preferences::Preferences(std::filesystem::path newPath) : path{std::move(newPath
       input(preferencesData);
       loaded = true;
     } else {
-      Log->warn("Error reading application preferences from: {0}", path.string());
+      Log::error("Error reading application preferences from: {0}", path.string());
     }
   } catch (const std::exception& ex) {
-    Log->warn("Error reading application preferences from: {0}, {1}", path.string(), ex.what());
+    Log::warn("Error reading application preferences from: {0}, {1}", path.string(), ex.what());
   }
-  Log->debug("Loaded preferences");
+  Log::trace("Loaded preferences");
 }
 
 auto Preferences::put(const std::string& key, const std::string& value) -> void {
@@ -42,7 +50,7 @@ void Preferences::save() const {
     cereal::BinaryOutputArchive output{o};
     output(preferencesData);
   } else {
-    Log->warn("Error saving application preferences to file: {0}", path.string());
+    Log::info("Error saving application preferences to file: {0}", path.string());
   }
 }
 

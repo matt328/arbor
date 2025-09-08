@@ -1,6 +1,7 @@
 #pragma once
 
 #include "graphics/common/GraphicsOptions.hpp"
+#include "bk/NonCopyMove.hpp"
 
 namespace arb {
 

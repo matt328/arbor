@@ -1,4 +1,8 @@
 #include "vulkan/base/VulkanContext.hpp"
+
+#include <thread>
+
+#include "bk/Logger.hpp"
 #include "bk/IEventQueue.hpp"
 #include "core/CoreContext.hpp"
 #include "engine/common/SimState.hpp"
@@ -11,7 +15,7 @@ VulkanContext::VulkanContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
                              const GraphicsOptions& newOptions,
                              bk::NativeWindowHandle newWindowHandle)
     : eventQueue{std::move(newEventQueue)} {
-  Log->trace("Creating VulkanContext");
+  Log::trace("Creating VulkanContext");
   coreContext = std::make_shared<CoreContext>(eventQueue, newOptions, newWindowHandle);
   renderContext = std::make_unique<RenderContext>(newOptions,
                                                   coreContext->getDevice(),
@@ -20,11 +24,11 @@ VulkanContext::VulkanContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
 }
 
 VulkanContext::~VulkanContext() {
-  Log->trace("Destroying Vulkan Context");
+  Log::trace("Destroying Vulkan Context");
 }
 
 auto VulkanContext::run(std::stop_token token) -> void {
-  Log->trace("GraphicsContext::run()");
+  Log::trace("GraphicsContext::run()");
   using clock = std::chrono::steady_clock;
   constexpr int targetHz = 1;
   constexpr auto timestep = std::chrono::nanoseconds(1'000'000'000 / targetHz);
@@ -33,7 +37,7 @@ auto VulkanContext::run(std::stop_token token) -> void {
   while (!token.stop_requested()) {
     auto now = clock::now();
     if (now >= nextTick) {
-      Log->trace("graphicsContext tick()");
+      Log::trace("graphicsContext tick()");
       eventQueue->dispatchPending();
       nextTick += timestep;
       if (now > nextTick + timestep * 10) {

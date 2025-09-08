@@ -1,5 +1,12 @@
 #pragma once
 
+#include <string>
+#include <format>
+
+namespace spdlog {
+class logger;
+}
+
 namespace bk {
 
 const std::string LOG_PATTERN = "%I:%M:%S [%-10n] %^%-8l%$ %v";
@@ -7,66 +14,50 @@ const std::string LOG_PATTERN = "%I:%M:%S [%-10n] %^%-8l%$ %v";
 class LoggerManager {
 public:
   // Initialize a logger for the current thread (or module)
-  static void initLogger(const std::string &name) {
-    // Only create if not already registered
-    if (!spdlog::get(name)) {
-      auto console_sink =
-          std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-      std::vector<spdlog::sink_ptr> sinks{console_sink};
-      if (qt_sink()) {
-        sinks.push_back(qt_sink());
-      }
+  static void initLogger(const std::string& name);
 
-      auto logger =
-          std::make_shared<spdlog::logger>(name, sinks.begin(), sinks.end());
-      logger->set_pattern(LOG_PATTERN);
-      logger->set_level(spdlog::level::trace);
-      spdlog::register_logger(logger);
-    }
+  static auto logStringTrace(std::string message) -> void;
+  static auto logStringDebug(std::string message) -> void;
+  static auto logStringInfo(std::string message) -> void;
+  static auto logStringWarn(std::string message) -> void;
+  static auto logStringError(std::string message) -> void;
 
-    // Set the "current" logger pointer
-    current_logger() = spdlog::get(name);
+  template <typename... Args>
+  static auto trace(const std::string& fmt, Args&&... args) -> void {
+    const std::string message = std::vformat(fmt, std::make_format_args(args...));
+    logStringTrace(message);
+  }
+
+  template <typename... Args>
+  static auto debug(const std::string& fmt, Args&&... args) -> void {
+    const std::string message = std::vformat(fmt, std::make_format_args(args...));
+    logStringDebug(message);
+  }
+
+  template <typename... Args>
+  static auto info(const std::string& fmt, Args&&... args) -> void {
+    const std::string message = std::vformat(fmt, std::make_format_args(args...));
+    logStringInfo(message);
+  }
+
+  template <typename... Args>
+  static auto warn(const std::string& fmt, Args&&... args) -> void {
+    const std::string message = std::vformat(fmt, std::make_format_args(args...));
+    logStringWarn(message);
+  }
+  template <typename... Args>
+  static auto error(const std::string& fmt, Args&&... args) -> void {
+    const std::string message = std::vformat(fmt, std::make_format_args(args...));
+    logStringError(message);
   }
 
   // Access the current logger conveniently
-  static auto getLogger() -> std::shared_ptr<spdlog::logger> & {
+  static auto getLogger() -> std::shared_ptr<spdlog::logger>& {
     return current_logger();
   }
 
-  // Optional: register Qt sink
-  static void registerQtSink(spdlog::sink_ptr sink) {
-    qt_sink() = sink;
-    // Add it to all existing loggers
-    spdlog::details::registry::instance().apply_all(
-        [&](std::shared_ptr<spdlog::logger> logger) {
-          auto &sinks = logger->sinks();
-          sinks.push_back(sink); // or remove, depending on operation
-        });
-  }
-
-  // Unregister Qt sink safely
-  static void unregisterQtSink() {
-    if (!qt_sink()) {
-      return;
-    }
-
-    spdlog::details::registry::instance().apply_all(
-        [&](std::shared_ptr<spdlog::logger> logger) {
-          auto &sinks = logger->sinks();
-          sinks.erase(std::remove(sinks.begin(), sinks.end(), qt_sink()),
-                      sinks.end());
-        });
-
-    qt_sink().reset();
-  }
-
 private:
-  static auto qt_sink() -> spdlog::sink_ptr & {
-    static spdlog::sink_ptr s;
-    return s;
-  }
-
-  static std::shared_ptr<spdlog::logger> &current_logger() {
+  static std::shared_ptr<spdlog::logger>& current_logger() {
     static thread_local std::shared_ptr<spdlog::logger> logger;
     return logger;
   }
@@ -74,5 +65,5 @@ private:
 
 // Macros to preserve old usage
 #define InitLogger(name) bk::LoggerManager::initLogger(name)
-#define Log bk::LoggerManager::getLogger()
+#define Log bk::LoggerManager
 } // namespace bk

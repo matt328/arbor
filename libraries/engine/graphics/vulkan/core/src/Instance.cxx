@@ -1,4 +1,7 @@
 #include "Instance.hpp"
+
+#include "bk/Logger.hpp"
+
 #include "ErrorUtils.hpp"
 #include "graphics/common/GraphicsOptions.hpp"
 #include "PhysicalDevice.hpp"
@@ -6,7 +9,7 @@
 namespace arb {
 
 Instance::Instance(const GraphicsOptions& newOptions) {
-  Log->trace("Creating Vulkan Instance");
+  Log::trace("Creating Vulkan Instance");
   graphicsOptions = newOptions;
   const auto appInfo = VkApplicationInfo{.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
                                          .pApplicationName = "Arbor Application",
@@ -34,7 +37,7 @@ Instance::Instance(const GraphicsOptions& newOptions) {
   }
 
   checkVk(vkCreateInstance(&createInfo, nullptr, &vkInstance), "vkCreateInstance()");
-  Log->trace("Created Vulkan Instance");
+  Log::trace("Created Vulkan Instance");
 
   if (graphicsOptions.debugEnabled) {
     auto debugCreateInfo = VkDebugUtilsMessengerCreateInfoEXT{
@@ -58,12 +61,12 @@ Instance::Instance(const GraphicsOptions& newOptions) {
       throw std::runtime_error(
           "vkGetInstanceProcAddr failed to acquire vkCreateDebugUtilsMessengerEXT");
     }
-    Log->trace("Registered Debug Messenger");
+    Log::trace("Registered Debug Messenger");
   }
 }
 
 Instance::~Instance() {
-  Log->trace("Destroying Vulkan Instance");
+  Log::trace("Destroying Vulkan Instance");
   if (vkInstance != nullptr) {
     if (graphicsOptions.debugEnabled && debugMessenger != nullptr) {
       auto func = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(
@@ -71,7 +74,7 @@ Instance::~Instance() {
       if (func != nullptr) {
         func(vkInstance, debugMessenger, nullptr);
       } else {
-        Log->warn("vkGetInstanceProcAddr failed to acquire vkDestroyDebugUtilsMessengerEXT");
+        Log::warn("vkGetInstanceProcAddr failed to acquire vkDestroyDebugUtilsMessengerEXT");
       }
     }
     vkDestroyInstance(vkInstance, nullptr);
@@ -144,7 +147,7 @@ Instance::debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
                         const VkDebugUtilsMessengerCallbackDataEXT* callbackData,
                         void* userData) -> VkBool32 {
 
-  Log->debug("Vulkan Validation: {}", callbackData->pMessage);
+  Log::debug("Vulkan Validation: {}", callbackData->pMessage);
   return VK_FALSE;
 }
 

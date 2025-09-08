@@ -10,7 +10,6 @@
 #include <QWKWidgets/widgetwindowagent.h>
 
 #include "panels/AssetsPanel.hpp"
-#include "panels/LogPanel.hpp"
 #include "widget-frame/WindowBar.hpp"
 #include "widget-frame/WindowButton.hpp"
 
@@ -25,11 +24,8 @@ MainWindow::MainWindow(QWidget* parent)
 
   undoStack = new QUndoStack(this);
 
-  auto* logOutput = new gld::LogPanel(this);
-  ui->bottomPanelLayout->addWidget(logOutput);
-
   InitLogger("Main");
-  Log->info("Logger Initialized");
+  Log::info("Logger Initialized");
 
   setupActions();
   installWindowAgent();
@@ -63,7 +59,6 @@ MainWindow::MainWindow(QWidget* parent)
 }
 
 MainWindow::~MainWindow() {
-  bk::LoggerManager::unregisterQtSink();
   delete ui;
 }
 

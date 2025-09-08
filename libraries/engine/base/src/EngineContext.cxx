@@ -9,7 +9,7 @@
 namespace arb {
 EngineContext::EngineContext(bk::NativeWindowHandle newWindowHandle, EngineOptions engineOptions)
     : windowHandle{newWindowHandle} {
-  Log->trace("Creating EngineContext");
+  Log::trace("Creating EngineContext");
 
   eventQueue = std::make_shared<bk::EventQueue>();
   simStateBuffer = std::make_unique<TripleBuffer<SimState>>();
@@ -17,7 +17,7 @@ EngineContext::EngineContext(bk::NativeWindowHandle newWindowHandle, EngineOptio
   gameThread = std::jthread([this](std::stop_token token) {
     try {
       InitLogger("Game");
-      Log->trace("Game Thread Started");
+      Log::trace("Game Thread Started");
       auto gameplayContext = makeGameplayContext(eventQueue);
       gameplayContext->run(token);
     } catch (const std::exception& e) {
@@ -29,7 +29,7 @@ EngineContext::EngineContext(bk::NativeWindowHandle newWindowHandle, EngineOptio
   graphicsThread = std::jthread([this, &engineOptions](std::stop_token token) {
     try {
       InitLogger("Graphics");
-      Log->trace("Graphics Thread Started");
+      Log::trace("Graphics Thread Started");
       EngineOptions::Size size = engineOptions.initialSize;
       auto graphicsContext = makeGraphicsContext(
           eventQueue,
@@ -49,7 +49,7 @@ EngineContext::EngineContext(bk::NativeWindowHandle newWindowHandle, EngineOptio
 }
 
 EngineContext::~EngineContext() {
-  Log->trace("Destroying EngineContext");
+  Log::trace("Destroying EngineContext");
 }
 
 auto EngineContext::update() -> void {

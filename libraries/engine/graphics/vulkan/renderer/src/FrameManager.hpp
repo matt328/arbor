@@ -1,5 +1,7 @@
 #pragma once
 
+#include "bk/NonCopyMove.hpp"
+
 #include "common/ImageAcquireResult.hpp"
 
 namespace arb {

@@ -1,4 +1,9 @@
 #include "PhysicalDevice.hpp"
+
+#include <ranges>
+
+#include "bk/Logger.hpp"
+
 #include "core/Device.hpp"
 #include "DeviceFeatures.hpp"
 #include "ErrorUtils.hpp"
@@ -27,9 +32,9 @@ DeviceFeatures PhysicalDevice::RequiredFeatures = [] {
 }();
 
 PhysicalDevice::PhysicalDevice(VkPhysicalDevice handle) : vkPhysicalDevice{handle} {
-  Log->trace("Constructed PhysicalDevice");
+  Log::trace("Constructed PhysicalDevice");
   vkGetPhysicalDeviceProperties(vkPhysicalDevice, &properties);
-  Log->info("Using GPU: {} (API version {}.{}.{}), Driver version {}, Vendor ID: {}, Device ID: "
+  Log::info("Using GPU: {} (API version {}.{}.{}), Driver version {}, Vendor ID: {}, Device ID: "
             "{}, Type: {}",
             properties.deviceName,
             VK_VERSION_MAJOR(properties.apiVersion),
@@ -42,7 +47,7 @@ PhysicalDevice::PhysicalDevice(VkPhysicalDevice handle) : vkPhysicalDevice{handl
 }
 
 PhysicalDevice::~PhysicalDevice() {
-  Log->trace("Destroyed PhysicalDevice");
+  Log::trace("Destroyed PhysicalDevice");
 }
 
 auto PhysicalDevice::isSuitable(const Surface& surface) const -> bool {
@@ -65,7 +70,7 @@ auto PhysicalDevice::supportsExtensions() const -> bool {
       return std::strcmp(ext.extensionName, req) == 0;
     });
     if (!found) {
-      Log->warn("Device {}, Required Extension {} not present", deviceName, req);
+      Log::warn("Device {}, Required Extension {} not present", deviceName, req);
       return false;
     }
   }
@@ -280,7 +285,7 @@ auto PhysicalDevice::getQueueCreateInfo(std::vector<VkDeviceQueueCreateInfo>& qu
       queueFamilyIndices.presentFamilyCount.has_value()) {
     const uint32_t index = queueFamilyIndices.presentFamily.value();
     if (!usedQueueFamilies.contains(index)) {
-      Log->trace("Device supports separate present queue");
+      Log::trace("Device supports separate present queue");
 
       usedQueueFamilies.insert(index);
       const auto presentFamilyCreateInfo = VkDeviceQueueCreateInfo{
@@ -321,6 +326,30 @@ auto PhysicalDevice::getQueueCreateInfo(std::vector<VkDeviceQueueCreateInfo>& qu
       queueCreateInfo.push_back(computeFamilyCreateInfo);
     }
   }
+}
+
+void PhysicalDevice::logQueueFamilyIndices(const QueueFamilyIndices& qf) {
+  auto logFamily = [](const char* name,
+                      std::optional<uint32_t> index,
+                      std::optional<uint32_t> count,
+                      const std::vector<float>& priorities) {
+    if (index.has_value()) {
+      std::string prioStr;
+      for (size_t i = 0; i < priorities.size(); ++i) {
+        prioStr += std::to_string(priorities[i]);
+        if (i + 1 < priorities.size())
+          prioStr += ", ";
+      }
+      Log::trace("{}: index={} count={} priorities=[{}]", name, *index, *count, prioStr);
+    } else {
+      Log::trace("{}: not found", name);
+    }
+  };
+
+  logFamily("Graphics", qf.graphicsFamily, qf.graphicsFamilyCount, qf.graphicsFamilyPriorities);
+  logFamily("Compute", qf.computeFamily, qf.computeFamilyCount, qf.computeFamilyPriorities);
+  logFamily("Transfer", qf.transferFamily, qf.transferFamilyCount, qf.transferFamilyPriorities);
+  logFamily("Present", qf.presentFamily, qf.presentFamilyCount, qf.presentFamilyPriorities);
 }
 
 }

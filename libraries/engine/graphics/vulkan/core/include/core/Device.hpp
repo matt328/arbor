@@ -1,5 +1,7 @@
 #pragma once
 
+#include "bk/NonCopyMove.hpp"
+
 namespace arb {
 
 class PhysicalDevice;

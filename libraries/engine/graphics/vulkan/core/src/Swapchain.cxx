@@ -6,6 +6,7 @@
 #include "common/ImageView.hpp"
 #include "common/Semaphore.hpp"
 #include "bk/IEventQueue.hpp"
+#include "bk/Logger.hpp"
 #include "engine/common/EngineEvents.hpp"
 
 namespace arb {
@@ -20,12 +21,12 @@ Swapchain::Swapchain(PhysicalDevice* newPhysicalDevice,
       device{newDevice},
       eventQueue{std::move(newEventQueue)},
       windowSize{initialSize.width, initialSize.height} {
-  Log->trace("Creating Swapchain size: {}x{}", windowSize.width, windowSize.height);
+  Log::trace("Creating Swapchain size: {}x{}", windowSize.width, windowSize.height);
   createSwapchain();
 }
 
 Swapchain::~Swapchain() {
-  Log->trace("Destroying Swapchain");
+  Log::trace("Destroying Swapchain");
   if (currentSwapchain != VK_NULL_HANDLE) {
     vkDestroySwapchainKHR(device, currentSwapchain, nullptr);
   }

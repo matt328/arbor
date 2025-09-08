@@ -26,6 +26,7 @@ target_precompile_headers(${PROJECT_NAME}
   <limits>
   <string_view>
   <string>
+  <unordered_set>
   <variant>
 
   <vulkan/vulkan.h>

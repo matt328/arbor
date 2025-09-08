@@ -1,5 +1,7 @@
 #pragma once
 
+#include "bk/NonCopyMove.hpp"
+
 #include "engine/common/IStateBuffer.hpp"
 #include "engine/common/SimState.hpp"
 

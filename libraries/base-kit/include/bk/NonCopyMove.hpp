@@ -13,7 +13,7 @@ struct NonMovable {
   ~NonMovable() = default;
 
   NonMovable(NonMovable&&) = delete;
-  NonMovable& operator=(NonMovable&&) = delete;
+  auto operator=(NonMovable&&) -> NonMovable& = delete;
 };
 
 struct NonCopyableMovable : NonCopyable, NonMovable {

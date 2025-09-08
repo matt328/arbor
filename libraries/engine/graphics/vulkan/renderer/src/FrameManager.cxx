@@ -1,5 +1,7 @@
 #include "FrameManager.hpp"
 
+#include "bk/Logger.hpp"
+
 #include "core/Device.hpp"
 #include "core/Swapchain.hpp"
 
@@ -12,7 +14,7 @@ FrameManager::FrameManager(const GraphicsOptions& graphicsOptions,
                            Device& newDevice,
                            Swapchain& newSwapchain)
     : device{newDevice}, swapchain{newSwapchain} {
-  Log->trace("Constructing FrameManager");
+  Log::trace("Constructing FrameManager");
   frames.reserve(graphicsOptions.framesInFlight);
   for (uint8_t i = 0; i < graphicsOptions.framesInFlight; ++i) {
     const auto fenceName = std::format("Fence-InFlight-Frame-{}", i);
@@ -69,7 +71,7 @@ auto FrameManager::acquireFrame() -> std::variant<Frame*, ImageAcquireResult> {
 }
 
 FrameManager::~FrameManager() {
-  Log->trace("Destroying FrameManager");
+  Log::trace("Destroying FrameManager");
 }
 
 }

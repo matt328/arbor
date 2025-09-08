@@ -1,6 +1,9 @@
 #include "renderer/RenderContext.hpp"
 
+#include "bk/Logger.hpp"
+
 #include "graphics/common/GraphicsOptions.hpp"
+
 #include "core/Device.hpp"
 #include "core/Swapchain.hpp"
 
@@ -14,13 +17,13 @@ RenderContext::RenderContext(const GraphicsOptions& graphicsOptions,
                              Swapchain& newSwapchain,
                              IStateBuffer<SimState>& simStateBuffer)
     : device{newDevice}, swapchain{newSwapchain} {
-  Log->trace("Creating RenderContext");
+  Log::trace("Creating RenderContext");
   frameManager = std::make_unique<FrameManager>(graphicsOptions, device, swapchain);
   perFrameUploader = std::make_unique<PerFrameUploader>(simStateBuffer);
 }
 
 RenderContext::~RenderContext() {
-  Log->trace("Destroying RenderContext");
+  Log::trace("Destroying RenderContext");
 }
 
 auto RenderContext::renderNextFrame() -> void {
@@ -55,13 +58,13 @@ auto RenderContext::tryAcquireFrame() -> Frame* {
 
   switch (std::get<ImageAcquireResult>(result)) {
     case ImageAcquireResult::Error:
-      Log->warn("Failed to acquire swapchain image, skipping frame");
+      Log::warn("Failed to acquire swapchain image, skipping frame");
       return nullptr;
     case ImageAcquireResult::NeedsResize:
       resizePending = true;
       return nullptr;
     default:
-      Log->warn("Unexpected result acquiring swapchain image");
+      Log::warn("Unexpected result acquiring swapchain image");
       return nullptr;
   }
 }

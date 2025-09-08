@@ -4,7 +4,7 @@
 
 auto main() -> int {
   InitLogger("Main");
-  Log->info("Logger Initialized");
+  Log::info("Logger Initialized");
 
   uint32_t dummyWindowId = 5;
   auto windowId = bk::NativeWindowHandle{};
@@ -27,7 +27,7 @@ auto main() -> int {
       std::this_thread::sleep_for(nanoseconds(1000)); // 1µs
     }
   } catch (const std::exception& e) {
-    Log->error("Exception in engine context: {}", e.what());
+    Log::error("Exception in engine context: {}", e.what());
     return -1;
   }
 

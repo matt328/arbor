@@ -22,9 +22,6 @@ set(PROJECT_SOURCES
   src/dialogs/ModelDialog.ui
   src/dialogs/ModelDialog.cxx
 
-  src/panels/LogPanel.cxx
-  src/panels/LogPanel.ui
-
   src/MainWindow.ui
 )
 
@@ -54,6 +51,7 @@ target_link_libraries(${PROJECT_NAME}
   Qt${QT_VERSION_MAJOR}::Widgets
   Qt${QT_VERSION_MAJOR}::Svg
   QWindowKit::Widgets
+  base-kit
   engine::base
   engine::common
 )
@@ -71,12 +69,6 @@ target_compile_definitions(${PROJECT_NAME}
 
 target_precompile_headers(${PROJECT_NAME}
   PRIVATE
-  <cereal/archives/binary.hpp>
-  <cereal/types/complex.hpp>
-  <cereal/types/map.hpp>
-  <cereal/types/string.hpp>
-  <cereal/types/unordered_map.hpp>
-  <cereal/types/vector.hpp>
 
   <glm/gtc/type_ptr.hpp>
   <glm/gtx/string_cast.hpp>
@@ -116,9 +108,6 @@ target_precompile_headers(${PROJECT_NAME}
   <QKeySequence>
   <qcoreapplication.h>
   <qnamespace.h>
-
-  <spdlog/details/null_mutex.h>
-  <spdlog/sinks/base_sink.h>
 
   <any>
   <filesystem>
