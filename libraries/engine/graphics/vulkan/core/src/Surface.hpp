@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vulkan/vulkan.h>
+
 #include "bk/NonCopyMove.hpp"
 
 namespace arb {

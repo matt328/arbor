@@ -19,29 +19,16 @@ target_compile_definitions(${PROJECT_NAME}
   VK_USE_PLATFORM_WIN32_KHR
 )
 
-target_precompile_headers(${PROJECT_NAME}
-  PUBLIC
-  <filesystem>
-  <fstream>
-  <limits>
-  <string_view>
-  <string>
-  <unordered_set>
-  <variant>
-
-  <vulkan/vulkan.h>
-)
-
 target_include_directories(${PROJECT_NAME}
   PUBLIC
   include
-  ${Vulkan_INCLUDE_DIRS}
   PRIVATE
+  ${Vulkan_INCLUDE_DIRS}
   src
 )
 
 target_link_libraries(${PROJECT_NAME}
-  PUBLIC
+  PRIVATE
   base-kit
   vulkan::common
   graphics::common

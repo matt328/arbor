@@ -1,6 +1,7 @@
 #include "PhysicalDevice.hpp"
 
-#include <ranges>
+#include <algorithm>
+#include <unordered_set>
 
 #include "bk/Logger.hpp"
 

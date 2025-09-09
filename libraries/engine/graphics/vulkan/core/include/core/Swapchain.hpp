@@ -1,5 +1,10 @@
 #pragma once
 
+#include <memory>
+#include <variant>
+#include <vector>
+#include <vulkan/vulkan_core.h>
+
 #include "graphics/common/GraphicsOptions.hpp"
 #include "common/ImageAcquireResult.hpp"
 #include "bk/NonCopyMove.hpp"

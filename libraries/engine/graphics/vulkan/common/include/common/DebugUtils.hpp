@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string_view>
+#include <vulkan/vulkan.h>
+
 namespace arb::dbg {
 
 template <typename T>

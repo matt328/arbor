@@ -70,9 +70,6 @@ target_compile_definitions(${PROJECT_NAME}
 target_precompile_headers(${PROJECT_NAME}
   PRIVATE
 
-  <glm/gtc/type_ptr.hpp>
-  <glm/gtx/string_cast.hpp>
-
   <QAbstractButton>
   <QAbstractItemModel>
   <QActionGroup>

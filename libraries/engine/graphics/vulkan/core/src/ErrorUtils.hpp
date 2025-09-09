@@ -1,8 +1,12 @@
 #pragma once
 
+#include <format>
+#include <stdexcept>
+#include <vulkan/vulkan.h>
+
 namespace arb {
 
-inline const char* toString(VkResult result) {
+inline auto toString(VkResult result) -> const char* {
   switch (result) {
     case VK_SUCCESS:
       return "VK_SUCCESS";

@@ -12,28 +12,16 @@ add_library(vulkan::renderer ALIAS ${PROJECT_NAME})
 
 find_package(Vulkan REQUIRED)
 
-target_precompile_headers(${PROJECT_NAME}
-  PUBLIC
-  <filesystem>
-  <fstream>
-  <limits>
-  <string_view>
-  <string>
-  <variant>
-
-  <vulkan/vulkan.h>
-)
-
 target_include_directories(${PROJECT_NAME}
   PUBLIC
   include
-  ${Vulkan_INCLUDE_DIRS}
   PRIVATE
   src
+  ${Vulkan_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME}
-  PUBLIC
+  PRIVATE
   base-kit
   vulkan::common
   vulkan::core

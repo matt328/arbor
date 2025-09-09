@@ -7,11 +7,6 @@ set(basekit_SRC
 
 add_library(${PROJECT_NAME} STATIC ${basekit_SRC})
 
-target_compile_definitions(${PROJECT_NAME}
-  PRIVATE
-  SPDLOG_ENABLE_THREAD_NAME
-)
-
 target_link_libraries(${PROJECT_NAME}
   PRIVATE
   cereal::cereal

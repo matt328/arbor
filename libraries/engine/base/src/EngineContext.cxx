@@ -7,6 +7,7 @@
 #include "engine/common/TripleBuffer.hpp"
 
 namespace arb {
+
 EngineContext::EngineContext(bk::NativeWindowHandle newWindowHandle, EngineOptions engineOptions)
     : windowHandle{newWindowHandle} {
   Log::trace("Creating EngineContext");

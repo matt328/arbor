@@ -1,6 +1,11 @@
 #pragma once
 
 #include <array>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <vector>
+#include <vulkan/vulkan.h>
 
 #include "DeviceFeatures.hpp"
 #include "QueueFamilyIndices.hpp"

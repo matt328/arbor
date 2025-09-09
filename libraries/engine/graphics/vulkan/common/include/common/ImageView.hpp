@@ -1,5 +1,9 @@
 #pragma once
 
+#include <optional>
+#include <string>
+#include <stdexcept>
+
 #include "DebugUtils.hpp"
 
 namespace arb {

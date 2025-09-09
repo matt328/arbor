@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm/glm.hpp>
+
 #include "bk/ChronoDefs.hpp"
 #include "data/gpu/Object.hpp"
 #include "data/Handle.hpp"

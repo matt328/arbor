@@ -1,5 +1,7 @@
 #include "Instance.hpp"
 
+#include <algorithm>
+
 #include "bk/Logger.hpp"
 
 #include "ErrorUtils.hpp"

@@ -1,5 +1,9 @@
 #pragma once
 
+#include <memory>
+#include <variant>
+#include <vector>
+
 #include "bk/NonCopyMove.hpp"
 
 #include "common/ImageAcquireResult.hpp"

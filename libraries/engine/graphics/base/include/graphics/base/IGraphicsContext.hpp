@@ -4,12 +4,13 @@
 
 #include "engine/common/IStateBuffer.hpp"
 #include "engine/common/SimState.hpp"
-#include "graphics/common/GraphicsOptions.hpp"
 #include "bk/IEventQueue.hpp"
 #include "bk/NonCopyMove.hpp"
 #include "bk/NativeWindowHandle.hpp"
 
 namespace arb {
+
+struct GraphicsOptions;
 
 class IGraphicsContext : public NonCopyableMovable {
 public:

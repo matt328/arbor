@@ -1,5 +1,10 @@
 #pragma once
 
+#include <vulkan/vulkan.h>
+#include <optional>
+#include <string>
+#include <stdexcept>
+
 #include "DebugUtils.hpp"
 
 namespace arb {

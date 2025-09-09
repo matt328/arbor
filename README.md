@@ -14,3 +14,11 @@ Technical Details:
 - Gameplay fully decoupled from rendering with separate threads for each
 - Fully bindless gpu driven rendering.
 - Vertex pulling
+
+Before removing precompiled headers:
+
+`[driver] Build completed: 00:00:13.236`
+
+After removing precompiled headers:
+
+`[driver] Build completed: 00:00:13.532`

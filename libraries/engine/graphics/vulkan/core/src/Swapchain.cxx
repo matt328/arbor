@@ -1,4 +1,7 @@
 #include "core/Swapchain.hpp"
+
+#include <algorithm>
+
 #include "core/Device.hpp"
 #include "ErrorUtils.hpp"
 #include "PhysicalDevice.hpp"

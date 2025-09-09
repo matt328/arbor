@@ -8,13 +8,6 @@ target_include_directories(${PROJECT_NAME}
   include
 )
 
-target_precompile_headers(${PROJECT_NAME}
-  INTERFACE
-  <glm/glm.hpp>
-  <glm/ext/matrix_clip_space.hpp>
-  <glm/gtc/quaternion.hpp>
-)
-
 target_link_libraries(${PROJECT_NAME}
   INTERFACE
   glm

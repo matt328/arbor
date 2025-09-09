@@ -1,5 +1,8 @@
 #pragma once
 
+#include <optional>
+#include <vector>
+
 namespace arb {
 struct QueueFamilyIndices {
   std::optional<uint32_t> graphicsFamily;
