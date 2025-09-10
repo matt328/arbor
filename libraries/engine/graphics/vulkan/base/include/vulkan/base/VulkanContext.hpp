@@ -2,11 +2,13 @@
 
 #include "bk/IEventQueue.hpp"
 #include "graphics/base/IGraphicsContext.hpp"
+#include "common/HandleMapperTypes.hpp"
 
 namespace arb {
 
 class CoreContext;
 class RenderContext;
+class ResourceContext;
 
 class VulkanContext : public IGraphicsContext {
 public:
@@ -21,7 +23,9 @@ public:
 private:
   std::shared_ptr<bk::IEventQueue> eventQueue;
   std::shared_ptr<CoreContext> coreContext;
+  std::unique_ptr<GeometryHandleMapper> geometryHandleMapper;
   std::unique_ptr<RenderContext> renderContext;
+  std::unique_ptr<ResourceContext> resourceContext;
 };
 
 }

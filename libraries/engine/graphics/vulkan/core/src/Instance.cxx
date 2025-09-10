@@ -4,7 +4,7 @@
 
 #include "bk/Logger.hpp"
 
-#include "ErrorUtils.hpp"
+#include "common/ErrorUtils.hpp"
 #include "graphics/common/GraphicsOptions.hpp"
 #include "PhysicalDevice.hpp"
 

@@ -13,6 +13,7 @@ class Swapchain;
 class Instance;
 class Surface;
 class PhysicalDevice;
+class AllocatorService;
 
 class CoreContext : NonCopyableMovable {
 public:
@@ -29,6 +30,10 @@ public:
     return *swapchain;
   }
 
+  [[nodiscard]] auto getAllocatorService() const -> AllocatorService& {
+    return *allocatorService;
+  }
+
 private:
   GraphicsOptions options;
   std::unique_ptr<Instance> vulkanInstance;
@@ -36,6 +41,7 @@ private:
   std::unique_ptr<PhysicalDevice> physicalDevice;
   std::shared_ptr<Device> device;
   std::unique_ptr<Swapchain> swapchain;
+  std::unique_ptr<AllocatorService> allocatorService;
 
   std::shared_ptr<bk::IEventQueue> eventQueue;
 };

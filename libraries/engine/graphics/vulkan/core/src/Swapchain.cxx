@@ -3,7 +3,7 @@
 #include <algorithm>
 
 #include "core/Device.hpp"
-#include "ErrorUtils.hpp"
+#include "common/ErrorUtils.hpp"
 #include "PhysicalDevice.hpp"
 #include "Surface.hpp"
 #include "common/ImageView.hpp"

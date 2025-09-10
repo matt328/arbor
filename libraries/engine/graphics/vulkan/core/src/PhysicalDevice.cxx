@@ -7,7 +7,7 @@
 
 #include "core/Device.hpp"
 #include "DeviceFeatures.hpp"
-#include "ErrorUtils.hpp"
+#include "common/ErrorUtils.hpp"
 #include "Surface.hpp"
 
 namespace arb {

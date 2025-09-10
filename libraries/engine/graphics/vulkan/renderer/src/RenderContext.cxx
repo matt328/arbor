@@ -15,11 +15,12 @@ namespace arb {
 RenderContext::RenderContext(const GraphicsOptions& graphicsOptions,
                              Device& newDevice,
                              Swapchain& newSwapchain,
-                             IStateBuffer<SimState>& simStateBuffer)
+                             IStateBuffer<SimState>& simStateBuffer,
+                             GeometryHandleMapper& newGeometryHandleMapper)
     : device{newDevice}, swapchain{newSwapchain} {
   Log::trace("Creating RenderContext");
   frameManager = std::make_unique<FrameManager>(graphicsOptions, device, swapchain);
-  perFrameUploader = std::make_unique<PerFrameUploader>(simStateBuffer);
+  perFrameUploader = std::make_unique<PerFrameUploader>(simStateBuffer, newGeometryHandleMapper);
 }
 
 RenderContext::~RenderContext() {

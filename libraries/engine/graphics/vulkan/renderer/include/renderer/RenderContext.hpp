@@ -4,6 +4,7 @@
 
 #include "engine/common/IStateBuffer.hpp"
 #include "engine/common/SimState.hpp"
+#include "common/HandleMapperTypes.hpp"
 
 namespace arb {
 
@@ -19,7 +20,8 @@ public:
   RenderContext(const GraphicsOptions& graphicsOptions,
                 Device& newDevice,
                 Swapchain& newSwapchain,
-                IStateBuffer<SimState>& simStateBuffer);
+                IStateBuffer<SimState>& simStateBuffer,
+                GeometryHandleMapper& newGeometryHandleMapper);
   ~RenderContext();
 
   auto renderNextFrame() -> void;

@@ -20,6 +20,8 @@ target_link_libraries(${PROJECT_NAME}
   graphics::common
   engine::common
   vulkan::renderer
+  vulkan::common
+  vulkan::resources
 )
 
 target_include_directories(${PROJECT_NAME}

@@ -4,8 +4,9 @@
 
 namespace arb {
 
-PerFrameUploader::PerFrameUploader(IStateBuffer<SimState>& newStateBuffer)
-    : stateBuffer(newStateBuffer) {
+PerFrameUploader::PerFrameUploader(IStateBuffer<SimState>& newStateBuffer,
+                                   GeometryHandleMapper& newGeometryHandleMapper)
+    : stateBuffer(newStateBuffer), geometryHandleMapper{newGeometryHandleMapper} {
   Log::trace("Constructing PerFrameUploader");
 }
 
@@ -26,7 +27,7 @@ auto PerFrameUploader::collectGeometryDetails(SimState& state) -> void {
   materialCache.clear();
 
   for (size_t i = 0; i < state.objectMetadata.size(); ++i) {
-    // auto regionHandle = geometryHandleMapper->toInternal(state.stateHandles[i].geometryHandle);
+    auto regionHandle = geometryHandleMapper.toInternal(state.stateHandles[i].geometryHandle);
     // auto regionData = geometryAllocator->getRegionData(*regionHandle);
 
     // geometryRegionCache.push_back(regionData);
@@ -40,6 +41,9 @@ auto PerFrameUploader::collectGeometryDetails(SimState& state) -> void {
     //       gpu::Material{.baseColor = {1.f, 0.f, 0.f, 1.f}, .albedoTextureId = textureId});
     // }
   }
+}
+
+auto PerFrameUploader::uploadPerFrameData(Frame* frame, SimState& state) -> void {
 }
 
 }

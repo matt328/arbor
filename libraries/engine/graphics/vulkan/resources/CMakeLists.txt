@@ -1,17 +1,12 @@
-project("vulkan-core")
+project("vulkan-resources")
 
-set(vulkancore_SRC
-  src/CoreContext.cxx
-  src/Device.cxx
-  src/Instance.cxx
-  src/PhysicalDevice.cxx
-  src/Surface.cxx
-  src/Swapchain.cxx
-  src/AllocatorService.cxx
+set(vulkanresources_SRC
+  src/BufferManager.cxx
+  src/ResourceContext.cxx
 )
 
-add_library(${PROJECT_NAME} STATIC ${vulkancore_SRC})
-add_library(vulkan::core ALIAS ${PROJECT_NAME})
+add_library(${PROJECT_NAME} STATIC ${vulkanresources_SRC})
+add_library(vulkan::resources ALIAS ${PROJECT_NAME})
 
 find_package(Vulkan REQUIRED)
 
@@ -31,9 +26,10 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
   PRIVATE
+  vulkan::core
+  PUBLIC
   base-kit
   vulkan::common
-  graphics::common
   engine::common
   ${Vulkan_LIBRARIES}
 )

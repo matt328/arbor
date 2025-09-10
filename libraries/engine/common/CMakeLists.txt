@@ -1,15 +1,22 @@
 project("engine-common")
 
-add_library(${PROJECT_NAME} INTERFACE)
+set(enginecommon_SRC
+  src/Placeholder.cxx
+)
+
+add_library(${PROJECT_NAME} STATIC ${enginecommon_SRC})
 add_library(engine::common ALIAS ${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME}
-  INTERFACE
+  PUBLIC
   include
+  PRIVATE
+  src
 )
 
 target_link_libraries(${PROJECT_NAME}
-  INTERFACE
-  glm
+  PRIVATE
   base-kit
+  PUBLIC
+  glm
 )

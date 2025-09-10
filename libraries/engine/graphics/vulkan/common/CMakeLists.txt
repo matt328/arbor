@@ -12,11 +12,14 @@ find_package(Vulkan REQUIRED)
 target_include_directories(${PROJECT_NAME}
   PUBLIC
   include
-  PRIVATE
   ${Vulkan_INCLUDE_DIRS}
+  PRIVATE
   src
 )
 
 target_link_libraries(${PROJECT_NAME}
-  PUBLIC
+  PRIVATE
+  glm
+  base-kit
+  engine::common
 )

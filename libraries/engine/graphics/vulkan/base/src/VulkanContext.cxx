@@ -1,12 +1,14 @@
 #include "vulkan/base/VulkanContext.hpp"
 
 #include <thread>
+#include <memory>
 
 #include "bk/Logger.hpp"
 #include "bk/IEventQueue.hpp"
 #include "core/CoreContext.hpp"
 #include "engine/common/SimState.hpp"
 #include "renderer/RenderContext.hpp"
+#include "resources/ResourceContext.hpp"
 
 namespace arb {
 
@@ -16,11 +18,18 @@ VulkanContext::VulkanContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
                              bk::NativeWindowHandle newWindowHandle)
     : eventQueue{std::move(newEventQueue)} {
   Log::trace("Creating VulkanContext");
+
+  geometryHandleMapper = std::make_unique<GeometryHandleMapper>();
+
   coreContext = std::make_shared<CoreContext>(eventQueue, newOptions, newWindowHandle);
+
   renderContext = std::make_unique<RenderContext>(newOptions,
                                                   coreContext->getDevice(),
                                                   coreContext->getSwapchain(),
-                                                  simStateBuffer);
+                                                  simStateBuffer,
+                                                  *geometryHandleMapper);
+
+  resourceContext = std::make_unique<ResourceContext>();
 }
 
 VulkanContext::~VulkanContext() {

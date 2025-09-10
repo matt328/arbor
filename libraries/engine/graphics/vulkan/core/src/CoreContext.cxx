@@ -3,6 +3,7 @@
 #include "bk/Logger.hpp"
 #include "bk/IEventQueue.hpp"
 
+#include "core/AllocatorService.hpp"
 #include "graphics/common/GraphicsOptions.hpp"
 
 #include "core/Swapchain.hpp"
@@ -38,6 +39,8 @@ CoreContext::CoreContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
                                           *device,
                                           eventQueue,
                                           options.initialSize);
+  allocatorService =
+      std::make_unique<AllocatorService>(physicalDevice->handle(), *device, *vulkanInstance);
 }
 
 CoreContext::~CoreContext() {

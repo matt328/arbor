@@ -15,6 +15,8 @@ Technical Details:
 - Fully bindless gpu driven rendering.
 - Vertex pulling
 
+As of a329c8e:
+
 Before removing precompiled headers:
 
 `[driver] Build completed: 00:00:13.236`
@@ -22,3 +24,7 @@ Before removing precompiled headers:
 After removing precompiled headers:
 
 `[driver] Build completed: 00:00:13.532`
+
+*7s of that is running QT's build tools. Building the engine's static libs:
+
+`[driver] Build completed: 00:00:06.482`

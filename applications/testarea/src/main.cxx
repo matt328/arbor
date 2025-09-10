@@ -1,6 +1,8 @@
-#include "IEngineContext.hpp"
-#include "IEventQueue.hpp"
-#include "TestEvents.hpp"
+#include <chrono>
+#include <thread>
+
+#include "engine/base/IEngineContext.hpp"
+#include "bk/Logger.hpp"
 
 auto main() -> int {
   InitLogger("Main");
@@ -10,11 +12,9 @@ auto main() -> int {
   auto windowId = bk::NativeWindowHandle{};
   windowId.set(&dummyWindowId);
 
-  auto context = arb::makeEngineContext(windowId);
+  auto context = arb::makeEngineContext(windowId, {});
 
   auto eventQueue = context->getEventQueue();
-
-  eventQueue->emitEvent(arb::TestEvent{});
 
   using namespace std::chrono;
   auto start = steady_clock::now();

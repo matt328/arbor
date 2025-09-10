@@ -4,7 +4,7 @@
 
 #include "bk/ChronoDefs.hpp"
 #include "data/gpu/Object.hpp"
-#include "data/Handle.hpp"
+#include "engine/common/Handle.hpp"
 #include "data/Tags.hpp"
 
 namespace arb {

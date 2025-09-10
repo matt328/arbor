@@ -2,7 +2,7 @@
 
 #include "bk/Logger.hpp"
 
-#include "ErrorUtils.hpp"
+#include "common/ErrorUtils.hpp"
 #include "Instance.hpp"
 
 namespace arb {
