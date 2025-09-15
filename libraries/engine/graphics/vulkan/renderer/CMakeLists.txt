@@ -5,6 +5,12 @@ set(vulkanrenderer_SRC
   src/FrameManager.cxx
   src/PerFrameUploader.cxx
   src/RenderContext.cxx
+
+  src/framegraph/FrameGraph.cxx
+
+  src/geometry/VirtualGeometryAllocator.cxx
+  src/geometry/VirtualGeometryAllocator.cxx
+  src/geometry/GeometryStream.cxx
 )
 
 add_library(${PROJECT_NAME} STATIC ${vulkanrenderer_SRC})
@@ -23,6 +29,7 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
   PRIVATE
   base-kit
+  vulkan::resources
   vulkan::common
   vulkan::core
   graphics::common

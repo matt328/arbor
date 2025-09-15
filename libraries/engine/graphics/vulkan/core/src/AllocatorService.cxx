@@ -55,4 +55,11 @@ void AllocatorService::unmapMemory(VmaAllocation alloc) {
   vmaUnmapMemory(allocator, alloc);
 }
 
+auto AllocatorService::getAllocationMemoryProperties(VmaAllocation allocation)
+    -> VkMemoryPropertyFlags {
+  VkMemoryPropertyFlags flags{};
+  vmaGetAllocationMemoryProperties(allocator, allocation, &flags);
+  return flags;
+}
+
 }

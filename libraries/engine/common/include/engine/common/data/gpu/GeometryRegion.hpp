@@ -19,23 +19,23 @@ struct GeometryRegion {
 };
 
 // Typical Index Data each index 'indexes' into the GpuVertex*Data buffer
-struct GpuIndexData {
+struct IndexData {
   uint32_t index;
 };
 
-struct GpuVertexPositionData {
+struct VertexPositionData {
   glm::vec3 position;
 };
 
-struct GpuVertexColorData {
+struct VertexColorData {
   glm::vec4 color;
 };
 
-struct GpuVertexTexCoordData {
+struct VertexTexCoordData {
   glm::vec2 texCoords;
 };
 
-struct GpuVertexNormalData {
+struct VertexNormalData {
   glm::vec3 normal;
 };
 }

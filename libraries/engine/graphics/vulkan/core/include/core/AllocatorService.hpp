@@ -26,6 +26,8 @@ public:
   [[nodiscard]] auto mapMemory(VmaAllocation alloc) -> void*;
   void unmapMemory(VmaAllocation alloc);
 
+  auto getAllocationMemoryProperties(VmaAllocation allocation) -> VkMemoryPropertyFlags;
+
 private:
   VmaAllocator allocator{VK_NULL_HANDLE};
 };

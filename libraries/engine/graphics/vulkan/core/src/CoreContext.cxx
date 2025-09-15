@@ -4,6 +4,7 @@
 #include "bk/IEventQueue.hpp"
 
 #include "core/AllocatorService.hpp"
+#include "core/command-buffers/CommandBufferManager.hpp"
 #include "graphics/common/GraphicsOptions.hpp"
 
 #include "core/Swapchain.hpp"
@@ -33,6 +34,12 @@ CoreContext::CoreContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
   }
 
   device = physicalDevice->createDevice(*surface);
+
+  commandBufferManager = std::make_unique<CommandBufferManager>(*device);
+
+  transferSemaphore = std::make_unique<Semaphore>(*device, true, "TransferQueueSemaphore");
+  graphicsSemaphore = std::make_unique<Semaphore>(*device, true, "GraphicsQueueSemaphore");
+  computeSemaphore = std::make_unique<Semaphore>(*device, true, "ComputeQueueSemaphore");
 
   swapchain = std::make_unique<Swapchain>(physicalDevice.get(),
                                           surface.get(),

@@ -1,0 +1,58 @@
+#include "BufferManager.hpp"
+
+#include "bk/Logger.hpp"
+#include "buffers/BufferPool.hpp"
+#include "core/AllocatorService.hpp"
+#include "core/Device.hpp"
+
+namespace arb {
+
+BufferManager::BufferManager(Device& newDevice,
+                             AllocatorService& newAllocatorService,
+                             SemaphorePack semaphores) {
+  Log::trace("Creating BufferManager");
+  bufferPool = std::make_unique<BufferPool>(newDevice, newAllocatorService);
+}
+
+BufferManager::~BufferManager() {
+  Log::trace("Destroying BufferManager");
+}
+
+auto BufferManager::registerBuffer(const BufferCreateInfo& createInfo) -> BufferHandle {
+  return bufferPool->registerBuffer(createInfo);
+}
+
+auto BufferManager::registerPerFrameBuffer(const BufferCreateInfo& createInfo, uint32_t frameCount)
+    -> PerFrameBufferHandles {
+  return bufferPool->registerPerFrameBuffer(createInfo, frameCount);
+}
+
+auto BufferManager::insert(BufferHandle handle, void* data, const BufferRegion& targetRegion)
+    -> std::optional<BufferRegion> {
+  return bufferPool->insert(handle, data, targetRegion);
+}
+
+auto BufferManager::allocate(BufferHandle handle, size_t size) -> BufferRegion {
+  return {};
+}
+
+auto BufferManager::checkSize(BufferHandle handle, size_t size) -> std::optional<ResizeRequest> {
+  return std::nullopt;
+  // return virtualAllocationManager->checkSizes(handle, size);
+}
+
+auto BufferManager::processResizes(const std::vector<ResizeRequest>& resizeRequests,
+                                   TransferSystem& transferSystem) -> void {
+}
+
+auto BufferManager::resolve(LogicalBufferHandle logicalHandle, size_t frameIndex) const
+    -> BufferHandle {
+}
+
+auto BufferManager::getVkBuffer(BufferHandle handle) const -> VkBuffer {
+}
+
+auto BufferManager::getBuffer(BufferHandle handle) const -> Buffer& {
+}
+
+}

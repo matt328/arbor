@@ -9,6 +9,7 @@ namespace arb {
 class CoreContext;
 class RenderContext;
 class ResourceContext;
+class AssetContext;
 
 class VulkanContext : public IGraphicsContext {
 public:
@@ -26,6 +27,7 @@ private:
   std::unique_ptr<GeometryHandleMapper> geometryHandleMapper;
   std::unique_ptr<RenderContext> renderContext;
   std::unique_ptr<ResourceContext> resourceContext;
+  std::unique_ptr<AssetContext> assetContext;
 };
 
 }

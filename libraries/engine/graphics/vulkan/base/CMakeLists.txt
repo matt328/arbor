@@ -22,6 +22,7 @@ target_link_libraries(${PROJECT_NAME}
   vulkan::renderer
   vulkan::common
   vulkan::resources
+  vulkan::assets
 )
 
 target_include_directories(${PROJECT_NAME}

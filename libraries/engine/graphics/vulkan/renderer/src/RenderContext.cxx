@@ -2,10 +2,14 @@
 
 #include "bk/Logger.hpp"
 
-#include "graphics/common/GraphicsOptions.hpp"
-
 #include "core/Device.hpp"
 #include "core/Swapchain.hpp"
+#include "core/command-buffers/CommandBufferManager.hpp"
+#include "resources/ResourceFacade.hpp"
+
+#include "graphics/common/GraphicsOptions.hpp"
+
+#include "framegraph/FrameGraph.hpp"
 
 #include "FrameManager.hpp"
 #include "PerFrameUploader.hpp"
@@ -16,11 +20,15 @@ RenderContext::RenderContext(const GraphicsOptions& graphicsOptions,
                              Device& newDevice,
                              Swapchain& newSwapchain,
                              IStateBuffer<SimState>& simStateBuffer,
-                             GeometryHandleMapper& newGeometryHandleMapper)
+                             GeometryHandleMapper& newGeometryHandleMapper,
+                             CommandBufferManager& newCommandBufferManager,
+                             ResourceFacade& newResourceFacade)
     : device{newDevice}, swapchain{newSwapchain} {
   Log::trace("Creating RenderContext");
   frameManager = std::make_unique<FrameManager>(graphicsOptions, device, swapchain);
   perFrameUploader = std::make_unique<PerFrameUploader>(simStateBuffer, newGeometryHandleMapper);
+
+  frameGraph = std::make_unique<FrameGraph>(newCommandBufferManager, newResourceFacade);
 }
 
 RenderContext::~RenderContext() {
@@ -41,6 +49,17 @@ auto RenderContext::renderNextFrame() -> void {
   }
 
   perFrameUploader->upload();
+
+  // auto results = frameGraph->execute(frame);
+
+  // submitFrame(frame, results);
+
+  // const auto presentResult = presentFrame(frame);
+  // if (presentResult == VK_SUBOPTIMAL_KHR || presentResult == VK_ERROR_OUT_OF_DATE_KHR) {
+  //   Log::warn("PresentFrame resports swapchain needs resized");
+  //   resizePending = true;
+  // }
+  // FrameMark;
 }
 
 auto RenderContext::recreateSwapchain() -> void {

@@ -53,7 +53,6 @@ PhysicalDevice::~PhysicalDevice() {
 
 auto PhysicalDevice::isSuitable(const Surface& surface) const -> bool {
   return supportsExtensions() && supportsFeatures() && findQueueFamilies(&surface).isComplete();
-  return true;
 }
 
 auto PhysicalDevice::supportsExtensions() const -> bool {
@@ -133,7 +132,6 @@ auto PhysicalDevice::supportsFeatures() const -> bool {
 
 auto PhysicalDevice::createDevice(const Surface& surface) -> std::shared_ptr<Device> {
 
-  // Queue Families
   auto queueFamilies = findQueueFamilies(&surface);
   logQueueFamilyIndices(queueFamilies);
 
@@ -150,12 +148,11 @@ auto PhysicalDevice::createDevice(const Surface& surface) -> std::shared_ptr<Dev
   deviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(requiredExtensions.size());
   deviceCreateInfo.ppEnabledExtensionNames = requiredExtensions.data();
 
-  // 6. Create the logical device
   VkDevice vkDevice = nullptr;
   checkVk(vkCreateDevice(vkPhysicalDevice, &deviceCreateInfo, nullptr, &vkDevice),
           "Failed to create logical device");
 
-  return std::make_shared<Device>(vkDevice, this);
+  return std::make_shared<Device>(vkDevice, this, queueFamilies);
 }
 
 auto PhysicalDevice::handle() const -> VkPhysicalDevice {

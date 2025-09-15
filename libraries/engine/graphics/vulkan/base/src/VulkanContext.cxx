@@ -9,6 +9,8 @@
 #include "engine/common/SimState.hpp"
 #include "renderer/RenderContext.hpp"
 #include "resources/ResourceContext.hpp"
+#include "common/SemaphorePack.hpp"
+#include "assets/AssetContext.hpp"
 
 namespace arb {
 
@@ -19,17 +21,27 @@ VulkanContext::VulkanContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
     : eventQueue{std::move(newEventQueue)} {
   Log::trace("Creating VulkanContext");
 
+  // TODO: Consider promoting to a SharedContext if too many of these start to accumulate here
   geometryHandleMapper = std::make_unique<GeometryHandleMapper>();
 
   coreContext = std::make_shared<CoreContext>(eventQueue, newOptions, newWindowHandle);
+
+  resourceContext = std::make_unique<ResourceContext>(
+      coreContext->getDevice(),
+      coreContext->getAllocatorService(),
+      SemaphorePack{.graphics = coreContext->getGraphicsSemaphore(),
+                    .transfer = coreContext->getTransferSemaphore(),
+                    .compute = coreContext->getComputeSemaphore()});
 
   renderContext = std::make_unique<RenderContext>(newOptions,
                                                   coreContext->getDevice(),
                                                   coreContext->getSwapchain(),
                                                   simStateBuffer,
-                                                  *geometryHandleMapper);
+                                                  *geometryHandleMapper,
+                                                  coreContext->getCommandBufferManager(),
+                                                  resourceContext->getResourceFacade());
 
-  resourceContext = std::make_unique<ResourceContext>();
+  assetContext = std::make_unique<AssetContext>();
 }
 
 VulkanContext::~VulkanContext() {

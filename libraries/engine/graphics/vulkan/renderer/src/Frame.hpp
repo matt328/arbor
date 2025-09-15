@@ -2,46 +2,62 @@
 
 #include "common/Semaphore.hpp"
 #include "common/Fence.hpp"
+#include "FrameManager.hpp"
 
 namespace arb {
 
 class Frame {
 public:
-  Frame(uint8_t newIndex,
-        Fence&& newRenderFence,
-        Semaphore&& newImageAvailableSemaphore,
-        Semaphore&& newComputeFinishedSemaphore);
+  Frame(FrameManager* newFrameManager, uint8_t newIndex);
   ~Frame();
 
   auto setSubmitted(bool newSubmitted) {
-    submitted = newSubmitted;
+    frameManager->setSubmittedFrame(index, newSubmitted);
   }
 
   [[nodiscard]] auto isSubmitted() const {
-    return submitted;
+    return frameManager->isSubmittedFrame(index);
   }
 
   [[nodiscard]] auto getInflightFence() -> Fence& {
-    return inFlightFence;
+    return frameManager->getFrameInflightFence(index);
   }
 
   [[nodiscard]] auto getImageAvailableSemaphore() -> Semaphore& {
-    return imageAvailableSemaphore;
+    return frameManager->getFrameImageAvailableSemaphore(index);
+  }
+
+  [[nodiscard]] auto getIndex() const {
+    return index;
   }
 
   auto setSwapchainImageIndex(uint32_t imageIndex) {
-    swapchainImageIndex = imageIndex;
+    frameManager->setFrameSwapchainIndex(index, imageIndex);
+  }
+
+  auto getSwapchainImageIndex() {
+    return frameManager->getFrameSwapchainIndex(index);
+  }
+
+  auto setLastImageUse(ImageAlias alias, LastImageUse use) {
+    frameManager->setFrameLastImageUse(index, alias, use);
+  }
+
+  auto getLastImageUse(ImageAlias alias) {
+    return frameManager->getFrameLastImageUse(index, alias);
+  }
+
+  auto setLastBufferUse(BufferAliasVariant alias, LastBufferUse use) {
+    frameManager->setFrameLastBufferUse(index, alias, use);
+  }
+
+  auto getLastBufferUse(BufferAliasVariant alias) {
+    return frameManager->getFrameLastBufferUse(index, alias);
   }
 
 private:
   uint8_t index;
-  bool submitted{};
-
-  uint32_t swapchainImageIndex;
-
-  Fence inFlightFence;
-  Semaphore imageAvailableSemaphore;
-  Semaphore computeFinishedSemaphore;
+  FrameManager* frameManager;
 };
 
 }

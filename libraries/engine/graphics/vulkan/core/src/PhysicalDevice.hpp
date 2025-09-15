@@ -8,7 +8,7 @@
 #include <vulkan/vulkan.h>
 
 #include "DeviceFeatures.hpp"
-#include "QueueFamilyIndices.hpp"
+#include "core/QueueFamilyIndices.hpp"
 
 namespace arb {
 

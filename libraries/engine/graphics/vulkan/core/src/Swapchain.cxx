@@ -150,7 +150,7 @@ auto Swapchain::createSwapchain() -> void {
     semaphoreName.emplace(std::format("Swapchain Image Semaphore {}", index));
 #endif
     swapchainImageViews.emplace_back(device, createInfo, imageViewName);
-    imageSemaphores.emplace_back(device, semaphoreName);
+    imageSemaphores.emplace_back(device, false, semaphoreName);
     ++index;
   }
 

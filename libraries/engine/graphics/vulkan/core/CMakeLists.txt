@@ -8,6 +8,8 @@ set(vulkancore_SRC
   src/Surface.cxx
   src/Swapchain.cxx
   src/AllocatorService.cxx
+  src/CommandBuffer.cxx
+  src/CommandBufferManager.cxx
 )
 
 add_library(${PROJECT_NAME} STATIC ${vulkancore_SRC})

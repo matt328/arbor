@@ -1,8 +1,14 @@
 project("vulkan-resources")
 
 set(vulkanresources_SRC
-  src/BufferManager.cxx
   src/ResourceContext.cxx
+  src/ResourceFacade.cxx
+
+  src/buffers/BufferManager.cxx
+  src/buffers/ArenaAllocator.cxx
+  src/buffers/BufferAllocator.cxx
+  src/buffers/LinearAllocator.cxx
+  src/buffers/BufferPool.cxx
 )
 
 add_library(${PROJECT_NAME} STATIC ${vulkanresources_SRC})

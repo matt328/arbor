@@ -15,10 +15,16 @@ struct Semaphore {
 
   Semaphore() = default;
 
-  explicit Semaphore(VkDevice d, std::optional<std::string> name = std::nullopt) : device(d) {
+  explicit Semaphore(VkDevice d,
+                     bool timeline = false,
+                     std::optional<std::string> name = std::nullopt)
+      : device(d) {
     VkSemaphoreCreateInfo createInfo{
         .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
     };
+    if (timeline) {
+      createInfo.flags |= VK_SEMAPHORE_TYPE_TIMELINE;
+    }
     if (vkCreateSemaphore(device, &createInfo, nullptr, &handle) != VK_SUCCESS) {
       throw std::runtime_error("Failed to create semaphore");
     }
