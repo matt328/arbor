@@ -23,7 +23,7 @@ public:
   static auto logStringError(std::string message) -> void;
 
   template <typename... Args>
-  static auto trace(const std::string& fmt, Args&&... args) -> void {
+  static auto trace(const std::string& fmt, Args&&... args) noexcept -> void {
     const std::string message = std::vformat(fmt, std::make_format_args(args...));
     logStringTrace(message);
   }

@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "framegraph/barriers/BarrierPrecursorPlan.hpp"
-#include "framegraph/passes/IRenderPass.hpp"
+#include "framegraph/render-pass/IRenderPass.hpp"
 
 namespace arb {
 

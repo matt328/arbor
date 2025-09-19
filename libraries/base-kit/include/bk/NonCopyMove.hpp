@@ -16,7 +16,7 @@ struct NonMovable {
   auto operator=(NonMovable&&) -> NonMovable& = delete;
 };
 
-struct NonCopyableMovable : NonCopyable, NonMovable {
+struct NonCopyableMovable : public NonCopyable, public NonMovable {
   NonCopyableMovable() = default;
   ~NonCopyableMovable() = default;
 };

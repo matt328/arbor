@@ -1,8 +1,9 @@
 {
   "clangd.arguments": [
     "--clang-tidy",
-    "--header-insertion=never",
+    "--header-insertion=iwyu",
     "--compile-commands-dir=${workspaceFolder}/build/msvc-debug",
-    "--query-driver=**"
+    "--query-driver=**",
+    "--completion-style=detailed"
   ]
 }

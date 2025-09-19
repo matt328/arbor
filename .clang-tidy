@@ -1,16 +1,19 @@
 ---
 Checks: >
+  cppcoreguidelines-*,
   clang-analyzer-*,
   bugprone-*,
   modernize-*,
   performance-*,
   readability-*,
+  hicpp-explicit-conversions,
   -readability-identifier-length,
   -readability-uppercase-literal-suffix,
   -misc-no-recursion,
-  -google-readability-namespace-comments
+  -google-readability-namespace-comments,
+  -cppcoreguidelines-special-member-functions
 WarningsAsErrors: "false"
-HeaderFilterRegex: "^(?!.*(build/debug/_deps)).*$"
+HeaderFilterRegex: ""
 FormatStyle: google
 CheckOptions:
   - key: google-readability-braces-around-statements.ShortStatementLines

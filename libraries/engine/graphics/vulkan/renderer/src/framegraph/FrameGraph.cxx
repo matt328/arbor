@@ -9,9 +9,10 @@
 #include "core/command-buffers/CommandBufferManager.hpp"
 
 #include "resources/ResourceFacade.hpp"
-#include "framegraph/passes/IRenderPass.hpp"
+#include "framegraph/render-pass/IRenderPass.hpp"
 
 #include "framegraph/AliasRegistry.hpp"
+#include "framegraph/barriers/Builders.hpp"
 
 namespace arb {
 
@@ -60,10 +61,10 @@ auto FrameGraph::execute(Frame* frame) -> FrameGraphResult {
         } else {
           lastUse = frame->getLastImageUse(precursor.alias);
         }
-        auto imageBarrier = BarrierBuilder::build(precursor, lastUse);
+        auto imageBarrier = barriers::build(precursor, lastUse);
         if (imageBarrier) {
           const auto& image = resourceFacade.getImage(handle);
-          imageBarrier->setImage(image);
+          imageBarrier->image = image;
           imageBarriers.push_back(*imageBarrier);
         }
         const auto newLastUse = LastImageUse{
@@ -98,9 +99,9 @@ auto FrameGraph::execute(Frame* frame) -> FrameGraphResult {
       for (const auto& precursor : barrierPrecursorPlan.bufferPrecursors.at(passId)) {
         const auto& buffer = std::visit(visitor, precursor.alias);
         auto lastUse = frame->getLastBufferUse(precursor.alias);
-        auto bufferBarrier = BarrierBuilder::build(precursor, lastUse);
+        auto bufferBarrier = barriers::build(precursor, lastUse);
         if (bufferBarrier) {
-          bufferBarrier->setBuffer(*buffer);
+          bufferBarrier->buffer = buffer;
           bufferBarriers.push_back(*bufferBarrier);
         }
         frame->setLastBufferUse(precursor.alias,

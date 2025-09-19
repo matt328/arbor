@@ -1,0 +1,44 @@
+#include "ShaderModule.hpp"
+
+#include "bk/Logger.hpp"
+#include "common/ErrorUtils.hpp"
+#include "common/DebugUtils.hpp"
+#include "vulkan/vulkan_core.h"
+
+namespace arb {
+
+ShaderModule::ShaderModule(Device* newDevice,
+                           const VkShaderModuleCreateInfo& createInfo,
+                           const std::optional<std::string>& newName)
+    : device{newDevice},
+      handle{VK_NULL_HANDLE},
+      debugName{newName.value_or("Unnamed ShaderModule")} {
+  checkVk(vkCreateShaderModule(*device, &createInfo, nullptr, &handle), "vkCeateShaderModule");
+  dbg::setDebugName(*device, handle, debugName);
+}
+
+ShaderModule::~ShaderModule() {
+  Log::trace("Destroying ShaderModule: {}", debugName);
+  cleanup();
+}
+
+ShaderModule::ShaderModule(ShaderModule&& other) noexcept
+    : device{other.device}, handle{std::exchange(other.handle, VK_NULL_HANDLE)} {
+}
+
+auto ShaderModule::operator=(ShaderModule&& other) noexcept -> ShaderModule& {
+  if (this != &other) {
+    cleanup();
+    device = other.device;
+    handle = std::exchange(other.handle, VK_NULL_HANDLE);
+  }
+  return *this;
+}
+
+auto ShaderModule::cleanup() -> void {
+  if (handle != VK_NULL_HANDLE) {
+    vkDestroyShaderModule(*device, handle, nullptr);
+  }
+}
+
+}

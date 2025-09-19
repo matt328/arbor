@@ -2,8 +2,8 @@
 
 namespace arb {
 
-CommandBuffer::CommandBuffer(VkDevice device, VkCommandPool pool, VkCommandBuffer buf)
-    : device{device}, pool{pool}, handle{buf} {
+CommandBuffer::CommandBuffer(VkDevice newDevice, VkCommandPool pool, VkCommandBuffer buf)
+    : device{newDevice}, pool{pool}, handle{buf} {
 }
 
 CommandBuffer::~CommandBuffer() {
@@ -30,15 +30,15 @@ auto CommandBuffer::operator=(CommandBuffer&& other) noexcept -> CommandBuffer& 
   return *this;
 }
 
-void CommandBuffer::begin(const VkCommandBufferBeginInfo& info) {
+void CommandBuffer::begin(const VkCommandBufferBeginInfo& info) const {
   vkBeginCommandBuffer(handle, &info);
 }
 
-void CommandBuffer::end() {
+void CommandBuffer::end() const {
   vkEndCommandBuffer(handle);
 }
 
-void CommandBuffer::pipelineBarrier2(const VkDependencyInfo& dep) {
+void CommandBuffer::pipelineBarrier2(const VkDependencyInfo& dep) const {
   vkCmdPipelineBarrier2(handle, &dep);
 }
 

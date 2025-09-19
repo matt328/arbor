@@ -33,4 +33,18 @@ auto ResourceFacade::getBuffer(LogicalBufferHandle logicalHandle, size_t frameIn
   return bufferManager.getBuffer(bufferHandle);
 }
 
+auto ResourceFacade::getBuffer(BufferHandle handle) -> Buffer& {
+  return bufferManager.getBuffer(handle);
+}
+
+auto ResourceFacade::getImageHandle(LogicalImageHandle logicalHandle, size_t frameIndex)
+    -> ImageHandle {
+}
+
+auto ResourceFacade::getImage(LogicalImageHandle logicalHandle, size_t frameIndex) -> Image& {
+}
+
+auto ResourceFacade::getImage(ImageHandle handle) -> Image& {
+}
+
 }

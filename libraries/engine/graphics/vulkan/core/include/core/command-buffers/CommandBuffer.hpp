@@ -8,19 +8,19 @@ namespace arb {
 
 class CommandBuffer : public NonCopyable {
 public:
-  CommandBuffer(VkDevice device, VkCommandPool pool, VkCommandBuffer buf);
+  CommandBuffer(VkDevice newDevice, VkCommandPool pool, VkCommandBuffer buf);
   ~CommandBuffer();
 
   CommandBuffer(CommandBuffer&& other) noexcept;
   auto operator=(CommandBuffer&& other) noexcept -> CommandBuffer&;
 
-  operator VkCommandBuffer() const noexcept {
+  explicit operator VkCommandBuffer() const noexcept {
     return handle;
   }
 
-  void begin(const VkCommandBufferBeginInfo& info);
-  void end();
-  void pipelineBarrier2(const VkDependencyInfo& dep);
+  void begin(const VkCommandBufferBeginInfo& info) const;
+  void end() const;
+  void pipelineBarrier2(const VkDependencyInfo& dep) const;
 
 private:
   VkDevice device;

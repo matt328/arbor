@@ -1,16 +1,12 @@
 #include "Frame.hpp"
 
 #include "bk/Logger.hpp"
+#include "FrameManager.hpp"
 
 namespace arb {
 
-Frame::Frame(uint8_t newIndex,
-             Fence&& newRenderFence,
-             Semaphore&& newImageAvailableSemaphore,
-             Semaphore&& newComputeFinishedSemaphore)
-    : index{newIndex},
-      imageAvailableSemaphore{std::move(newImageAvailableSemaphore)},
-      computeFinishedSemaphore{std::move(newComputeFinishedSemaphore)} {
+Frame::Frame(FrameManager* newFrameManager, uint8_t newIndex)
+    : frameManager{newFrameManager}, index{newIndex} {
   Log::trace("Creating Frame index={}", newIndex);
 }
 

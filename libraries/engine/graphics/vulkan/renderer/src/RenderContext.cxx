@@ -13,6 +13,7 @@
 
 #include "FrameManager.hpp"
 #include "PerFrameUploader.hpp"
+#include "framegraph/AliasRegistry.hpp"
 
 namespace arb {
 
@@ -27,8 +28,9 @@ RenderContext::RenderContext(const GraphicsOptions& graphicsOptions,
   Log::trace("Creating RenderContext");
   frameManager = std::make_unique<FrameManager>(graphicsOptions, device, swapchain);
   perFrameUploader = std::make_unique<PerFrameUploader>(simStateBuffer, newGeometryHandleMapper);
-
-  frameGraph = std::make_unique<FrameGraph>(newCommandBufferManager, newResourceFacade);
+  aliasRegistry = std::make_unique<AliasRegistry>();
+  frameGraph =
+      std::make_unique<FrameGraph>(newCommandBufferManager, newResourceFacade, *aliasRegistry);
 }
 
 RenderContext::~RenderContext() {
@@ -50,7 +52,7 @@ auto RenderContext::renderNextFrame() -> void {
 
   perFrameUploader->upload();
 
-  // auto results = frameGraph->execute(frame);
+  auto results = frameGraph->execute(frame);
 
   // submitFrame(frame, results);
 

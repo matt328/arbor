@@ -17,6 +17,7 @@ class PerFrameUploader;
 class FrameGraph;
 class CommandBufferManager;
 class ResourceFacade;
+class AliasRegistry;
 
 class RenderContext : public NonCopyableMovable {
 public:
@@ -37,6 +38,7 @@ private:
   bool resizePending{false};
   std::unique_ptr<FrameManager> frameManager;
   std::unique_ptr<PerFrameUploader> perFrameUploader;
+  std::unique_ptr<AliasRegistry> aliasRegistry;
   std::unique_ptr<FrameGraph> frameGraph;
 
   auto recreateSwapchain() -> void;

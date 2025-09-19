@@ -7,6 +7,7 @@ set(vulkanrenderer_SRC
   src/RenderContext.cxx
 
   src/framegraph/FrameGraph.cxx
+  src/framegraph/AliasRegistry.cxx
 
   src/geometry/VirtualGeometryAllocator.cxx
   src/geometry/VirtualGeometryAllocator.cxx

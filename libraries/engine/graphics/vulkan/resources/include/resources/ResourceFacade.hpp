@@ -21,6 +21,7 @@ public:
   ResourceFacade(BufferManager& newBufferManager);
   ~ResourceFacade();
 
+  // Buffers
   auto createBuffer(const BufferCreateInfo& info) -> BufferHandle;
   auto createPerFrameBuffer(const BufferCreateInfo& info, uint32_t frameCount)
       -> PerFrameBufferHandles;
@@ -30,6 +31,7 @@ public:
   auto checkBufferSize(BufferHandle handle, size_t size) -> std::optional<ResizeRequest>;
   auto allocateInBuffer(BufferHandle handle, size_t size) -> BufferRegion;
 
+  // Images
   auto getImageHandle(LogicalImageHandle logicalHandle, size_t frameIndex) -> ImageHandle;
   auto getImage(LogicalImageHandle logicalHandle, size_t frameIndex) -> Image&;
   auto getImage(ImageHandle handle) -> Image&;

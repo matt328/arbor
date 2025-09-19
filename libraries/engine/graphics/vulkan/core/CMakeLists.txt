@@ -10,6 +10,7 @@ set(vulkancore_SRC
   src/AllocatorService.cxx
   src/CommandBuffer.cxx
   src/CommandBufferManager.cxx
+  src/shader-binding/DSLayout.cxx
 )
 
 add_library(${PROJECT_NAME} STATIC ${vulkancore_SRC})

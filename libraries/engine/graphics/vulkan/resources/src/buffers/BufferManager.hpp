@@ -53,7 +53,6 @@ public:
 
 private:
   std::unique_ptr<BufferPool> bufferPool;
-  std::unique_ptr<VirtualAllocationManager> virtualAllocationManager;
 };
 
 }

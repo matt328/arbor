@@ -13,7 +13,7 @@ enum class PassId : uint8_t {
   Present,
 };
 
-enum class ContextId : uint8_t {
+enum class DispatcherId : uint8_t {
   Culling = 0,
   Cube,
   Composition,
