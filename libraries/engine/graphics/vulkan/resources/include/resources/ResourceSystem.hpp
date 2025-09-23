@@ -6,20 +6,22 @@
 #include "BufferHandle.hpp"
 #include "bk/NonCopyMove.hpp"
 #include "BufferCreateInfo.hpp"
+#include "resources/images/ImageView.hpp"
 #include "resources/BufferRegion.hpp"
-#include "resources/ImageHandle.hpp"
+#include "resources/images/ImageHandle.hpp"
 #include "resources/PerFrameBufferHandles.hpp"
-#include "Image.hpp"
+#include "resources/images/Image.hpp"
 #include "resources/ResizeRequest.hpp"
+#include "resources/images/ImageSystem.hpp"
 
 namespace arb {
 
 class BufferManager;
 
-class ResourceFacade : public NonCopyableMovable {
+class ResourceSystem : public NonCopyableMovable {
 public:
-  ResourceFacade(BufferManager& newBufferManager);
-  ~ResourceFacade();
+  explicit ResourceSystem(BufferManager& newBufferManager, ImageSystem& newImageSystem);
+  ~ResourceSystem();
 
   // Buffers
   auto createBuffer(const BufferCreateInfo& info) -> BufferHandle;
@@ -32,12 +34,17 @@ public:
   auto allocateInBuffer(BufferHandle handle, size_t size) -> BufferRegion;
 
   // Images
-  auto getImageHandle(LogicalImageHandle logicalHandle, size_t frameIndex) -> ImageHandle;
-  auto getImage(LogicalImageHandle logicalHandle, size_t frameIndex) -> Image&;
-  auto getImage(ImageHandle handle) -> Image&;
+  auto createImage(const ImageSpec& imageSpec) -> ImageHandle;
+  auto createImageView(const ImageViewSpec& imageViewSpec) -> ImageViewHandle;
+  auto resolveImageHandle(LogicalImageHandle logicalHandle, uint32_t frameIndex) -> ImageHandle;
+  auto getImage(LogicalImageHandle logicalHandle, size_t frameIndex) -> const Image&;
+  auto getImage(ImageHandle handle) -> const Image&;
+  auto getImageView(LogicalImageViewHandle logicalHandle, uint32_t frameIndex) -> const ImageView&;
+  auto getImageView(ImageViewHandle handle) -> const ImageView&;
 
 private:
   BufferManager& bufferManager;
+  ImageSystem& imageSystem;
 };
 
 }

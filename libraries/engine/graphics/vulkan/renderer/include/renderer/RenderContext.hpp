@@ -16,7 +16,7 @@ class Frame;
 class PerFrameUploader;
 class FrameGraph;
 class CommandBufferManager;
-class ResourceFacade;
+class ResourceSystem;
 class AliasRegistry;
 
 class RenderContext : public NonCopyableMovable {
@@ -27,7 +27,7 @@ public:
                 IStateBuffer<SimState>& simStateBuffer,
                 GeometryHandleMapper& newGeometryHandleMapper,
                 CommandBufferManager& newCommandBufferManager,
-                ResourceFacade& newResourceFacade);
+                ResourceSystem& newResourceSystem);
   ~RenderContext();
 
   auto renderNextFrame() -> void;

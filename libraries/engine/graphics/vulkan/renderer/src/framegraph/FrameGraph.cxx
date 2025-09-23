@@ -8,7 +8,7 @@
 #include "core/command-buffers/CommandBuffer.hpp"
 #include "core/command-buffers/CommandBufferManager.hpp"
 
-#include "resources/ResourceFacade.hpp"
+#include "resources/ResourceSystem.hpp"
 #include "framegraph/render-pass/IRenderPass.hpp"
 
 #include "framegraph/AliasRegistry.hpp"
@@ -17,10 +17,10 @@
 namespace arb {
 
 FrameGraph::FrameGraph(CommandBufferManager& newCommandBufferManager,
-                       ResourceFacade& newResourceFacade,
+                       ResourceSystem& newResourceFacade,
                        AliasRegistry& newAliasRegistry)
     : commandBufferManager{newCommandBufferManager},
-      resourceFacade{newResourceFacade},
+      resourceSystem{newResourceFacade},
       aliasRegistry{newAliasRegistry} {
 }
 
@@ -53,17 +53,16 @@ auto FrameGraph::execute(Frame* frame) -> FrameGraphResult {
 
     if (barrierPrecursorPlan.imagePrecursors.contains(passId)) {
       for (const auto& precursor : barrierPrecursorPlan.imagePrecursors.at(passId)) {
-        const auto handle = resourceFacade.getImageHandle(aliasRegistry.getHandle(precursor.alias),
-                                                          frame->getIndex());
+        const auto handle = aliasRegistry.getImageHandle(precursor.alias, frame->getIndex());
         auto lastUse = std::optional<LastImageUse>();
-        if (precursor.alias == ImageAlias::SwapchainImage) {
+        if (precursor.alias == "SwapchainImage") {
           lastUse = getSwapchainImageLastUse(handle);
         } else {
           lastUse = frame->getLastImageUse(precursor.alias);
         }
         auto imageBarrier = barriers::build(precursor, lastUse);
         if (imageBarrier) {
-          const auto& image = resourceFacade.getImage(handle);
+          const auto& image = resourceSystem.getImage(handle);
           imageBarrier->image = image;
           imageBarriers.push_back(*imageBarrier);
         }
@@ -73,7 +72,7 @@ auto FrameGraph::execute(Frame* frame) -> FrameGraphResult {
             .stage = precursor.stageFlags,
             .layout = precursor.layout,
         };
-        if (precursor.alias == ImageAlias::SwapchainImage) {
+        if (precursor.alias == "SwapchainImage") {
           setSwapchainImageLastUse(handle, newLastUse);
         } else {
           frame->setLastImageUse(precursor.alias, newLastUse);
@@ -84,20 +83,8 @@ auto FrameGraph::execute(Frame* frame) -> FrameGraphResult {
     auto bufferBarriers = std::vector<VkBufferMemoryBarrier2>{};
     if (barrierPrecursorPlan.bufferPrecursors.contains(passId)) {
 
-      const auto visitor = [&]<typename T>(T&& arg) -> VkBuffer {
-        using U = std::decay_t<T>;
-        if constexpr (std::is_same_v<U, BufferAlias>) {
-          const auto logicalHandle = aliasRegistry.getHandle(std::forward<T>(arg));
-          return resourceFacade.getBuffer(logicalHandle, frame->getIndex());
-        }
-        if constexpr (std::is_same_v<U, GlobalBufferAlias>) {
-          const auto handle = aliasRegistry.getHandle(std::forward<T>(arg));
-          return resourceFacade.getBuffer(handle);
-        }
-      };
-
       for (const auto& precursor : barrierPrecursorPlan.bufferPrecursors.at(passId)) {
-        const auto& buffer = std::visit(visitor, precursor.alias);
+        const auto& buffer = aliasRegistry.getBuffer(precursor.alias, frame->getIndex());
         auto lastUse = frame->getLastBufferUse(precursor.alias);
         auto bufferBarrier = barriers::build(precursor, lastUse);
         if (bufferBarrier) {

@@ -1,6 +1,7 @@
 #pragma once
 
 // This include is full of warnings, but it's fine everything's fine.
+#include "vulkan/vulkan_core.h"
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wnullability-completeness"
 #include <vma/vk_mem_alloc.h>
@@ -25,6 +26,14 @@ public:
 
   [[nodiscard]] auto mapMemory(VmaAllocation alloc) -> void*;
   void unmapMemory(VmaAllocation alloc);
+
+  auto createImage(const VkImageCreateInfo& ici,
+                   const VmaAllocationCreateInfo& aci,
+                   VkImage& outImage,
+                   VmaAllocation& outAllocation,
+                   VmaAllocationInfo* outAllocationInfo = nullptr) -> void;
+
+  auto destroyImage(VkImage image, VmaAllocation allocation) -> void;
 
   auto getAllocationMemoryProperties(VmaAllocation allocation) -> VkMemoryPropertyFlags;
 

@@ -1,15 +1,14 @@
 #pragma once
 
+#include <format>
 #include <unordered_set>
 #include <vulkan/vk_enum_string_helper.h>
 #include <vulkan/vulkan_core.h>
 
-#include "framegraph/ResourceAliases.hpp"
-
 namespace arb {
 
 struct BufferUsageInfo {
-  BufferAliasVariant alias;
+  std::string alias;
   VkAccessFlags2 accessFlags;
   VkPipelineStageFlags2 stageFlags;
   VkDeviceSize offset = 0;
@@ -23,14 +22,7 @@ struct BufferUsageInfo {
 
 struct BufferUsageInfoHash {
   auto operator()(const BufferUsageInfo& b) const -> std::size_t {
-    std::size_t h1 = std::visit(
-        [](auto&& alias) {
-          using T = std::decay_t<decltype(alias)>;
-          std::size_t tag = std::is_same_v<T, BufferAlias> ? 0 : 1;
-          return (std::hash<T>{}(alias) << 1) | tag;
-        },
-        b.alias);
-
+    std::size_t h1 = std::hash<std::string>{}(b.alias);
     std::size_t h2 = std::hash<uint64_t>{}(static_cast<uint64_t>(b.accessFlags));
     std::size_t h3 = std::hash<uint64_t>{}(static_cast<uint64_t>(b.stageFlags));
     std::size_t h4 = std::hash<VkDeviceSize>{}(b.offset);
@@ -54,7 +46,7 @@ struct std::formatter<arb::BufferUsageInfo> {
   auto format(const arb::BufferUsageInfo& info, FormatContext& ctx) {
     return format_to(ctx.out(),
                      "{{ alias: {}, access: {}, stage: {}, offset: {}, size: {} }}",
-                     to_string(info.alias),
+                     info.alias,
                      string_VkAccessFlags2(info.accessFlags),
                      string_VkPipelineStageFlags2(info.stageFlags),
                      info.offset,

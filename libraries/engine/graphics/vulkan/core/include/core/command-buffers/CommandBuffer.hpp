@@ -14,7 +14,7 @@ public:
   CommandBuffer(CommandBuffer&& other) noexcept;
   auto operator=(CommandBuffer&& other) noexcept -> CommandBuffer&;
 
-  explicit operator VkCommandBuffer() const noexcept {
+  operator VkCommandBuffer() const noexcept {
     return handle;
   }
 

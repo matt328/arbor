@@ -6,7 +6,6 @@
 #include "common/ErrorUtils.hpp"
 #include "PhysicalDevice.hpp"
 #include "Surface.hpp"
-#include "common/ImageView.hpp"
 #include "common/Semaphore.hpp"
 #include "bk/IEventQueue.hpp"
 #include "bk/Logger.hpp"
@@ -23,7 +22,9 @@ Swapchain::Swapchain(PhysicalDevice* newPhysicalDevice,
       surface{newSurface},
       device{newDevice},
       eventQueue{std::move(newEventQueue)},
-      windowSize{initialSize.width, initialSize.height} {
+      windowSize{initialSize.width, initialSize.height},
+      swapchainExtent{},
+      swapchainImageFormat{} {
   Log::trace("Creating Swapchain size: {}x{}", windowSize.width, windowSize.height);
   createSwapchain();
 }
@@ -63,7 +64,6 @@ auto Swapchain::createSwapchain() -> void {
   if (oldSwapchain != nullptr) {
     // Clear out any images/views/semaphores
     swapchainImages.clear();
-    swapchainImageViews.clear();
   }
 
   const auto queueFamilyInfo = physicalDevice->findQueueFamilies(surface);
@@ -115,6 +115,9 @@ auto Swapchain::createSwapchain() -> void {
   checkVk(vkCreateSwapchainKHR(device, &swapchainCreateInfo, nullptr, &currentSwapchain),
           "vkCreateSwapchainKHR");
 
+  // TODO: shift swapchain imageview creation/ownership into the renderer.
+  // renderer will just query the swapchain for its VkImage handles.
+
   uint32_t currentImageCount{};
   checkVk(vkGetSwapchainImagesKHR(device, currentSwapchain, &currentImageCount, nullptr),
           "vkGetSwapchainImagesKHR(count)");
@@ -143,13 +146,10 @@ auto Swapchain::createSwapchain() -> void {
                                                   .format = swapchainImageFormat,
                                                   .components = components,
                                                   .subresourceRange = subersourceRange};
-    std::optional<std::string> imageViewName{};
     std::optional<std::string> semaphoreName{};
 #ifdef DEBUG
-    imageViewName.emplace(std::format("Swapchain ImageView {}", index));
     semaphoreName.emplace(std::format("Swapchain Image Semaphore {}", index));
 #endif
-    swapchainImageViews.emplace_back(device, createInfo, imageViewName);
     imageSemaphores.emplace_back(device, false, semaphoreName);
     ++index;
   }

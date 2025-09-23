@@ -1,14 +1,15 @@
 #pragma once
 
+#include <string>
 #include <vector>
-#include "framegraph/ImageAlias.hpp"
+#include "core/shader-binding/Handles.hpp"
 
 namespace arb {
 
 struct ForwardCreateInfo {
-  ImageAlias colorImage;
-  ImageAlias depthImage;
-  // std::vector<Handle<DSLayout>> dsLayoutHandles;
+  std::string colorImage;
+  std::string depthImage;
+  std::vector<DSLayoutHandle> dsLayoutHandles;
 };
 
 }

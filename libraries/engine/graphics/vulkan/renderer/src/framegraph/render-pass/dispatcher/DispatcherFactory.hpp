@@ -16,7 +16,7 @@ using DispatcherCreateInfo =
 
 class DispatcherFactory {
 public:
-  DispatcherFactory(ResourceFacade& resourceFacade);
+  DispatcherFactory(ResourceSystem& resourceSystem);
   ~DispatcherFactory();
 
   auto createDispatcher(const DispatcherCreateInfo& createInfo) -> DispatcherHandle;
@@ -26,7 +26,7 @@ public:
   auto getDispatcher(DispatcherHandle handle) -> IDispatcher&;
 
 private:
-  ResourceFacade& resourceFacade;
+  ResourceSystem& resourceSystem;
 
   HandleGenerator<DispatcherTag> handleGenerator;
   std::unordered_map<DispatcherHandle, std::unique_ptr<IDispatcher>> dispatcherMap;

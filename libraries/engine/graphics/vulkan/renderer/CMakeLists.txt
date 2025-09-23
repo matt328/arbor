@@ -9,6 +9,10 @@ set(vulkanrenderer_SRC
   src/framegraph/FrameGraph.cxx
   src/framegraph/AliasRegistry.cxx
 
+  src/framegraph/render-pass/pass/ForwardPass.cxx
+  src/framegraph/render-pass/pass/PassFactory.cxx
+  src/framegraph/render-pass/dispatcher/DispatcherFactory.cxx
+
   src/geometry/VirtualGeometryAllocator.cxx
   src/geometry/VirtualGeometryAllocator.cxx
   src/geometry/GeometryStream.cxx
@@ -35,5 +39,6 @@ target_link_libraries(${PROJECT_NAME}
   vulkan::core
   graphics::common
   engine::common
+  readerwriterqueue
   ${Vulkan_LIBRARIES}
 )

@@ -2,17 +2,17 @@
 
 #include "framegraph/ComponentIds.hpp"
 #include "framegraph/IGraphInfoProvider.hpp"
-#include "resources/ResourceFacade.hpp"
+#include "resources/ResourceSystem.hpp"
 
 namespace arb {
 
 class Frame;
-class ResourceFacade;
+class ResourceSystem;
 
 class IDispatcher : public IGraphInfoProvider {
 public:
-  IDispatcher(DispatcherId newId, ResourceFacade& newResourceFacade)
-      : id{newId}, resourceFacade{newResourceFacade} {
+  IDispatcher(DispatcherId newId, ResourceSystem& newResourceFacade)
+      : id{newId}, resourceSystem{newResourceFacade} {
   }
 
   ~IDispatcher() override = default;
@@ -26,7 +26,7 @@ public:
 
 protected:
   DispatcherId id;
-  ResourceFacade& resourceFacade;
+  ResourceSystem& resourceSystem;
 };
 
 }

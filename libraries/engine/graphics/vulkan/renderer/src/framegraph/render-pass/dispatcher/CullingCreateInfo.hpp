@@ -6,14 +6,14 @@
 
 namespace arb {
 
-class ResourceFacade;
+class ResourceSystem;
 
 struct CullingCreateInfo {
   DispatcherId id;
   LogicalBufferHandle resourceTable;
   LogicalBufferHandle frameData;
 
-  auto create(ResourceFacade& resourceFacade) const -> std::unique_ptr<CullingDispatcher> {
+  auto create(ResourceSystem& resourceSystem) const -> std::unique_ptr<CullingDispatcher> {
     return nullptr;
   }
 };

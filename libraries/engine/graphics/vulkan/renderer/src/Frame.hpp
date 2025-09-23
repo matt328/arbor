@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ImageTransitionQueue.hpp"
 #include "common/Semaphore.hpp"
 #include "common/Fence.hpp"
 #include "FrameManager.hpp"
@@ -39,20 +40,28 @@ public:
     return frameManager->getFrameSwapchainIndex(index);
   }
 
-  auto setLastImageUse(ImageAlias alias, LastImageUse use) {
+  auto setLastImageUse(std::string alias, LastImageUse use) {
     frameManager->setFrameLastImageUse(index, alias, use);
   }
 
-  auto getLastImageUse(ImageAlias alias) {
+  auto getLastImageUse(std::string alias) {
     return frameManager->getFrameLastImageUse(index, alias);
   }
 
-  auto setLastBufferUse(BufferAliasVariant alias, LastBufferUse use) {
+  auto setLastBufferUse(std::string alias, LastBufferUse use) {
     frameManager->setFrameLastBufferUse(index, alias, use);
   }
 
-  auto getLastBufferUse(BufferAliasVariant alias) {
+  auto getLastBufferUse(std::string alias) {
     return frameManager->getFrameLastBufferUse(index, alias);
+  }
+
+  auto setImageTransitionInfo(const std::vector<ImageTransitionInfo>& transitionInfo) {
+    frameManager->setImageTransitionInfo(index, transitionInfo);
+  }
+
+  auto getImageTransitionInfo() {
+    return frameManager->getImageTransitionInfo(index);
   }
 
 private:

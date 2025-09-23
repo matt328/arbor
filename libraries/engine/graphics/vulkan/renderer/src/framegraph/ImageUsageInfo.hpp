@@ -1,14 +1,13 @@
 #pragma once
 
+#include <format>
 #include <vulkan/vulkan_core.h>
 #include <vulkan/vk_enum_string_helper.h>
-
-#include "framegraph/ImageAlias.hpp"
 
 namespace arb {
 
 struct ImageUsageInfo {
-  ImageAlias alias;
+  std::string alias;
   VkAccessFlags2 accessFlags;
   VkPipelineStageFlags2 stageFlags;
   VkImageAspectFlags aspectFlags;
@@ -31,7 +30,7 @@ namespace std {
 template <>
 struct hash<arb::ImageUsageInfo> {
   auto operator()(const arb::ImageUsageInfo& info) const noexcept -> size_t {
-    size_t h = std::hash<int>{}(static_cast<int>(info.alias)); // or a suitable hash of alias
+    size_t h = std::hash<std::string>{}(info.alias); // or a suitable hash of alias
     h ^= std::hash<uint32_t>{}(static_cast<uint64_t>(info.accessFlags)) + 0x9e3779b9 + (h << 6) +
          (h >> 2);
     h ^= std::hash<uint32_t>{}(static_cast<uint64_t>(info.stageFlags)) + 0x9e3779b9 + (h << 6) +
@@ -66,7 +65,7 @@ struct std::formatter<arb::ImageUsageInfo> {
     return std::format_to(
         ctx.out(),
         "ImageUsageInfo {{ alias={}, access={}, stage={}, aspect={}, layout={}, clear={} }}",
-        static_cast<uint8_t>(info.alias),
+        info.alias,
         string_VkAccessFlags2(info.accessFlags),
         string_VkPipelineStageFlags2(info.stageFlags),
         string_VkImageAspectFlags(info.aspectFlags),

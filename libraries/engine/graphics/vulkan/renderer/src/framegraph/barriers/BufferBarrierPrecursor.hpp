@@ -3,12 +3,11 @@
 #include <vulkan/vulkan_core.h>
 #include <vulkan/vk_enum_string_helper.h>
 
-#include "framegraph/ResourceAliases.hpp"
 #include "framegraph/barriers/AccessMode.hpp"
 
 namespace arb {
 struct BufferBarrierPrecursor {
-  BufferAliasVariant alias;
+  std::string alias;
   AccessMode accessMode;
   VkAccessFlags2 accessFlags;
   VkPipelineStageFlags2 stageFlags;

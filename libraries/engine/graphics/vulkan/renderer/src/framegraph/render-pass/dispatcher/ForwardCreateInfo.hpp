@@ -7,7 +7,7 @@
 
 namespace arb {
 
-class ResourceFacade;
+class ResourceSystem;
 
 struct ForwardCreateInfo {
   DispatcherId id;
@@ -16,7 +16,7 @@ struct ForwardCreateInfo {
   LogicalBufferHandle indirectCommand;
   LogicalBufferHandle indirectCommandCount;
 
-  auto create(ResourceFacade& resourceFacade) const -> std::unique_ptr<ForwardDispatcher> {
+  auto create(ResourceSystem& resourceSystem) const -> std::unique_ptr<ForwardDispatcher> {
     return nullptr;
   }
 };

@@ -1,5 +1,9 @@
 #pragma once
 
+#include "framegraph/render-pass/dispatcher/IDispatcher.hpp"
+
 namespace arb {
-class CullingDispatcher {};
+
+class CullingDispatcher : public IDispatcher {};
+
 }

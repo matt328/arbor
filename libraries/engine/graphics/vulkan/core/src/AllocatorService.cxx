@@ -38,7 +38,8 @@ void AllocatorService::createBuffer(const VkBufferCreateInfo& bci,
                                     VkBuffer& outBuffer,
                                     VmaAllocation& outAlloc,
                                     VmaAllocationInfo* outAllocInfo) {
-  vmaCreateBuffer(allocator, &bci, &aci, &outBuffer, &outAlloc, outAllocInfo);
+  checkVk(vmaCreateBuffer(allocator, &bci, &aci, &outBuffer, &outAlloc, outAllocInfo),
+          "vmaCreateBuffer");
 }
 
 void AllocatorService::destroyBuffer(VkBuffer buffer, VmaAllocation alloc) {
@@ -53,6 +54,19 @@ void AllocatorService::destroyBuffer(VkBuffer buffer, VmaAllocation alloc) {
 
 void AllocatorService::unmapMemory(VmaAllocation alloc) {
   vmaUnmapMemory(allocator, alloc);
+}
+
+auto AllocatorService::createImage(const VkImageCreateInfo& ici,
+                                   const VmaAllocationCreateInfo& aci,
+                                   VkImage& outImage,
+                                   VmaAllocation& outAllocation,
+                                   VmaAllocationInfo* outAllocationInfo) -> void {
+  checkVk(vmaCreateImage(allocator, &ici, &aci, &outImage, &outAllocation, outAllocationInfo),
+          "vmaCreateImage");
+}
+
+auto AllocatorService::destroyImage(VkImage image, VmaAllocation allocation) -> void {
+  vmaDestroyImage(allocator, image, allocation);
 }
 
 auto AllocatorService::getAllocationMemoryProperties(VmaAllocation allocation)

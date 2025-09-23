@@ -11,7 +11,8 @@ Checks: >
   -readability-uppercase-literal-suffix,
   -misc-no-recursion,
   -google-readability-namespace-comments,
-  -cppcoreguidelines-special-member-functions
+  -cppcoreguidelines-special-member-functions,
+  -cppcoreguidelines-avoid-const-or-ref-data-members
 WarningsAsErrors: "false"
 HeaderFilterRegex: ""
 FormatStyle: google

@@ -1,34 +1,54 @@
 #pragma once
 
-#include <array>
+#include <string>
+#include <unordered_map>
+#include <vulkan/vulkan_core.h>
 
 #include "bk/NonCopyMove.hpp"
-#include "ImageAlias.hpp"
-#include "ResourceAliases.hpp"
 #include "resources/BufferHandle.hpp"
-#include "resources/ImageHandle.hpp"
+#include "resources/images/ImageHandle.hpp"
+#include "resources/images/ImageSpec.hpp"
+#include "resources/ResourceSystem.hpp"
 
 namespace arb {
+
+struct BufferSpec {};
 
 /// Contains mappings of resource Aliases used in the FrameGraph to their (Logical)Handles.
 class AliasRegistry : public NonCopyableMovable {
 public:
-  AliasRegistry() = default;
+  explicit AliasRegistry(ResourceSystem& newResourceSystem);
   ~AliasRegistry() = default;
 
-  [[nodiscard]] auto getHandle(ImageAlias alias) const -> LogicalImageHandle;
-  [[nodiscard]] auto getHandle(BufferAlias alias) const -> LogicalBufferHandle;
-  [[nodiscard]] auto getHandle(GlobalBufferAlias alias) const -> BufferHandle;
+  void registerImageAlias(const std::string& alias, ImageSpec spec);
+  void registerBufferAlias(std::string alias, BufferSpec spec);
 
-  auto setHandle(ImageAlias alias, LogicalImageHandle handle) -> void;
-  auto setHandle(BufferAlias alias, LogicalBufferHandle handle) -> void;
-  auto setHandle(GlobalBufferAlias alias, BufferHandle handle) -> void;
-  auto reset() -> void;
+  void buildResources(uint32_t frameCount);
+
+  [[nodiscard]] auto getImageHandle(std::string_view alias, uint32_t frameIndex) const
+      -> ImageHandle;
+  [[nodiscard]] auto getBufferHandle(std::string_view alias, uint32_t frameIndex) const
+      -> BufferHandle;
+  [[nodiscard]] auto getBuffer(std::string_view alias, uint32_t frameIndex) const -> Buffer&;
+
+  [[nodiscard]] auto getAttachmentInfo(const std::string& alias,
+                                       uint32_t frameIndex,
+                                       VkImageLayout layout,
+                                       VkAttachmentLoadOp loadOp,
+                                       VkAttachmentStoreOp storeOp,
+                                       std::optional<VkClearValue> clearValue = std::nullopt) const
+      -> VkRenderingAttachmentInfo;
+
+  void logAliases() const;
 
 private:
-  std::array<LogicalImageHandle, static_cast<size_t>(ImageAlias::Count)> handles;
-  std::array<LogicalBufferHandle, static_cast<size_t>(BufferAlias::Count)> bufferHandles;
-  std::array<BufferHandle, static_cast<size_t>(GlobalBufferAlias::Count)> globalBufferHandles;
+  ResourceSystem& resourceSystem;
+
+  std::unordered_map<std::string, ImageSpec> aliasImageSpecMap;
+  std::unordered_map<std::string, std::vector<ImageViewHandle>> aliasImageViewMap;
+
+  static auto createImageViewSpec(ImageHandle imageHandle, const ImageSpec& imageSpec)
+      -> ImageViewSpec;
 };
 
 }

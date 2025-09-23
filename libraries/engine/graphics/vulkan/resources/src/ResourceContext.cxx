@@ -2,7 +2,7 @@
 
 #include "bk/Logger.hpp"
 #include "buffers/BufferManager.hpp"
-#include "resources/ResourceFacade.hpp"
+#include "resources/ResourceSystem.hpp"
 
 namespace arb {
 
@@ -11,15 +11,16 @@ ResourceContext::ResourceContext(Device& newDevice,
                                  SemaphorePack semaphores) {
   Log::trace("Constructing ResourceContext");
   bufferManager = std::make_unique<BufferManager>(newDevice, allocatorService, semaphores);
-  resourceFacade = std::make_unique<ResourceFacade>(*bufferManager);
+  imageSystem = std::make_unique<ImageSystem>(newDevice, allocatorService);
+  resourceSystem = std::make_unique<ResourceSystem>(*bufferManager, *imageSystem);
 }
 
 ResourceContext::~ResourceContext() {
   Log::trace("Destroying ResourceContext");
 }
 
-auto ResourceContext::getResourceFacade() const -> ResourceFacade& {
-  return *resourceFacade;
+auto ResourceContext::getResourceFacade() const -> ResourceSystem& {
+  return *resourceSystem;
 }
 
 }

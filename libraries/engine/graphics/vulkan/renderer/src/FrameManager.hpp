@@ -5,13 +5,12 @@
 #include <variant>
 #include <vector>
 
+#include "ImageTransitionQueue.hpp"
 #include "bk/NonCopyMove.hpp"
 
 #include "common/Semaphore.hpp"
 #include "common/Fence.hpp"
 #include "common/ImageAcquireResult.hpp"
-#include "framegraph/ImageAlias.hpp"
-#include "framegraph/ResourceAliases.hpp"
 #include "framegraph/barriers/LastBufferUse.hpp"
 #include "framegraph/barriers/LastImageUse.hpp"
 
@@ -39,11 +38,15 @@ public:
   auto setFrameSwapchainIndex(uint8_t index, uint32_t imageIndex) -> void;
   auto getFrameSwapchainIndex(uint8_t index) -> uint32_t;
 
-  auto setFrameLastImageUse(uint8_t index, ImageAlias alias, LastImageUse use) -> void;
-  auto getFrameLastImageUse(uint8_t index, ImageAlias alias) -> LastImageUse;
+  auto setFrameLastImageUse(uint8_t index, std::string alias, LastImageUse use) -> void;
+  auto getFrameLastImageUse(uint8_t index, std::string alias) -> LastImageUse;
 
-  auto setFrameLastBufferUse(uint8_t index, BufferAliasVariant alias, LastBufferUse use) -> void;
-  auto getFrameLastBufferUse(uint8_t index, BufferAliasVariant alias) -> LastBufferUse;
+  auto setFrameLastBufferUse(uint8_t index, std::string alias, LastBufferUse use) -> void;
+  auto getFrameLastBufferUse(uint8_t index, std::string alias) -> LastBufferUse;
+
+  auto setImageTransitionInfo(uint8_t index, const std::vector<ImageTransitionInfo>& transitionInfo)
+      -> void;
+  auto getImageTransitionInfo(uint8_t index) -> std::vector<ImageTransitionInfo>;
 
 private:
   Device& device;
@@ -56,8 +59,9 @@ private:
   std::vector<Fence> inFlightFences;
   std::vector<Semaphore> imageAvailableSemaphores;
   std::vector<Semaphore> computeFinishedSemaphores;
-  std::vector<std::unordered_map<ImageAlias, LastImageUse>> lastImageUses;
-  std::vector<std::unordered_map<BufferAliasVariant, LastBufferUse>> lastBufferUses;
+  std::vector<std::unordered_map<std::string, LastImageUse>> lastImageUses;
+  std::vector<std::unordered_map<std::string, LastBufferUse>> lastBufferUses;
+  std::vector<std::vector<ImageTransitionInfo>> imageTransitionInfo;
 };
 
 }

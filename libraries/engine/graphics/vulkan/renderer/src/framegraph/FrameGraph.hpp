@@ -8,7 +8,7 @@
 
 #include "barriers/BarrierPrecursorPlan.hpp"
 #include "bk/NonCopyMove.hpp"
-#include "resources/ImageHandle.hpp"
+#include "resources/images/ImageHandle.hpp"
 
 #include "barriers/LastImageUse.hpp"
 #include "ComponentIds.hpp"
@@ -17,7 +17,7 @@ namespace arb {
 
 class CommandBufferManager;
 class IRenderPass;
-class ResourceFacade;
+class ResourceSystem;
 class Frame;
 class AliasRegistry;
 
@@ -28,7 +28,7 @@ struct FrameGraphResult {
 class FrameGraph : public NonCopyableMovable {
 public:
   FrameGraph(CommandBufferManager& newCommandBufferManager,
-             ResourceFacade& newResourceFacade,
+             ResourceSystem& newResourceFacade,
              AliasRegistry& newAliasRegistry);
   ~FrameGraph();
 
@@ -42,7 +42,7 @@ public:
 
 private:
   CommandBufferManager& commandBufferManager;
-  ResourceFacade& resourceFacade;
+  ResourceSystem& resourceSystem;
   AliasRegistry& aliasRegistry;
 
   std::vector<std::unique_ptr<IRenderPass>> renderPasses;

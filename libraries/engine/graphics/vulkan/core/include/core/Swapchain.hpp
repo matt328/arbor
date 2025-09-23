@@ -48,7 +48,6 @@ private:
   VkFormat swapchainImageFormat;
 
   std::vector<VkImage> swapchainImages;
-  std::vector<ImageView> swapchainImageViews;
   std::vector<Semaphore> imageSemaphores;
 
   auto createSwapchain() -> void;

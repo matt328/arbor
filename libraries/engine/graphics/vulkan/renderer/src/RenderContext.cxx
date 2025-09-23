@@ -5,7 +5,7 @@
 #include "core/Device.hpp"
 #include "core/Swapchain.hpp"
 #include "core/command-buffers/CommandBufferManager.hpp"
-#include "resources/ResourceFacade.hpp"
+#include "resources/ResourceSystem.hpp"
 
 #include "graphics/common/GraphicsOptions.hpp"
 
@@ -23,14 +23,14 @@ RenderContext::RenderContext(const GraphicsOptions& graphicsOptions,
                              IStateBuffer<SimState>& simStateBuffer,
                              GeometryHandleMapper& newGeometryHandleMapper,
                              CommandBufferManager& newCommandBufferManager,
-                             ResourceFacade& newResourceFacade)
+                             ResourceSystem& newResourceSystem)
     : device{newDevice}, swapchain{newSwapchain} {
   Log::trace("Creating RenderContext");
   frameManager = std::make_unique<FrameManager>(graphicsOptions, device, swapchain);
   perFrameUploader = std::make_unique<PerFrameUploader>(simStateBuffer, newGeometryHandleMapper);
-  aliasRegistry = std::make_unique<AliasRegistry>();
+  aliasRegistry = std::make_unique<AliasRegistry>(newResourceSystem);
   frameGraph =
-      std::make_unique<FrameGraph>(newCommandBufferManager, newResourceFacade, *aliasRegistry);
+      std::make_unique<FrameGraph>(newCommandBufferManager, newResourceSystem, *aliasRegistry);
 }
 
 RenderContext::~RenderContext() {

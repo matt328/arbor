@@ -8,7 +8,7 @@ class ShaderBindingProxy;
 
 class CompositionDispatcher : public IDispatcher {
 public:
-  CompositionDispatcher(ResourceFacade& newResourceFacade,
+  CompositionDispatcher(ResourceSystem& newResourceFacade,
                         ShaderBindingProxy& newShaderBindingProxy);
   ~CompositionDispatcher() override;
 
@@ -22,7 +22,7 @@ public:
   [[nodiscard]] auto getGraphInfo() const -> PassGraphInfo override;
 
 private:
-  ResourceFacade& resourceFacade;
+  ResourceSystem& resourceSystem;
   ShaderBindingProxy& shaderBindingProxy;
 };
 

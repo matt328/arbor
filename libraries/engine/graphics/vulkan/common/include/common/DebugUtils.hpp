@@ -38,6 +38,11 @@ struct VulkanObjectType<VkDescriptorSetLayout> {
   static constexpr VkObjectType value = VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT;
 };
 
+template <>
+struct VulkanObjectType<VkSampler> {
+  static constexpr VkObjectType value = VK_OBJECT_TYPE_SAMPLER;
+};
+
 template <typename Handle>
 inline void setDebugName(VkDevice device, Handle handle, std::string_view name) {
 #ifdef DEBUG

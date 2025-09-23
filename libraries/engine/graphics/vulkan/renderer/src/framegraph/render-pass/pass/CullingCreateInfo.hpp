@@ -1,12 +1,14 @@
 #pragma once
 
-#include "framegraph/ResourceAliases.hpp"
+#include <string>
 
 namespace arb {
+
 struct CullingCreateInfo {
-  BufferAlias objectDataBuffer;
-  BufferAlias geometryRegionBuffer;
-  BufferAlias indirectCommandBuffer;
-  BufferAlias indirectCommandCountBuffer;
+  std::string objectDataBuffer;
+  std::string geometryRegionBuffer;
+  std::string indirectCommandBuffer;
+  std::string indirectCommandCountBuffer;
 };
+
 }

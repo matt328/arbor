@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/common/Handle.hpp"
+#include "dispatcher/DispatcherHandles.hpp"
 #include "framegraph/ComponentIds.hpp"
 #include "framegraph/IGraphInfoProvider.hpp"
 
@@ -16,7 +16,7 @@ public:
 
   [[nodiscard]] virtual auto getId() const -> PassId = 0;
   virtual auto execute(Frame* frame, VkCommandBuffer cmdBuffer) -> void = 0;
-  virtual auto registerDispatchContext(Handle<IDispatchContext> handle) -> void = 0;
+  virtual auto registerDispatchContext(DispatcherHandle handle) -> void = 0;
 };
 
 }

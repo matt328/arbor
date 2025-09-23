@@ -49,6 +49,14 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Cereal)
 
+# readerwriterqueue
+FetchContent_Declare(
+  readerwriterqueue
+  GIT_REPOSITORY https://github.com/cameron314/readerwriterqueue
+  GIT_TAG master
+)
+FetchContent_MakeAvailable(readerwriterqueue)
+
 # Restore original flags
 set(CMAKE_CXX_FLAGS "${old_cxx_flags}")
 set(CMAKE_C_FLAGS "${old_c_flags}")

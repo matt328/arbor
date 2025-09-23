@@ -4,12 +4,14 @@
 #include <variant>
 
 #include "bk/Logger.hpp"
-#include "resources/ResourceFacade.hpp"
+#include "framegraph/render-pass/dispatcher/CullingCreateInfo.hpp"
+#include "framegraph/render-pass/dispatcher/IDispatcher.hpp"
+#include "resources/ResourceSystem.hpp"
 
 namespace arb {
 
-DispatcherFactory::DispatcherFactory(ResourceFacade& newResourceFacade)
-    : resourceFacade{newResourceFacade} {
+DispatcherFactory::DispatcherFactory(ResourceSystem& newResourceSystem)
+    : resourceSystem{newResourceSystem} {
   Log::trace("Creating DispatcherFactory");
 }
 
@@ -25,7 +27,8 @@ auto DispatcherFactory::createDispatcher(const DispatcherCreateInfo& createInfo)
       [&](auto&& info) -> void {
         Log::trace("visiting");
         handlesById.emplace(info.id, handle);
-        dispatcherMap.emplace(handle, info.create(resourceFacade));
+        auto dispatcher = info.create(resourceSystem);
+        dispatcherMap.emplace(handle, info.create(resourceSystem));
       },
       createInfo);
 

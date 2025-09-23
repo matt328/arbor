@@ -24,6 +24,7 @@ FrameManager::FrameManager(const GraphicsOptions& graphicsOptions,
   computeFinishedSemaphores.reserve(graphicsOptions.framesInFlight);
   lastImageUses.reserve(graphicsOptions.framesInFlight);
   lastBufferUses.reserve(graphicsOptions.framesInFlight);
+  imageTransitionInfo.reserve(graphicsOptions.framesInFlight);
 
   for (uint8_t i = 0; i < graphicsOptions.framesInFlight; ++i) {
     const auto fenceName = std::format("Fence-InFlight-Frame-{}", i);
@@ -116,21 +117,32 @@ auto FrameManager::getFrameSwapchainIndex(uint8_t index) -> uint32_t {
   return swapchainImageIndices[index];
 }
 
-auto FrameManager::setFrameLastImageUse(uint8_t index, ImageAlias alias, LastImageUse use) -> void {
+auto FrameManager::setFrameLastImageUse(uint8_t index, std::string alias, LastImageUse use)
+    -> void {
   lastImageUses[index][alias] = use;
 }
 
-auto FrameManager::getFrameLastImageUse(uint8_t index, ImageAlias alias) -> LastImageUse {
+auto FrameManager::getFrameLastImageUse(uint8_t index, std::string alias) -> LastImageUse {
   return lastImageUses[index][alias];
 }
 
-auto FrameManager::setFrameLastBufferUse(uint8_t index, BufferAliasVariant alias, LastBufferUse use)
+auto FrameManager::setFrameLastBufferUse(uint8_t index, std::string alias, LastBufferUse use)
     -> void {
   lastBufferUses[index][alias] = use;
 }
 
-auto FrameManager::getFrameLastBufferUse(uint8_t index, BufferAliasVariant alias) -> LastBufferUse {
+auto FrameManager::getFrameLastBufferUse(uint8_t index, std::string alias) -> LastBufferUse {
   return lastBufferUses[index][alias];
+}
+
+auto FrameManager::setImageTransitionInfo(uint8_t index,
+                                          const std::vector<ImageTransitionInfo>& transitionInfo)
+    -> void {
+  imageTransitionInfo[index] = transitionInfo;
+}
+
+auto FrameManager::getImageTransitionInfo(uint8_t index) -> std::vector<ImageTransitionInfo> {
+  return imageTransitionInfo[index];
 }
 
 }

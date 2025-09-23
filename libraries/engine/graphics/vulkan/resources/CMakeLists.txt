@@ -2,13 +2,23 @@ project("vulkan-resources")
 
 set(vulkanresources_SRC
   src/ResourceContext.cxx
-  src/ResourceFacade.cxx
+  src/ResourceSystem.cxx
 
   src/buffers/BufferManager.cxx
   src/buffers/ArenaAllocator.cxx
   src/buffers/BufferAllocator.cxx
   src/buffers/LinearAllocator.cxx
   src/buffers/BufferPool.cxx
+
+  src/images/Image.cxx
+  src/images/ImageManager.cxx
+  src/images/ImageSystem.cxx
+  src/images/ImageView.cxx
+  src/images/ImageViewManager.cxx
+  src/images/LogicalImageAllocator.cxx
+  src/images/LogicalImageViewAllocator.cxx
+  src/images/Sampler.cxx
+  src/images/SamplerManager.cxx
 )
 
 add_library(${PROJECT_NAME} STATIC ${vulkanresources_SRC})

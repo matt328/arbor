@@ -1,9 +1,6 @@
 #pragma once
 
-#include "Buffer.hpp"
-#include "BufferHandle.hpp"
 #include "bk/NonCopyMove.hpp"
-#include "BufferCreateInfo.hpp"
 #include "common/SemaphorePack.hpp"
 
 #include <memory>
@@ -14,18 +11,20 @@ class BufferManager;
 class AllocatorService;
 class Semaphore;
 class Device;
-class ResourceFacade;
+class ImageSystem;
+class ResourceSystem;
 
 class ResourceContext : public NonCopyableMovable {
 public:
   ResourceContext(Device& newDevice, AllocatorService& allocatorService, SemaphorePack semaphores);
   ~ResourceContext();
 
-  [[nodiscard]] auto getResourceFacade() const -> ResourceFacade&;
+  [[nodiscard]] auto getResourceFacade() const -> ResourceSystem&;
 
 private:
   std::unique_ptr<BufferManager> bufferManager;
-  std::unique_ptr<ResourceFacade> resourceFacade;
+  std::unique_ptr<ImageSystem> imageSystem;
+  std::unique_ptr<ResourceSystem> resourceSystem;
 };
 
 }

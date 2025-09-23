@@ -12,7 +12,7 @@
 
 namespace arb {
 
-class ResourceFacade;
+class ResourceSystem;
 
 // Set these 1 byte larger than the test model so we can force a resize when loading 1 model
 constexpr size_t IndexBufferInitialSize = 45937;
@@ -25,7 +25,7 @@ constexpr size_t AnimationBufferInitialSize = 1024000;
 /// A Facade over all of the individual buffers that store geometry information on the GPU.
 class GeometryStream {
 public:
-  GeometryStream(ResourceFacade& newResourceFacade);
+  GeometryStream(ResourceSystem& newResourceFacade);
   ~GeometryStream();
 
   GeometryStream(const GeometryStream&) = delete;
@@ -70,7 +70,7 @@ public:
   auto allocateAnimationBuffer(const BufferRequest& bufferRequest) -> BufferRegion;
 
 private:
-  ResourceFacade& resourceFacade;
+  ResourceSystem& resourceSystem;
 
   BufferHandle indexBuffer;
   BufferHandle positionBuffer;

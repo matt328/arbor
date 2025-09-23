@@ -1,5 +1,7 @@
 #pragma once
 
+#include <format>
+
 #include "framegraph/BufferUsageInfo.hpp"
 #include "framegraph/ImageUsageInfo.hpp"
 
