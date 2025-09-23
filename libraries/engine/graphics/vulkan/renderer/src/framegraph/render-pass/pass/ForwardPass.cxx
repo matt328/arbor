@@ -70,6 +70,19 @@ auto ForwardPass::execute(Frame* frame, VkCommandBuffer cmdBuffer) -> void {
       vkCmdPipelineBarrier2(cmdBuffer, &dependencyInfo);
     }
   }
+
+  const auto& pipelineUnit = pipelineManager.getPipelineUnit(pipelineHandle);
+
+  vkCmdBeginRendering(cmdBuffer, &renderingInfo);
+  vkCmdBindPipeline(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineUnit.pipeline);
+
+  for (const auto& handle : dispatcherHandles) {
+    auto& dispatcher = dispatcherFactory.getDispatcher(handle);
+    dispatcher.bind(frame, cmdBuffer, pipelineUnit.layout);
+    dispatcher.dispatch(frame, cmdBuffer);
+  }
+
+  vkCmdEndRendering(cmdBuffer);
 }
 
 auto ForwardPass::registerDispatchContext(DispatcherHandle handle) -> void {

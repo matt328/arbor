@@ -1,5 +1,9 @@
 #include "renderer/RenderContext.hpp"
 
+#include <array>
+#include <vulkan/vulkan_core.h>
+
+#include "Frame.hpp"
 #include "bk/Logger.hpp"
 
 #include "core/Device.hpp"
@@ -54,7 +58,7 @@ auto RenderContext::renderNextFrame() -> void {
 
   auto results = frameGraph->execute(frame);
 
-  // submitFrame(frame, results);
+  submitFrame(frame, results);
 
   // const auto presentResult = presentFrame(frame);
   // if (presentResult == VK_SUBOPTIMAL_KHR || presentResult == VK_ERROR_OUT_OF_DATE_KHR) {
@@ -62,6 +66,36 @@ auto RenderContext::renderNextFrame() -> void {
   //   resizePending = true;
   // }
   // FrameMark;
+}
+
+void RenderContext::submitFrame(Frame* frame, const FrameGraphResult& frameResult) {
+  frame->setSubmitted(true);
+
+  constexpr auto waitStages =
+      std::array<VkPipelineStageFlags, 1>{VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+
+  const auto swapchainImageIndex = frame->getSwapchainImageIndex();
+  VkSemaphore swapchainImageSemaphore = swapchain.getImageSemaphore(swapchainImageIndex);
+
+  VkSemaphore imageAvailableSemaphore = frame->getImageAvailableSemaphore();
+
+  const auto submitInfo = VkSubmitInfo{
+      .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+      .waitSemaphoreCount = 1,
+      .pWaitSemaphores = &imageAvailableSemaphore,
+      .pWaitDstStageMask = waitStages.data(),
+      .commandBufferCount = static_cast<uint32_t>(frameResult.commandBuffers.size()),
+      .pCommandBuffers = frameResult.commandBuffers.data(),
+      .signalSemaphoreCount = 1,
+      .pSignalSemaphores = &swapchainImageSemaphore,
+  };
+
+  try {
+    graphicsQueue->getQueue().submit(submitInfo, *frame->getInFlightFence());
+    frameState->advanceFrame();
+  } catch (const std::exception& ex) {
+    Log->error("Failed to submit command buffer submission {}", ex.what());
+  }
 }
 
 auto RenderContext::recreateSwapchain() -> void {

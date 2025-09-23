@@ -5,6 +5,7 @@
 #include "engine/common/IStateBuffer.hpp"
 #include "engine/common/SimState.hpp"
 #include "common/HandleMapperTypes.hpp"
+#include "framegraph/FrameGraph.hpp"
 
 namespace arb {
 
@@ -30,7 +31,7 @@ public:
                 ResourceSystem& newResourceSystem);
   ~RenderContext();
 
-  auto renderNextFrame() -> void;
+  void renderNextFrame();
 
 private:
   Device& device;
@@ -41,8 +42,9 @@ private:
   std::unique_ptr<AliasRegistry> aliasRegistry;
   std::unique_ptr<FrameGraph> frameGraph;
 
-  auto recreateSwapchain() -> void;
+  void recreateSwapchain();
   auto tryAcquireFrame() -> Frame*;
+  void submitFrame(Frame* frame, const FrameGraphResult& frameResult);
 };
 
 }

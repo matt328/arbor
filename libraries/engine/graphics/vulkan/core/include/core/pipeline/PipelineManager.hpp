@@ -5,6 +5,7 @@
 #include "PipelineUnitCreateInfo.hpp"
 #include "core/Device.hpp"
 #include "bk/NonCopyMove.hpp"
+#include "core/pipeline/Pipeline.hpp"
 #include "engine/common/Handle.hpp"
 #include "engine/common/HandleGenerator.hpp"
 
@@ -24,6 +25,8 @@ public:
   ~PipelineManager();
 
   auto createPipeline(const PipelineCreateInfo& createInfo) -> PipelineUnitHandle;
+
+  [[nodiscard]] auto getPipelineUnit(PipelineUnitHandle handle) const -> const PipelineUnit&;
 
 private:
   Device& device;

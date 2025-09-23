@@ -32,7 +32,9 @@ public:
 
   auto acquireNextImage(const Semaphore& semaphore) -> std::variant<uint32_t, ImageAcquireResult>;
 
-  auto recreate() -> void;
+  void recreate();
+
+  auto getImageSemaphore(uint32_t index) -> const Semaphore&;
 
 private:
   PhysicalDevice* physicalDevice;

@@ -23,7 +23,7 @@ public:
 
   ~Pipeline();
 
-  explicit operator VkPipeline() const {
+  operator VkPipeline() const {
     return pipeline;
   }
 
