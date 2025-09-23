@@ -16,9 +16,10 @@ PerFrameUploader::~PerFrameUploader() {
 
 auto PerFrameUploader::upload() -> void {
   auto slot = stateBuffer.checkoutForRead();
-  auto& simState = slot.value()->data;
-
-  collectGeometryDetails(simState);
+  if (slot.has_value()) {
+    auto& simState = slot.value()->data;
+    collectGeometryDetails(simState);
+  }
 }
 
 auto PerFrameUploader::collectGeometryDetails(SimState& state) -> void {

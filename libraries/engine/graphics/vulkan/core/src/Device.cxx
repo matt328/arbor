@@ -1,6 +1,7 @@
-#include <utility>
-
 #include "core/Device.hpp"
+
+#include <cassert>
+#include <utility>
 
 #include "PhysicalDevice.hpp"
 #include "bk/Logger.hpp"
@@ -14,6 +15,18 @@ Device::Device(VkDevice newDevice,
       physicalDevice{newPhysicalDevice},
       queueFamilyIndices{std::move(newQueueFamilyIndices)} {
   Log::trace("Creating Device");
+
+  assert(queueFamilyIndices.graphicsFamily.has_value());
+  vkGetDeviceQueue(vkDevice, *queueFamilyIndices.graphicsFamily, 0, &graphics);
+
+  assert(queueFamilyIndices.presentFamily.has_value());
+  vkGetDeviceQueue(vkDevice, *queueFamilyIndices.presentFamily, 0, &present);
+
+  assert(queueFamilyIndices.computeFamily.has_value());
+  vkGetDeviceQueue(vkDevice, *queueFamilyIndices.computeFamily, 0, &compute);
+
+  assert(queueFamilyIndices.transferFamily.has_value());
+  vkGetDeviceQueue(vkDevice, *queueFamilyIndices.transferFamily, 0, &transfer);
 }
 
 Device::~Device() {

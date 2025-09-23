@@ -59,6 +59,10 @@ auto Swapchain::acquireNextImage(const Semaphore& semaphore)
 auto Swapchain::recreate() -> void {
 }
 
+auto Swapchain::getImageSemaphore(uint32_t index) -> const Semaphore& {
+  return imageSemaphores.at(index);
+}
+
 auto Swapchain::createSwapchain() -> void {
   vkDeviceWaitIdle(device);
   if (oldSwapchain != nullptr) {

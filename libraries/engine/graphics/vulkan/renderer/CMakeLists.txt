@@ -5,6 +5,7 @@ set(vulkanrenderer_SRC
   src/FrameManager.cxx
   src/PerFrameUploader.cxx
   src/RenderContext.cxx
+  src/FrameRenderer.cxx
 
   src/framegraph/FrameGraph.cxx
   src/framegraph/AliasRegistry.cxx

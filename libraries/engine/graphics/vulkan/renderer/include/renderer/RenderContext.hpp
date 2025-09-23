@@ -5,7 +5,6 @@
 #include "engine/common/IStateBuffer.hpp"
 #include "engine/common/SimState.hpp"
 #include "common/HandleMapperTypes.hpp"
-#include "framegraph/FrameGraph.hpp"
 
 namespace arb {
 
@@ -19,6 +18,9 @@ class FrameGraph;
 class CommandBufferManager;
 class ResourceSystem;
 class AliasRegistry;
+class FrameGraph;
+struct FrameGraphResult;
+class FrameRenderer;
 
 class RenderContext : public NonCopyableMovable {
 public:
@@ -41,10 +43,7 @@ private:
   std::unique_ptr<PerFrameUploader> perFrameUploader;
   std::unique_ptr<AliasRegistry> aliasRegistry;
   std::unique_ptr<FrameGraph> frameGraph;
-
-  void recreateSwapchain();
-  auto tryAcquireFrame() -> Frame*;
-  void submitFrame(Frame* frame, const FrameGraphResult& frameResult);
+  std::unique_ptr<FrameRenderer> frameRenderer;
 };
 
 }

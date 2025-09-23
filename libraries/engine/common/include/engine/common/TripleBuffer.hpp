@@ -5,6 +5,7 @@
 #include "IStateBuffer.hpp"
 
 #include <array>
+#include <thread>
 
 namespace arb {
 

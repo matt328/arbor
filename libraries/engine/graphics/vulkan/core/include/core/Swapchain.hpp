@@ -36,6 +36,10 @@ public:
 
   auto getImageSemaphore(uint32_t index) -> const Semaphore&;
 
+  operator VkSwapchainKHR() const noexcept {
+    return currentSwapchain;
+  }
+
 private:
   PhysicalDevice* physicalDevice;
   Surface* surface;

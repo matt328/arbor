@@ -165,7 +165,7 @@ auto PhysicalDevice::handle() const -> VkPhysicalDevice {
   checkVk(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vkPhysicalDevice, *surface, &capabilities),
           "vkGetPhysicalDeviceSurfaceCapabilitiesKHR");
 
-  uint32_t formatCount;
+  uint32_t formatCount = 0;
   checkVk(vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice, *surface, &formatCount, nullptr),
           "vkGetPhysicalDeviceSurfaceFormatsKHR(count)");
   auto surfaceFormats = std::vector<VkSurfaceFormatKHR>{formatCount};
@@ -174,7 +174,7 @@ auto PhysicalDevice::handle() const -> VkPhysicalDevice {
                                                &formatCount,
                                                surfaceFormats.data()),
           "vkGetPhysicalDeviceSurfaceFormatsKHR(data)");
-  uint32_t presentModeCount;
+  uint32_t presentModeCount = 0;
   vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice, *surface, &presentModeCount, nullptr);
   std::vector<VkPresentModeKHR> presentModes(presentModeCount);
   vkGetPhysicalDeviceSurfacePresentModesKHR(vkPhysicalDevice,

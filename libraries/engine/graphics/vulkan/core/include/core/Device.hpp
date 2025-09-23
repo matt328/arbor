@@ -27,11 +27,31 @@ public:
     return vkDevice;
   }
 
+  auto graphicsQueue() {
+    return graphics;
+  }
+
+  auto presentQueue() {
+    return present;
+  }
+
+  auto computeQueue() {
+    return compute;
+  }
+
+  auto transferQueue() {
+    return transfer;
+  }
+
 private:
   VkDevice vkDevice;
   const PhysicalDevice* physicalDevice;
 
   const QueueFamilyIndices queueFamilyIndices{};
+  VkQueue graphics{VK_NULL_HANDLE};
+  VkQueue present{VK_NULL_HANDLE};
+  VkQueue compute{VK_NULL_HANDLE};
+  VkQueue transfer{VK_NULL_HANDLE};
 };
 
 }

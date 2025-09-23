@@ -59,6 +59,7 @@ auto VulkanContext::run(std::stop_token token) -> void {
     auto now = clock::now();
     if (now >= nextTick) {
       Log::trace("graphicsContext tick()");
+      renderContext->renderNextFrame();
       eventQueue->dispatchPending();
       nextTick += timestep;
       if (now > nextTick + timestep * 10) {
