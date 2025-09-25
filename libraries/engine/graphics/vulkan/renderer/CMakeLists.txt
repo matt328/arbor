@@ -30,6 +30,7 @@ target_include_directories(${PROJECT_NAME}
   PRIVATE
   src
   ${Vulkan_INCLUDE_DIRS}
+  ${TRACY_INCLUDE_DIR}
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -42,4 +43,5 @@ target_link_libraries(${PROJECT_NAME}
   engine::common
   readerwriterqueue
   ${Vulkan_LIBRARIES}
+  ${TRACY_LIB}
 )

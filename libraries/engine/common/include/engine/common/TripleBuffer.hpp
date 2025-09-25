@@ -6,6 +6,7 @@
 
 #include <array>
 #include <thread>
+#include <Tracy.hpp>
 
 namespace arb {
 
@@ -34,24 +35,30 @@ public:
 
   auto checkoutForWrite(size_t maxRetries = DefaultMaxRetries)
       -> std::optional<typename IStateBuffer<T>::Slot*> override {
+    ZoneScoped;
     for (size_t attempt = 0; attempt < maxRetries; ++attempt) {
       if (auto slot = tryCheckoutForWrite()) {
+        TracyPlot("TripleBuffer_ReadAttempts", (long long)attempt);
         return slot;
       }
       std::this_thread::sleep_for(std::chrono::microseconds(DefaultSleep));
     }
+    TracyPlot("TripleBuffer_WriteFailures", (long long)1);
     return std::nullopt;
   }
 
   auto checkoutForRead(size_t maxRetries = DefaultMaxRetries)
       -> std::optional<typename IStateBuffer<T>::Slot*> override {
+    ZoneScoped;
     for (size_t attempt = 0; attempt < maxRetries; ++attempt) {
-      if (auto slot = tryCheckoutForWrite()) {
+      if (auto slot = tryCheckoutForRead()) {
+        TracyPlot("TripleBuffer_ReadAttempts", (int64_t)attempt);
         return slot;
       }
       std::this_thread::sleep_for(std::chrono::microseconds(DefaultSleep));
     }
     Log::warn("Couldn't checkout for read after {} retries, returning nullopt", maxRetries);
+    TracyPlot("TripleBuffer_ReadFailures", (int64_t)1);
     return std::nullopt;
   }
 

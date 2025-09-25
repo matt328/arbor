@@ -19,7 +19,7 @@ EngineContext::EngineContext(bk::NativeWindowHandle newWindowHandle, EngineOptio
     try {
       InitLogger("Game");
       Log::trace("Game Thread Started");
-      auto gameplayContext = makeGameplayContext(eventQueue);
+      auto gameplayContext = makeGameplayContext(eventQueue, *simStateBuffer);
       gameplayContext->run(token);
     } catch (const std::exception& e) {
       engineError = std::current_exception();

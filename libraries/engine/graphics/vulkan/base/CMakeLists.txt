@@ -23,6 +23,7 @@ target_link_libraries(${PROJECT_NAME}
   vulkan::common
   vulkan::resources
   vulkan::assets
+  ${TRACY_LIB}
 )
 
 target_include_directories(${PROJECT_NAME}
@@ -30,4 +31,5 @@ target_include_directories(${PROJECT_NAME}
   include
   PRIVATE
   src
+  ${TRACY_INCLUDE_DIR}
 )

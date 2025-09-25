@@ -28,6 +28,8 @@ private:
   std::unique_ptr<RenderContext> renderContext;
   std::unique_ptr<ResourceContext> resourceContext;
   std::unique_ptr<AssetContext> assetContext;
+
+  static const uint32_t MaxFrameTime = 250;
 };
 
 }

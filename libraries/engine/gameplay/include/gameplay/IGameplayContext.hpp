@@ -2,6 +2,8 @@
 
 #include "bk/IEventQueue.hpp"
 #include "bk/NonCopyMove.hpp"
+#include "engine/common/IStateBuffer.hpp"
+#include "engine/common/SimState.hpp"
 
 namespace arb {
 
@@ -11,7 +13,8 @@ public:
   virtual auto run(std::stop_token token) -> void = 0;
 };
 
-auto makeGameplayContext(std::shared_ptr<bk::IEventQueue> newEventQueue)
+auto makeGameplayContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
+                         IStateBuffer<SimState>& newSimStateBuffer)
     -> std::unique_ptr<IGameplayContext>;
 
 }

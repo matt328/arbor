@@ -1,6 +1,7 @@
 #include "vulkan/base/VulkanContext.hpp"
 
 #include <thread>
+#include "Tracy.hpp"
 #include <memory>
 
 #include "bk/Logger.hpp"
@@ -48,26 +49,21 @@ VulkanContext::~VulkanContext() {
   Log::trace("Destroying Vulkan Context");
 }
 
-auto VulkanContext::run(std::stop_token token) -> void {
+void VulkanContext::run(std::stop_token token) {
   Log::trace("GraphicsContext::run()");
-  using clock = std::chrono::steady_clock;
-  constexpr int targetHz = 1;
-  constexpr auto timestep = std::chrono::nanoseconds(1'000'000'000 / targetHz);
+  using Clock = std::chrono::steady_clock;
+  auto currentTime = Clock::now();
 
-  auto nextTick = clock::now();
   while (!token.stop_requested()) {
-    auto now = clock::now();
-    if (now >= nextTick) {
-      Log::trace("graphicsContext tick()");
-      renderContext->renderNextFrame();
-      eventQueue->dispatchPending();
-      nextTick += timestep;
-      if (now > nextTick + timestep * 10) {
-        nextTick = now;
-      }
-    } else {
-      std::this_thread::sleep_until(nextTick);
+    auto newTime = Clock::now();
+    auto frameTime = newTime - currentTime;
+    if (frameTime > std::chrono::milliseconds(MaxFrameTime)) {
+      frameTime = std::chrono::milliseconds(MaxFrameTime);
     }
+    currentTime = newTime;
+    eventQueue->dispatchPending();
+    renderContext->renderNextFrame();
+    FrameMark;
   }
 }
 
@@ -81,5 +77,4 @@ auto makeGraphicsContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
                                          newOptions,
                                          newWindowHandle);
 }
-
 }

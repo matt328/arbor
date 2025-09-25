@@ -15,7 +15,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
 
 list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/vendor/bin/QWindowKit")
 
-add_compile_definitions(_CRT_SECURE_NO_WARNINGS DEBUG)
+add_compile_definitions(_CRT_SECURE_NO_WARNINGS DEBUG TRACY_ENABLE)
 
 if(WIN32)
   add_compile_definitions(NOMINMAX)
@@ -24,6 +24,9 @@ endif()
 set(SPDLOG_VERSION v1.15.3)
 set(CEREAL_VERSION v1.3.2)
 set(GLM_VERSION 1.0.1)
+
+set(TRACY_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/vendor/src/tracy/include CACHE PATH "Tracy include dir")
+set(TRACY_LIB ${CMAKE_SOURCE_DIR}/vendor/src/tracy/lib/win64/TracyClient.lib CACHE FILEPATH "Tracy static lib")
 
 include(dependencies)
 

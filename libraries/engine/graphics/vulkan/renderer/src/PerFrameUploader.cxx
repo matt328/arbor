@@ -1,5 +1,7 @@
 #include "PerFrameUploader.hpp"
 
+#include <Tracy.hpp>
+
 #include "bk/Logger.hpp"
 
 namespace arb {
@@ -15,10 +17,12 @@ PerFrameUploader::~PerFrameUploader() {
 }
 
 auto PerFrameUploader::upload() -> void {
+  ZoneScoped;
   auto slot = stateBuffer.checkoutForRead();
   if (slot.has_value()) {
     auto& simState = slot.value()->data;
     collectGeometryDetails(simState);
+    stateBuffer.commitRead(slot.value());
   }
 }
 

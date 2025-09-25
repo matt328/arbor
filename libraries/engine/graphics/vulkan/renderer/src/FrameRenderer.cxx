@@ -1,6 +1,8 @@
 #include "FrameRenderer.hpp"
 
 #include <array>
+#include <Tracy.hpp>
+
 #include "Frame.hpp"
 #include "bk/Logger.hpp"
 
@@ -35,6 +37,7 @@ FrameRenderer::~FrameRenderer() {
 }
 
 void FrameRenderer::renderNextFrame() {
+  ZoneScoped;
   if (resizePending) {
     recreateSwapchain();
     resizePending = false;
@@ -58,10 +61,10 @@ void FrameRenderer::renderNextFrame() {
     Log::warn("PresentFrame resports swapchain needs resized");
     resizePending = true;
   }
-  // FrameMark;
 }
 
 auto FrameRenderer::presentFrame(Frame* frame) -> VkResult {
+  ZoneScoped;
   const auto swapchainImageIndex = frame->getSwapchainImageIndex();
   VkSemaphore swapchainImageSemaphore = swapchain.getImageSemaphore(swapchainImageIndex);
   VkSwapchainKHR chain = swapchain;
@@ -79,6 +82,7 @@ void FrameRenderer::recreateSwapchain() {
 }
 
 auto FrameRenderer::tryAcquireFrame() -> Frame* {
+  ZoneScoped;
   const auto result = frameManager.acquireFrame();
 
   if (std::holds_alternative<Frame*>(result)) {
@@ -99,6 +103,7 @@ auto FrameRenderer::tryAcquireFrame() -> Frame* {
 }
 
 void FrameRenderer::submitFrame(Frame* frame, const FrameGraphResult& frameResult) {
+  ZoneScoped;
   frame->setSubmitted(true);
 
   constexpr auto waitStages =
