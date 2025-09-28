@@ -38,6 +38,7 @@ set(CMAKE_AUTORCC ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Svg)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Svg)
+find_package(cpptrace REQUIRED PATHS ${CMAKE_SOURCE_DIR}/vendor/src/cpptrace)
 
 find_package(QWindowKit REQUIRED COMPONENTS Widgets Core)
 
@@ -54,6 +55,7 @@ target_link_libraries(${PROJECT_NAME}
   base-kit
   engine::base
   engine::common
+  cpptrace::cpptrace
 )
 
 target_compile_definitions(${PROJECT_NAME}

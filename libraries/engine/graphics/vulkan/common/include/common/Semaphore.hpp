@@ -3,9 +3,9 @@
 #include <vulkan/vulkan.h>
 #include <optional>
 #include <string>
-#include <stdexcept>
 
 #include "DebugUtils.hpp"
+#include "ErrorUtils.hpp"
 
 namespace arb {
 
@@ -25,9 +25,7 @@ struct Semaphore {
     if (timeline) {
       createInfo.flags |= VK_SEMAPHORE_TYPE_TIMELINE;
     }
-    if (vkCreateSemaphore(device, &createInfo, nullptr, &handle) != VK_SUCCESS) {
-      throw std::runtime_error("Failed to create semaphore");
-    }
+    checkVk(vkCreateSemaphore(device, &createInfo, nullptr, &handle), "vkCreateSemaphore");
     if (name) {
       dbg::setDebugName(device, handle, *name);
     }

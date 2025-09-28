@@ -22,4 +22,6 @@ target_link_libraries(${PROJECT_NAME}
   glm
   base-kit
   engine::common
+  PUBLIC
+  cpptrace::cpptrace
 )

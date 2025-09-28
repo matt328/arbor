@@ -1,8 +1,10 @@
 #include "AliasRegistry.hpp"
 
+#include <cpptrace/cpptrace.hpp>
+#include <vulkan/vulkan_core.h>
+
 #include "bk/Logger.hpp"
 #include "resources/images/ImageSpec.hpp"
-#include "vulkan/vulkan_core.h"
 
 namespace arb {
 
@@ -15,7 +17,7 @@ void AliasRegistry::registerImageAlias(const std::string& alias, ImageSpec spec)
   Log::trace("Registering ImageAlias {}", alias);
   if (aliasImageSpecMap.contains(alias)) {
     if (!(aliasImageSpecMap.at(alias) == spec)) {
-      throw std::runtime_error("Alias " + alias + " registered with a different spec");
+      throw cpptrace::runtime_error("Alias " + alias + " registered with a different spec");
     }
     Log::trace("Alias already existd: {}", alias);
     return;

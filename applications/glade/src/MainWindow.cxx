@@ -1,5 +1,9 @@
 #include "MainWindow.hpp"
 
+#include <cpptrace/cpptrace.hpp>
+#include <cpptrace/from_current.hpp>
+#include <cpptrace/formatting.hpp>
+
 #include "bk/Logger.hpp"
 #include "commands/ImportModelCommand.hpp"
 #include "engine/common/EngineOptions.hpp"
@@ -52,13 +56,15 @@ MainWindow::MainWindow(QWidget* parent)
   connect(updateTimer, &QTimer::timeout, this, [this]() {
     try {
       context->update(); // rethrows exceptions from engine threads
-    } catch (const std::exception& e) {
-      Log::error("Engine exception: {}", e.what());
-      QMessageBox::critical(this, "Engine Error", e.what());
-      qApp->quit(); // or some other graceful shutdown
-    } catch (...) {
-      Log::error("Engine threw unknown exception");
-      QMessageBox::critical(this, "Engine Error", "Unknown exception");
+    } catch (const cpptrace::exception& e) {
+      auto formatter = cpptrace::get_default_formatter();
+      formatter.symbols(cpptrace::formatter::symbol_mode::pruned);
+      formatter.colors(cpptrace::formatter::color_mode::always);
+      formatter.addresses(cpptrace::formatter::address_mode::none);
+      formatter.paths(cpptrace::formatter::path_mode::basename);
+      formatter.hide_exception_machinery(true);
+      Log::error("Engine exception: {} {}", e.message(), formatter.format(e.trace()));
+      QMessageBox::critical(this, "Engine Error", e.message());
       qApp->quit();
     }
   });

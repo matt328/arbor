@@ -1,5 +1,6 @@
 #include "SpirvShaderModuleFactory.hpp"
 
+#include <cpptrace/cpptrace.hpp>
 #include <fstream>
 
 #include "bk/Logger.hpp"
@@ -25,14 +26,14 @@ auto SpirvShaderModuleFactory::readSPIRVFile(const std::string& filename) -> std
 
   if (!file) {
     Log::error("Failed to open SPIR-V file: {}", filename);
-    throw std::runtime_error("Failed to open SPIR-V file: " + filename);
+    throw cpptrace::runtime_error("Failed to open SPIR-V file: " + filename);
   }
 
   // Get file size in bytes
   std::streamsize fileSize = file.tellg();
 
   if (fileSize % sizeof(uint32_t) != 0) {
-    throw std::runtime_error("SPIR-V file size is not a multiple of 4 bytes");
+    throw cpptrace::runtime_error("SPIR-V file size is not a multiple of 4 bytes");
   }
 
   std::vector<uint32_t> buffer(fileSize / sizeof(uint32_t));

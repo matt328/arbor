@@ -17,6 +17,8 @@ list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/vendor/bin/QWindowKit")
 
 add_compile_definitions(_CRT_SECURE_NO_WARNINGS DEBUG TRACY_ENABLE)
 
+find_package(cpptrace REQUIRED PATHS ${CMAKE_SOURCE_DIR}/vendor/src/cpptrace)
+
 if(WIN32)
   add_compile_definitions(NOMINMAX)
 endif()

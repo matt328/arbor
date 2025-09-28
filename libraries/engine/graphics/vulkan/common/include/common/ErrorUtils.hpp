@@ -1,7 +1,7 @@
 #pragma once
 
+#include <cpptrace/cpptrace.hpp>
 #include <format>
-#include <stdexcept>
 #include <vulkan/vulkan.h>
 
 namespace arb {
@@ -50,7 +50,7 @@ inline auto toString(VkResult result) -> const char* {
 
 inline void checkVk(VkResult result, const char* msg) {
   if (result != VK_SUCCESS) {
-    throw std::runtime_error(std::format("{}: {}", msg, toString(result)));
+    throw cpptrace::runtime_error(std::format("{}: {}", msg, toString(result)));
   }
 }
 

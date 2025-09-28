@@ -2,8 +2,8 @@
 
 #include <optional>
 #include <string>
-#include <stdexcept>
 
+#include "common/ErrorUtils.hpp"
 #include "DebugUtils.hpp"
 
 namespace arb {
@@ -18,9 +18,8 @@ struct Fence {
     VkFenceCreateInfo createInfo{
         .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
     };
-    if (vkCreateFence(device, &createInfo, nullptr, &handle) != VK_SUCCESS) {
-      throw std::runtime_error("Failed to create Fence");
-    }
+    checkVk(vkCreateFence(device, &createInfo, nullptr, &handle), "vkCreateFence");
+
     if (name) {
       dbg::setDebugName(device, handle, *name);
     }

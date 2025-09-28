@@ -1,4 +1,8 @@
 #include "EngineContext.hpp"
+
+#include <cpptrace/cpptrace.hpp>
+#include <cpptrace/from_current.hpp>
+
 #include "gameplay/IGameplayContext.hpp"
 #include "graphics/base/IGraphicsContext.hpp"
 #include "graphics/common/GraphicsOptions.hpp"
@@ -44,7 +48,6 @@ EngineContext::EngineContext(bk::NativeWindowHandle newWindowHandle, EngineOptio
           windowHandle);
       graphicsContext->run(token);
     } catch (const std::exception& e) {
-      Log::trace("Graphics Thread Exception: {}", e.what());
       engineError = std::current_exception();
       requestStop();
     }

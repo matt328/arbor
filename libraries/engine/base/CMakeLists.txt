@@ -14,6 +14,7 @@ target_link_libraries(${PROJECT_NAME}
   graphics::base
   graphics::common
   engine::common
+  cpptrace::cpptrace
 )
 
 target_include_directories(${PROJECT_NAME}

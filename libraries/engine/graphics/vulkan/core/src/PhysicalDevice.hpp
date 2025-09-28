@@ -1,9 +1,8 @@
 #pragma once
 
 #include <array>
+#include <cpptrace/cpptrace.hpp>
 #include <memory>
-#include <stdexcept>
-#include <string>
 #include <vector>
 #include <vulkan/vulkan.h>
 
@@ -36,7 +35,7 @@ static constexpr auto RequiredExtensions =
 class PhysicalDevice {
 public:
   PhysicalDevice() = default;
-  PhysicalDevice(VkPhysicalDevice handle);
+  explicit PhysicalDevice(VkPhysicalDevice handle);
   ~PhysicalDevice();
 
   PhysicalDevice(const PhysicalDevice&) = default;
@@ -67,7 +66,7 @@ private:
                     const FeatureStruct& supported,
                     auto MemberPtr) const {
     if (required.*MemberPtr && !(supported.*MemberPtr)) {
-      throw std::runtime_error(std::string("Missing required feature: ") + name);
+      throw cpptrace::runtime_error(std::string("Missing required feature: ") + name);
     }
   }
 

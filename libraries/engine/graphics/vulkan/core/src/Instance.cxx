@@ -31,7 +31,8 @@ Instance::Instance(const GraphicsOptions& newOptions) {
 
   if (graphicsOptions.debugEnabled) {
     if (!isLayerAvailable(validationLayerName)) {
-      throw std::runtime_error("Debug requested but VK_LAYER_KHRONOS_validation is not available");
+      throw cpptrace::runtime_error(
+          "Debug requested but VK_LAYER_KHRONOS_validation is not available");
     }
     std::array layers = {validationLayerName};
     createInfo.enabledLayerCount = static_cast<uint32_t>(layers.size());
@@ -60,7 +61,7 @@ Instance::Instance(const GraphicsOptions& newOptions) {
       checkVk(func(vkInstance, &debugCreateInfo, nullptr, &debugMessenger),
               "vkCreateDebugUtilsMessengerEXT");
     } else {
-      throw std::runtime_error(
+      throw cpptrace::runtime_error(
           "vkGetInstanceProcAddr failed to acquire vkCreateDebugUtilsMessengerEXT");
     }
     Log::trace("Registered Debug Messenger");
@@ -89,7 +90,7 @@ auto Instance::enumeratePhysicalDevices(const Surface& surface) -> std::vector<P
           "vkEnumeratePhysicalDevices(count)");
 
   if (deviceCount == 0) {
-    throw std::runtime_error("No Vulkan physical devices found");
+    throw cpptrace::runtime_error("No Vulkan physical devices found");
   }
 
   auto handles = std::vector<VkPhysicalDevice>{deviceCount};
@@ -129,7 +130,7 @@ auto Instance::getInstanceExtensions() const -> std::vector<const char*> {
       });
 
       if (!found) {
-        throw std::runtime_error(std::format(
+        throw cpptrace::runtime_error(std::format(
             "Instance::getInstanceExtensions(): Required Vulkan extension '{}' is not available",
             req));
       }
