@@ -6,6 +6,7 @@
 
 #include "bk/NonCopyMove.hpp"
 #include "resources/BufferHandle.hpp"
+#include "resources/images/Image.hpp"
 #include "resources/images/ImageHandle.hpp"
 #include "resources/images/ImageSpec.hpp"
 #include "resources/ResourceSystem.hpp"
@@ -25,6 +26,7 @@ public:
 
   void buildResources(uint32_t frameCount);
 
+  [[nodiscard]] auto getImage(std::string_view alias, uint32_t frameIndex) const -> Image&;
   [[nodiscard]] auto getImageHandle(std::string_view alias, uint32_t frameIndex) const
       -> ImageHandle;
   [[nodiscard]] auto getBufferHandle(std::string_view alias, uint32_t frameIndex) const

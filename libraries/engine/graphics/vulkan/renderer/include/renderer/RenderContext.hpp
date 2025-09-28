@@ -2,6 +2,7 @@
 
 #include "bk/NonCopyMove.hpp"
 
+#include "core/pipeline/PipelineManager.hpp"
 #include "engine/common/IStateBuffer.hpp"
 #include "engine/common/SimState.hpp"
 #include "common/HandleMapperTypes.hpp"
@@ -30,7 +31,8 @@ public:
                 IStateBuffer<SimState>& simStateBuffer,
                 GeometryHandleMapper& newGeometryHandleMapper,
                 CommandBufferManager& newCommandBufferManager,
-                ResourceSystem& newResourceSystem);
+                ResourceSystem& newResourceSystem,
+                PipelineManager& newPipelineManager);
   ~RenderContext();
 
   void renderNextFrame();
@@ -38,6 +40,7 @@ public:
 private:
   Device& device;
   Swapchain& swapchain;
+  PipelineManager& pipelineManager;
   bool resizePending{false};
   std::unique_ptr<FrameManager> frameManager;
   std::unique_ptr<PerFrameUploader> perFrameUploader;

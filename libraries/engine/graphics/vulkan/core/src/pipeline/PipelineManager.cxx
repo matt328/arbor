@@ -5,6 +5,7 @@
 #include "engine/common/HandleGenerator.hpp"
 
 #include <array>
+#include <cassert>
 #include <vulkan/vulkan_core.h>
 
 namespace arb {
@@ -16,6 +17,12 @@ PipelineManager::PipelineManager(Device& newDevice) : device{newDevice} {
 PipelineManager::~PipelineManager() {
   Log::trace("Destroying PipelineManager");
   pipelineMap.clear();
+}
+
+[[nodiscard]] auto PipelineManager::getPipelineUnit(PipelineUnitHandle handle) const
+    -> const PipelineUnit& {
+  assert(pipelineMap.contains(handle));
+  return *pipelineMap.at(handle);
 }
 
 auto PipelineManager::createPipeline(const PipelineCreateInfo& createInfo) -> PipelineUnitHandle {
@@ -33,8 +40,7 @@ auto PipelineManager::createGraphicsPipeline(const PipelineCreateInfo& createInf
   const auto& layoutInfo = createInfo.pipelineLayoutInfo;
 
   // Push Constants
-  auto pushConstantRanges =
-      std::vector<VkPushConstantRange>{layoutInfo.pushConstantInfoList.size()};
+  auto pushConstantRanges = std::vector<VkPushConstantRange>{};
   for (const auto& pcrInfo : layoutInfo.pushConstantInfoList) {
     pushConstantRanges.emplace_back(VkPushConstantRange{
         .stageFlags = pcrInfo.stageFlags,
@@ -46,8 +52,8 @@ auto PipelineManager::createGraphicsPipeline(const PipelineCreateInfo& createInf
   // DescriptorSetLayouts
   const auto layoutCreateInfo = VkPipelineLayoutCreateInfo{
       .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-      .setLayoutCount = static_cast<uint32_t>(layoutInfo.descriptorSetLayouts.size()),
-      .pSetLayouts = layoutInfo.descriptorSetLayouts.data(),
+      .setLayoutCount = 0,
+      .pSetLayouts = nullptr,
       .pushConstantRangeCount = static_cast<uint32_t>(pushConstantRanges.size()),
       .pPushConstantRanges = pushConstantRanges.data()};
 
@@ -63,16 +69,17 @@ auto PipelineManager::createGraphicsPipeline(const PipelineCreateInfo& createInf
   }
 
   // Shader Stages
-  auto shaderModules = std::vector<VkShaderModule>{};
+  auto shaderModules = std::vector<ShaderModule>{};
   auto shaderStages = std::vector<VkPipelineShaderStageCreateInfo>{};
   for (const auto& stageInfo : createInfo.shaderStageInfo) {
     shaderModules.emplace_back(SpirvShaderModuleFactory::createShaderModule(&device,
                                                                             stageInfo.stage,
                                                                             stageInfo.shaderFile));
-    shaderStages.emplace_back(
-        VkPipelineShaderStageCreateInfo{.stage = stageInfo.stage,
-                                        .module = shaderModules.back(),
-                                        .pName = stageInfo.entryPoint.c_str()});
+    shaderStages.emplace_back(VkPipelineShaderStageCreateInfo{
+        .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+        .stage = stageInfo.stage,
+        .module = shaderModules.back(),
+        .pName = stageInfo.entryPoint.c_str()});
   }
 
   // VertexInputState

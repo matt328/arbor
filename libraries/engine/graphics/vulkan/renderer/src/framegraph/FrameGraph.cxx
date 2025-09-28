@@ -8,40 +8,57 @@
 #include "core/command-buffers/CommandBuffer.hpp"
 #include "core/command-buffers/CommandBufferManager.hpp"
 
+#include "render-pass/pass/ForwardPass.hpp"
 #include "resources/ResourceSystem.hpp"
 #include "framegraph/render-pass/IRenderPass.hpp"
 
 #include "framegraph/AliasRegistry.hpp"
 #include "framegraph/barriers/Builders.hpp"
+#include "resources/images/ImageSpec.hpp"
 
 namespace arb {
 
 FrameGraph::FrameGraph(CommandBufferManager& newCommandBufferManager,
-                       ResourceSystem& newResourceFacade,
+                       PipelineManager& newPipelineManager,
                        AliasRegistry& newAliasRegistry)
     : commandBufferManager{newCommandBufferManager},
-      resourceSystem{newResourceFacade},
+      pipelineManager{newPipelineManager},
       aliasRegistry{newAliasRegistry} {
+  Log::trace("Creating FrameGraph");
+
+  auto forwardPass = ForwardPass::create(
+      ForwardPassContext{.aliasRegistry = aliasRegistry, .pipelineManager = pipelineManager});
+
+  renderPasses.push_back(std::move(forwardPass));
+
+  compileResources();
+  bake();
 }
 
 FrameGraph::~FrameGraph() {
   Log::trace("Destroying FrameGraph");
 }
 
-auto FrameGraph::addPass(std::unique_ptr<IRenderPass>&& pass) -> void {
-  const auto size = renderPasses.size();
-  const auto passId = pass->getId();
-  renderPasses.push_back(std::move(pass));
-  passesById.emplace(passId, size);
-}
-
-auto FrameGraph::getPass(PassId id) -> std::unique_ptr<IRenderPass>& {
-  assert(passesById.contains(id));
-  return renderPasses[passesById.at(id)];
-}
-
 auto FrameGraph::bake() -> void {
   barrierPrecursorPlan = generatePrecursorPlan(renderPasses);
+}
+
+void FrameGraph::compileResources() {
+  for (const auto& pass : renderPasses) {
+    const auto& desc = pass->getDescription();
+    for (const auto& ir : desc.images) {
+      aliasRegistry.registerImageAlias(
+          ir.alias,
+          ImageSpec{
+              .imageLifetime = ir.isGlobal ? ImageLifetime::Persistent : ImageLifetime::Transient,
+              .format = ir.format,
+              .extent = ir.extent,
+              .usageFlags = ir.usage,
+          });
+    }
+  }
+
+  aliasRegistry.buildResources(3);
 }
 
 auto FrameGraph::execute(Frame* frame) -> FrameGraphResult {
@@ -62,7 +79,7 @@ auto FrameGraph::execute(Frame* frame) -> FrameGraphResult {
         }
         auto imageBarrier = barriers::build(precursor, lastUse);
         if (imageBarrier) {
-          const auto& image = resourceSystem.getImage(handle);
+          const auto& image = aliasRegistry.getImage(precursor.alias, frame->getIndex());
           imageBarrier->image = image;
           imageBarriers.push_back(*imageBarrier);
         }

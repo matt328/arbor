@@ -19,7 +19,6 @@ void EntityManager::update() {
   {
     auto simStateSlot = simStateBuffer.checkoutForWrite();
     if (simStateSlot.has_value()) {
-      Log::trace("Checked out for write");
       simStateSlot.value()->data = SimState{1};
     } else {
       Log::warn("EntityManager can't checkout for write");

@@ -2,6 +2,7 @@
 
 #include <fstream>
 
+#include "bk/Logger.hpp"
 #include "ShaderModule.hpp"
 #include "vulkan/vulkan_core.h"
 
@@ -23,6 +24,7 @@ auto SpirvShaderModuleFactory::readSPIRVFile(const std::string& filename) -> std
   std::ifstream file(filename, std::ios::binary | std::ios::ate);
 
   if (!file) {
+    Log::error("Failed to open SPIR-V file: {}", filename);
     throw std::runtime_error("Failed to open SPIR-V file: " + filename);
   }
 

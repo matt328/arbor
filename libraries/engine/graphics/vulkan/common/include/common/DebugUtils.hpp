@@ -1,5 +1,6 @@
 #pragma once
 
+#include "vulkan/vulkan_core.h"
 #include <string_view>
 #include <vulkan/vulkan.h>
 
@@ -41,6 +42,21 @@ struct VulkanObjectType<VkDescriptorSetLayout> {
 template <>
 struct VulkanObjectType<VkSampler> {
   static constexpr VkObjectType value = VK_OBJECT_TYPE_SAMPLER;
+};
+
+template <>
+struct VulkanObjectType<VkPipeline> {
+  static constexpr VkObjectType value = VK_OBJECT_TYPE_PIPELINE;
+};
+
+template <>
+struct VulkanObjectType<VkPipelineLayout> {
+  static constexpr VkObjectType value = VK_OBJECT_TYPE_PIPELINE_LAYOUT;
+};
+
+template <>
+struct VulkanObjectType<VkShaderModule> {
+  static constexpr VkObjectType value = VK_OBJECT_TYPE_SHADER_MODULE;
 };
 
 template <typename Handle>

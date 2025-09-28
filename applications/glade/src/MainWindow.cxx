@@ -47,6 +47,23 @@ MainWindow::MainWindow(QWidget* parent)
 
   // Make EngineContext a unique_ptr
   context = arb::makeEngineContext(handle, options);
+
+  auto updateTimer = new QTimer(this);
+  connect(updateTimer, &QTimer::timeout, this, [this]() {
+    try {
+      context->update(); // rethrows exceptions from engine threads
+    } catch (const std::exception& e) {
+      Log::error("Engine exception: {}", e.what());
+      QMessageBox::critical(this, "Engine Error", e.what());
+      qApp->quit(); // or some other graceful shutdown
+    } catch (...) {
+      Log::error("Engine threw unknown exception");
+      QMessageBox::critical(this, "Engine Error", "Unknown exception");
+      qApp->quit();
+    }
+  });
+  updateTimer->start(16); // ~60Hz update, adjust as needed
+
   eventQueue = context->getEventQueue();
 
   assetAdapter = new gld::AssetAdapter(eventQueue, this);

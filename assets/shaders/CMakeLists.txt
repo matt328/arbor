@@ -20,7 +20,7 @@ set(Shaders
 get_property(GENERATOR_IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 
 set(SHADER_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-set(SHADER_BIN_DIR "${CMAKE_BINARY_DIR}$<$<BOOL:${GENERATOR_IS_MULTI_CONFIG}>:$<CONFIG>>/apps/glade/assets/shaders")
+set(SHADER_BIN_DIR "${CMAKE_BINARY_DIR}$<$<BOOL:${GENERATOR_IS_MULTI_CONFIG}>:$<CONFIG>>/applications/glade/assets/shaders")
 
 # Create output directory
 add_custom_command(

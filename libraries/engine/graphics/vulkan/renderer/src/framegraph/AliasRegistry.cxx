@@ -12,12 +12,15 @@ AliasRegistry::AliasRegistry(ResourceSystem& newResourceSystem)
 }
 
 void AliasRegistry::registerImageAlias(const std::string& alias, ImageSpec spec) {
+  Log::trace("Registering ImageAlias {}", alias);
   if (aliasImageSpecMap.contains(alias)) {
     if (!(aliasImageSpecMap.at(alias) == spec)) {
       throw std::runtime_error("Alias " + alias + " registered with a different spec");
     }
+    Log::trace("Alias already existd: {}", alias);
     return;
   }
+  Log::trace("Registering new alias {}", alias);
   aliasImageSpecMap.emplace(alias, spec);
 }
 
@@ -47,9 +50,11 @@ void AliasRegistry::buildResources(uint32_t frameCount) {
   }
 }
 
+auto AliasRegistry::getImage(std::string_view alias, uint32_t frameIndex) const -> Image& {
+}
+
 auto AliasRegistry::getImageHandle(std::string_view alias, uint32_t frameIndex) const
     -> ImageHandle {
-      
 }
 
 auto AliasRegistry::getBufferHandle(std::string_view alias, uint32_t frameIndex) const

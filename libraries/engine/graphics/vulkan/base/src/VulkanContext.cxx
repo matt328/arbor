@@ -40,7 +40,8 @@ VulkanContext::VulkanContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
                                                   simStateBuffer,
                                                   *geometryHandleMapper,
                                                   coreContext->getCommandBufferManager(),
-                                                  resourceContext->getResourceFacade());
+                                                  resourceContext->getResourceFacade(),
+                                                  coreContext->getPipelineManager());
 
   assetContext = std::make_unique<AssetContext>();
 }

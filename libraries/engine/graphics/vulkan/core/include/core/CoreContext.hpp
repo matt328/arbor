@@ -16,6 +16,7 @@ class Surface;
 class PhysicalDevice;
 class AllocatorService;
 class CommandBufferManager;
+class PipelineManager;
 
 class CoreContext : NonCopyableMovable {
 public:
@@ -52,6 +53,10 @@ public:
     return *commandBufferManager;
   }
 
+  [[nodiscard]] auto getPipelineManager() const -> PipelineManager& {
+    return *pipelineManager;
+  }
+
 private:
   GraphicsOptions options;
   std::unique_ptr<Instance> vulkanInstance;
@@ -61,6 +66,7 @@ private:
   std::unique_ptr<Swapchain> swapchain;
   std::unique_ptr<AllocatorService> allocatorService;
   std::unique_ptr<CommandBufferManager> commandBufferManager;
+  std::unique_ptr<PipelineManager> pipelineManager;
 
   std::unique_ptr<Semaphore> transferSemaphore;
   std::unique_ptr<Semaphore> graphicsSemaphore;

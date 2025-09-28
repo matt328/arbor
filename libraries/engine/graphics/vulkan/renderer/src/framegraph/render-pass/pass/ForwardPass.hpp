@@ -5,45 +5,43 @@
 #include "core/pipeline/PipelineManager.hpp"
 #include "framegraph/AliasRegistry.hpp"
 #include "framegraph/render-pass/IRenderPass.hpp"
-#include "framegraph/render-pass/dispatcher/DispatcherHandles.hpp"
-#include "resources/ResourceSystem.hpp"
-#include "framegraph/render-pass/dispatcher/DispatcherFactory.hpp"
+#include "reqs/DispatchBinding.hpp"
 
 namespace arb {
 
 struct ForwardPassContext {
   AliasRegistry& aliasRegistry;
-  ResourceSystem& resourceSystem;
-  DispatcherFactory& dispatcherFactory;
   PipelineManager& pipelineManager;
-};
-
-struct ForwardPassConfig {
-  PipelineUnitHandle pipelineHandle;
-  std::vector<DispatcherHandle> dispatcherHandles;
-  std::string colorImage;
-  std::string depthImage;
 };
 
 class ForwardPass : public IRenderPass {
 public:
-  ForwardPass(const ForwardPassContext& ctx, const ForwardPassConfig& config);
   ~ForwardPass();
 
   [[nodiscard]] auto getId() const -> PassId override;
   auto execute(Frame* frame, VkCommandBuffer cmdBuffer) -> void override;
-  auto registerDispatchContext(DispatcherHandle handle) -> void override;
+  [[nodiscard]] auto getDescription() const -> PassDescription override;
+
+  static auto create(const ForwardPassContext& ctx) -> std::unique_ptr<ForwardPass>;
 
 private:
+  struct ForwardPassConfig {
+    AliasRegistry& aliasRegistry;
+    PipelineManager& pipelineManager;
+    PipelineUnitHandle pipelineHandle;
+  };
+
+  explicit ForwardPass(const ForwardPassConfig& config);
+
   AliasRegistry& aliasRegistry;
-  ResourceSystem& resourceSystem;
-  DispatcherFactory& dispatcherFactory;
   PipelineManager& pipelineManager;
 
   PipelineUnitHandle pipelineHandle;
-  std::vector<DispatcherHandle> dispatcherHandles;
-  std::string colorImage;
-  std::string depthImage;
+  std::string colorImageAlias;
+  std::string depthImageAlias;
+
+  std::vector<std::unique_ptr<IDispatcher>> dispatchers;
+  std::unordered_map<std::string, std::string> bindingMap;
 };
 
 }

@@ -5,6 +5,7 @@
 
 #include "core/AllocatorService.hpp"
 #include "core/command-buffers/CommandBufferManager.hpp"
+#include "core/pipeline/PipelineManager.hpp"
 #include "graphics/common/GraphicsOptions.hpp"
 
 #include "core/Swapchain.hpp"
@@ -48,6 +49,8 @@ CoreContext::CoreContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
                                           options.initialSize);
   allocatorService =
       std::make_unique<AllocatorService>(physicalDevice->handle(), *device, *vulkanInstance);
+
+  pipelineManager = std::make_unique<PipelineManager>(*device);
 }
 
 CoreContext::~CoreContext() {

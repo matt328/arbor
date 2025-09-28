@@ -11,6 +11,12 @@ set(vulkancore_SRC
   src/CommandBuffer.cxx
   src/CommandBufferManager.cxx
   src/shader-binding/DSLayout.cxx
+
+  src/pipeline/PipelineManager.cxx
+  src/pipeline/SpirvShaderModuleFactory.cxx
+  src/pipeline/Pipeline.cxx
+  src/pipeline/PipelineLayout.cxx
+  src/pipeline/ShaderModule.cxx
 )
 
 add_library(${PROJECT_NAME} STATIC ${vulkancore_SRC})

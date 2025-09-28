@@ -1,32 +1,33 @@
 #pragma once
 
-#include "framegraph/ComponentIds.hpp"
-#include "framegraph/IGraphInfoProvider.hpp"
-#include "resources/ResourceSystem.hpp"
+#include "LogicalImageRequirement.hpp"
+#include "framegraph/AliasRegistry.hpp"
 
 namespace arb {
 
 class Frame;
 class ResourceSystem;
 
-class IDispatcher : public IGraphInfoProvider {
+struct DispatcherRequirements {
+  std::vector<LogicalImageRequirement> images;
+};
+
+class IDispatcher {
 public:
-  IDispatcher(DispatcherId newId, ResourceSystem& newResourceFacade)
-      : id{newId}, resourceSystem{newResourceFacade} {
+  explicit IDispatcher(AliasRegistry& newAliasRegistry) : aliasRegistry{newAliasRegistry} {
   }
 
-  ~IDispatcher() override = default;
-
-  virtual auto bind(const Frame* frame, VkCommandBuffer commandBuffer, VkPipelineLayout layout)
-      -> void = 0;
-
-  virtual auto dispatch(const Frame* frame, VkCommandBuffer commandBuffer) -> void = 0;
-
+  virtual ~IDispatcher() = default;
+  virtual void bindAlias(std::string alias, std::string logicalName) = 0;
+  virtual auto dispatch(const Frame* frame,
+                        VkPipelineLayout pipelineLayout,
+                        VkCommandBuffer commandBuffer) -> void = 0;
   virtual auto getPushConstantSize() -> size_t = 0;
+  virtual auto requirements() -> DispatcherRequirements = 0;
 
 protected:
-  DispatcherId id;
-  ResourceSystem& resourceSystem;
+  AliasRegistry& aliasRegistry;
+  std::unordered_map<std::string, std::string> logicalToAliasMap;
 };
 
 }

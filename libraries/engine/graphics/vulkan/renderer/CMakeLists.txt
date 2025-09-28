@@ -11,8 +11,7 @@ set(vulkanrenderer_SRC
   src/framegraph/AliasRegistry.cxx
 
   src/framegraph/render-pass/pass/ForwardPass.cxx
-  src/framegraph/render-pass/pass/PassFactory.cxx
-  src/framegraph/render-pass/dispatcher/DispatcherFactory.cxx
+  src/framegraph/render-pass/dispatcher/ClearDispatcher.cxx
 
   src/geometry/VirtualGeometryAllocator.cxx
   src/geometry/VirtualGeometryAllocator.cxx

@@ -87,6 +87,7 @@ target_precompile_headers(${PROJECT_NAME}
   <QMainWindow>
   <QMenu>
   <QMenuBar>
+  <QMessageBox>
   <QSettings>
   <QSplitter>
   <QStatusBar>

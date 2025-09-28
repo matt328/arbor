@@ -7,6 +7,9 @@
 
 namespace arb {
 
+// Adapt this struct to be used in DispatcherRequirements.
+// it doesn't need sizes or offsets since this is just usage, not creation information
+
 struct BufferUsageInfo {
   std::string alias;
   VkAccessFlags2 accessFlags;

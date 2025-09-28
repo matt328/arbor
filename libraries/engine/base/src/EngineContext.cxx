@@ -22,12 +22,13 @@ EngineContext::EngineContext(bk::NativeWindowHandle newWindowHandle, EngineOptio
       auto gameplayContext = makeGameplayContext(eventQueue, *simStateBuffer);
       gameplayContext->run(token);
     } catch (const std::exception& e) {
+      Log::trace("Gameplay Thread Exception: {}", e.what());
       engineError = std::current_exception();
       requestStop();
     }
   });
 
-  graphicsThread = std::jthread([this, &engineOptions](std::stop_token token) {
+  graphicsThread = std::jthread([this, engineOptions](std::stop_token token) {
     try {
       InitLogger("Graphics");
       Log::trace("Graphics Thread Started");
@@ -43,6 +44,7 @@ EngineContext::EngineContext(bk::NativeWindowHandle newWindowHandle, EngineOptio
           windowHandle);
       graphicsContext->run(token);
     } catch (const std::exception& e) {
+      Log::trace("Graphics Thread Exception: {}", e.what());
       engineError = std::current_exception();
       requestStop();
     }
@@ -60,10 +62,13 @@ auto EngineContext::update() -> void {
 }
 
 auto EngineContext::requestStop() -> void {
+  Log::trace("Stop Requested");
   if (gameThread.joinable()) {
+    Log::trace("GameThread joinable");
     gameThread.request_stop();
   }
   if (graphicsThread.joinable()) {
+    Log::trace("GraphicsThread joinable");
     graphicsThread.request_stop();
   }
 }

@@ -1,22 +1,21 @@
 #pragma once
 
-#include "dispatcher/DispatcherHandles.hpp"
 #include "framegraph/ComponentIds.hpp"
-#include "framegraph/IGraphInfoProvider.hpp"
+#include "pass/reqs/PassDescription.hpp"
 
 namespace arb {
 
 class Frame;
 class IDispatchContext;
 
-class IRenderPass : public IGraphInfoProvider {
+class IRenderPass {
 public:
   IRenderPass() = default;
-  virtual ~IRenderPass() override = default;
+  virtual ~IRenderPass() = default;
 
   [[nodiscard]] virtual auto getId() const -> PassId = 0;
-  virtual auto execute(Frame* frame, VkCommandBuffer cmdBuffer) -> void = 0;
-  virtual auto registerDispatchContext(DispatcherHandle handle) -> void = 0;
+  virtual void execute(Frame* frame, VkCommandBuffer cmdBuffer) = 0;
+  [[nodiscard]] virtual auto getDescription() const -> PassDescription = 0;
 };
 
 }

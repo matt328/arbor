@@ -8,6 +8,7 @@
 
 #include "barriers/BarrierPrecursorPlan.hpp"
 #include "bk/NonCopyMove.hpp"
+#include "core/pipeline/PipelineManager.hpp"
 #include "resources/images/ImageHandle.hpp"
 
 #include "barriers/LastImageUse.hpp"
@@ -28,28 +29,27 @@ struct FrameGraphResult {
 class FrameGraph : public NonCopyableMovable {
 public:
   FrameGraph(CommandBufferManager& newCommandBufferManager,
-             ResourceSystem& newResourceFacade,
+             PipelineManager& newPipelineManager,
              AliasRegistry& newAliasRegistry);
   ~FrameGraph();
 
-  auto addPass(std::unique_ptr<IRenderPass>&& pass) -> void;
-  [[nodiscard]] auto getPass(PassId id) -> std::unique_ptr<IRenderPass>&;
-  auto bake() -> void;
   auto execute(Frame* frame) -> FrameGraphResult;
   auto getSwapchainImageLastUse(ImageHandle handle) -> std::optional<LastImageUse>;
-  auto setSwapchainImageLastUse(ImageHandle handle, LastImageUse lastImageUse) -> void;
-  auto resetSwapchainUses() -> void;
+  void setSwapchainImageLastUse(ImageHandle handle, LastImageUse lastImageUse);
+  void resetSwapchainUses();
 
 private:
   CommandBufferManager& commandBufferManager;
-  ResourceSystem& resourceSystem;
+  PipelineManager& pipelineManager;
   AliasRegistry& aliasRegistry;
 
   std::vector<std::unique_ptr<IRenderPass>> renderPasses;
-  std::unordered_map<PassId, size_t> passesById;
   BarrierPrecursorPlan barrierPrecursorPlan;
 
   std::unordered_map<ImageHandle, LastImageUse> swapchainLastUses;
+
+  void compileResources();
+  void bake();
 };
 
 }

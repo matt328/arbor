@@ -13,6 +13,7 @@
 #include "PerFrameUploader.hpp"
 #include "framegraph/AliasRegistry.hpp"
 #include "framegraph/FrameGraph.hpp"
+#include "framegraph/render-pass/IRenderPass.hpp"
 #include "vulkan/vulkan_core.h"
 
 namespace arb {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "bk/NonCopyMove.hpp"
-#include "PassGraphInfo.hpp"
+#include "framegraph/render-pass/pass/reqs/PassDescription.hpp"
 
 namespace arb {
 
@@ -10,7 +10,7 @@ public:
   IGraphInfoProvider() = default;
   virtual ~IGraphInfoProvider() = default;
 
-  [[nodiscard]] virtual auto getGraphInfo() const -> PassGraphInfo = 0;
+  [[nodiscard]] virtual auto getDescription() const -> PassDescription = 0;
 };
 
 }
