@@ -1,5 +1,7 @@
 #pragma once
 
+#include "IResizable.hpp"
+#include "engine/common/RenderSurfaceState.hpp"
 #include "bk/NonCopyMove.hpp"
 #include "vulkan/vulkan_core.h"
 
@@ -14,17 +16,26 @@ class FrameGraph;
 class Frame;
 struct FrameGraphResult;
 
-class FrameRenderer : public NonCopyableMovable {
+struct FrameRendererDeps {
+  Device& device;
+  Swapchain& swapchain;
+  FrameManager& frameManager;
+  PerFrameUploader& perFrameUploader;
+  AliasRegistry& aliasRegistry;
+  FrameGraph& frameGraph;
+};
+
+struct FrameRendererCreateInfo {
+  RenderSurfaceState renderSurfaceState;
+};
+
+class FrameRenderer : public NonCopyableMovable, IResizable {
 public:
-  FrameRenderer(Device& newDevice,
-                Swapchain& newSwapchain,
-                FrameManager& newFrameManager,
-                PerFrameUploader& newPerFrameUploader,
-                AliasRegistry& newAliasRegistry,
-                FrameGraph& newFrameGraph);
+  explicit FrameRenderer(const FrameRendererDeps& deps, const FrameRendererCreateInfo& info);
   ~FrameRenderer();
 
   void renderNextFrame();
+  void resize(const RenderSurfaceState& newState) override;
 
 private:
   Device& device;

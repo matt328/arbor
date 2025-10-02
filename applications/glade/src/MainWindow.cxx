@@ -18,7 +18,7 @@
 #include "widget-frame/WindowButton.hpp"
 
 #include "bk/NativeWindowHandle.hpp"
-#include "engine/base/ResizeEvent.hpp"
+#include "engine/common/ResizeEvent.hpp"
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent),
@@ -45,11 +45,13 @@ MainWindow::MainWindow(QWidget* parent)
 
   const auto options = arb::EngineOptions{
       .debugEnabled = true,
-      .initialSize = {.width = static_cast<uint32_t>(ui->displayWidget->width()),
-                      .height = static_cast<uint32_t>(ui->displayWidget->height())},
-  };
+      .initialSurfaceState = {
+          .swapchainExtent =
+              arb::Size{.width = static_cast<uint32_t>(ui->displayWidget->width()),
+                        .height = static_cast<uint32_t>(ui->displayWidget->height())},
+          .renderScale = 1.f,
+      }};
 
-  // Make EngineContext a unique_ptr
   context = arb::makeEngineContext(handle, options);
 
   auto updateTimer = new QTimer(this);

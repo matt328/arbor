@@ -19,7 +19,8 @@ Image::Image(Device* newDevice,
       allocationCreateInfo{aci},
       allocationInfo{},
       debugName{name.value_or("Unnamed Image")} {
-  allocatorService.createImage(ici, aci, vkImage, allocation, &allocationInfo);
+  allocationInfo.pName = debugName.c_str();
+  allocatorService.createImage(ici, aci, vkImage, allocation, debugName, &allocationInfo);
   dbg::setDebugName(*device, vkImage, debugName);
 }
 

@@ -16,14 +16,14 @@
 
 namespace arb {
 
-struct GraphicsOptions;
+struct EngineOptions;
 class Frame;
 class Device;
 class Swapchain;
 
 class FrameManager : NonCopyableMovable {
 public:
-  FrameManager(const GraphicsOptions& graphicsOptions, Device& newDevice, Swapchain& swapchain);
+  FrameManager(const EngineOptions& options, Device& newDevice, Swapchain& swapchain);
   ~FrameManager();
 
   auto acquireFrame() -> std::variant<Frame*, ImageAcquireResult>;
@@ -38,17 +38,19 @@ public:
   auto setFrameSwapchainIndex(uint8_t index, uint32_t imageIndex) -> void;
   auto getFrameSwapchainIndex(uint8_t index) -> uint32_t;
 
-  auto setFrameLastImageUse(uint8_t index, std::string alias, LastImageUse use) -> void;
-  auto getFrameLastImageUse(uint8_t index, std::string alias) -> LastImageUse;
+  auto setFrameLastImageUse(uint8_t index, const std::string& alias, LastImageUse use) -> void;
+  auto getFrameLastImageUse(uint8_t index, const std::string& alias) -> LastImageUse;
 
-  auto setFrameLastBufferUse(uint8_t index, std::string alias, LastBufferUse use) -> void;
-  auto getFrameLastBufferUse(uint8_t index, std::string alias) -> LastBufferUse;
+  auto setFrameLastBufferUse(uint8_t index, const std::string& alias, LastBufferUse use) -> void;
+  auto getFrameLastBufferUse(uint8_t index, const std::string& alias) -> LastBufferUse;
 
   auto setImageTransitionInfo(uint8_t index, const std::vector<ImageTransitionInfo>& transitionInfo)
       -> void;
   auto getImageTransitionInfo(uint8_t index) -> std::vector<ImageTransitionInfo>;
 
 private:
+  static constexpr uint8_t FramesInFlight = 3;
+
   Device& device;
   Swapchain& swapchain;
   size_t currentFrame;

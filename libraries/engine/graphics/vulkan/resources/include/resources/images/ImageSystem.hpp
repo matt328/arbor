@@ -3,7 +3,7 @@
 #include <memory>
 #include <vulkan/vulkan_core.h>
 
-#include "ImageSpec.hpp"
+#include "common/ImageCreateDescription.hpp"
 #include "ImageViewSpec.hpp"
 #include "SamplerSpec.hpp"
 #include "ImageView.hpp"
@@ -26,8 +26,8 @@ public:
   ImageSystem(Device& device, AllocatorService& allocatorService);
   ~ImageSystem();
 
-  auto createImage(const ImageSpec& imageSpec) -> ImageHandle;
-  auto createPerFrameImage(const ImageSpec& imageSpec) -> LogicalImageHandle;
+  auto createImage(const ImageCreateDescription& imageSpec) -> ImageHandle;
+  auto createPerFrameImage(const ImageCreateDescription& imageSpec) -> LogicalImageHandle;
   auto resolveImageHandle(LogicalImageHandle logicalHandle, uint32_t frameIndex) -> ImageHandle;
   auto getImage(ImageHandle handle) -> const Image&;
   auto getImage(LogicalImageHandle handle, uint32_t frameIndex) -> const Image&;
@@ -53,7 +53,7 @@ private:
   std::unique_ptr<LogicalImageViewAllocator> logicalImageViewAllocator;
   std::unique_ptr<SamplerManager> samplerManager;
 
-  static auto fromImageSpec(const ImageSpec& imageSpec)
+  static auto fromImageSpec(const ImageCreateDescription& imageSpec)
       -> std::tuple<VkImageCreateInfo, VmaAllocationCreateInfo>;
 
   auto fromImageViewSpec(const ImageViewSpec& imageViewSpec)

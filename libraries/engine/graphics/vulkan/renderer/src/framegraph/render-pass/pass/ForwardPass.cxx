@@ -2,37 +2,25 @@
 
 #include "Frame.hpp"
 #include "bk/Logger.hpp"
+#include "common/ImageCreateDescription.hpp"
+#include "common/ImageLifetime.hpp"
 #include "core/pipeline/PipelineUnitCreateInfo.hpp"
-#include "framegraph/render-pass/dispatcher/IDispatcher.hpp"
-#include "reqs/Enums.hpp"
-#include "reqs/ImageRequest.hpp"
-#include "framegraph/render-pass/dispatcher/ClearDispatcher.hpp"
+#include "common/ImageRequirement.hpp"
 
+#include <cpptrace/cpptrace.hpp>
+#include <cpptrace/exceptions.hpp>
 #include <filesystem>
 #include <Tracy.hpp>
 #include <vulkan/vulkan_core.h>
 
 namespace arb {
 
-ForwardPass::ForwardPass(const ForwardPassConfig& config)
-    : aliasRegistry{config.aliasRegistry},
-      pipelineManager{config.pipelineManager},
-      pipelineHandle{config.pipelineHandle} {
+ForwardPass::ForwardPass(const ForwardPassDeps& deps, const ForwardPassConfig& config)
+    : aliasRegistry{deps.aliasRegistry},
+      pipelineManager{deps.pipelineManager},
+      surfaceState{config.initialSurfaceState} {
   Log::trace("Creating ForwardPass");
 
-  auto clear = std::make_unique<ClearDispatcher>(aliasRegistry);
-
-  bindingMap.emplace("ColorTarget", "SwapchainImage");
-  bindingMap.emplace("DepthTarget", "DepthBuffer");
-
-  dispatchers.push_back(std::move(clear));
-}
-
-ForwardPass::~ForwardPass() {
-  Log::trace("Destroying ForwardPass");
-}
-
-auto ForwardPass::create(const ForwardPassContext& ctx) -> std::unique_ptr<ForwardPass> {
   const auto pipelineLayoutInfo = PipelineLayoutInfo{
       .pushConstantInfoList = {
           PushConstantInfo{.stageFlags = VK_SHADER_STAGE_VERTEX_BIT, .offset = 0, .size = 36}}};
@@ -40,16 +28,14 @@ auto ForwardPass::create(const ForwardPassContext& ctx) -> std::unique_ptr<Forwa
   const auto vertexStage = ShaderStageInfo{
       .stage = VK_SHADER_STAGE_VERTEX_BIT,
       .shaderFile =
-          (std::filesystem::current_path() / "assets" / "shaders" / "composition.vert.spv")
-              .string(),
+          (std::filesystem::current_path() / "assets" / "shaders" / "forward2.vert.spv").string(),
       .entryPoint = "main",
   };
 
   const auto fragmentStage = ShaderStageInfo{
       .stage = VK_SHADER_STAGE_FRAGMENT_BIT,
       .shaderFile =
-          (std::filesystem::current_path() / "assets" / "shaders" / "composition.frag.spv")
-              .string(),
+          (std::filesystem::current_path() / "assets" / "shaders" / "forward2.frag.spv").string(),
       .entryPoint = "main",
   };
 
@@ -60,53 +46,43 @@ auto ForwardPass::create(const ForwardPassContext& ctx) -> std::unique_ptr<Forwa
                              {VK_FORMAT_R8G8B8A8_UNORM}, // Get swapchain attachment format somehow
                          .shaderStageInfo = {vertexStage, fragmentStage}};
 
-  auto handle = ctx.pipelineManager.createPipeline(pipelineCreateInfo);
+  pipelineHandle = deps.pipelineManager.createPipeline(pipelineCreateInfo);
+}
 
-  const auto config = ForwardPassConfig{
-      .aliasRegistry = ctx.aliasRegistry,
-      .pipelineManager = ctx.pipelineManager,
-      .pipelineHandle = handle,
-  };
-
-  return std::unique_ptr<ForwardPass>(new ForwardPass(config));
+ForwardPass::~ForwardPass() {
+  Log::trace("Destroying ForwardPass");
 }
 
 auto ForwardPass::getDescription() const -> PassDescription {
   auto desc = PassDescription{};
   desc.name = "ForwardPass";
   // Pass Resources
-  desc.images = {ImageRequirement{.alias = "SwapchainImage",
-                                  .isGlobal = false,
-                                  .accessType = AliasAccess::Write,
-                                  .usageType = AliasUseType::Attachment,
-                                  .format = VK_FORMAT_R8G8B8A8_UNORM,
-                                  .extent = {},
-                                  .usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT},
-                 ImageRequirement{.alias = "DepthBuffer",
-                                  .isGlobal = false,
-                                  .accessType = AliasAccess::Write,
-                                  .usageType = AliasUseType::Attachment,
-                                  .format = VK_FORMAT_D32_SFLOAT,
-                                  .extent = {},
-                                  .usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT}};
+  desc.images = {
+      ImageRequirement{.alias = "SwapchainImage",
+                       .createDesc = std::make_optional<ImageCreateDescription>(
+                           {.format = VK_FORMAT_R8G8B8A8_UNORM,
+                            .extent = {.width = surfaceState.swapchainExtent.width,
+                                       .height = surfaceState.swapchainExtent.height},
+                            .usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+                            .imageLifetime = ImageLifetime::Swapchain}),
+                       .useDesc = {.accessFlags = VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT,
+                                   .stageFlags = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT,
+                                   .imageLayout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL,
+                                   .aspectFlags = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT}},
+      ImageRequirement{.alias = "DepthBuffer",
+                       .createDesc = std::make_optional<ImageCreateDescription>(
+                           {.format = VK_FORMAT_D32_SFLOAT,
+                            .extent = {.width = surfaceState.swapchainExtent.width,
+                                       .height = surfaceState.swapchainExtent.height},
+                            .usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+                            .imageLifetime = ImageLifetime::Persistent}),
+                       .useDesc = {.accessFlags = VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+                                   .stageFlags = VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT |
+                                                 VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT,
+                                   .imageLayout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL,
+                                   .aspectFlags = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT}}};
   desc.buffers = {};
   desc.dependsOn = {};
-
-  // Add dispatcher Resources
-  for (const auto& dispatcher : dispatchers) {
-    const auto reqs = dispatcher->requirements();
-    for (const auto& lir : reqs.images) {
-      auto ir = ImageRequirement{};
-      ir.alias = bindingMap.at(lir.name);
-      ir.isGlobal = lir.isGlobal;
-      ir.accessType = lir.accessType;
-      ir.usageType = lir.usageType;
-      ir.format = lir.format;
-      ir.extent = lir.extent;
-      ir.usage = lir.usage;
-      desc.images.push_back(ir);
-    }
-  }
 
   return desc;
 }
@@ -118,7 +94,7 @@ auto ForwardPass::getDescription() const -> PassDescription {
 auto ForwardPass::execute(Frame* frame, VkCommandBuffer cmdBuffer) -> void {
   ZoneScoped;
   const auto colorAttachmentInfo = aliasRegistry.getAttachmentInfo(
-      "forward.color",
+      "SwapchainImage",
       frame->getIndex(),
       VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
       VK_ATTACHMENT_LOAD_OP_CLEAR,
@@ -126,7 +102,7 @@ auto ForwardPass::execute(Frame* frame, VkCommandBuffer cmdBuffer) -> void {
       VkClearValue{.color = {.float32 = {0.392f, 0.584f, 0.929f, 1.0f}}});
 
   const auto depthAttachmentInfo = aliasRegistry.getAttachmentInfo(
-      "forward.depth",
+      "DepthBuffer",
       frame->getIndex(),
       VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL,
       VK_ATTACHMENT_LOAD_OP_CLEAR,
@@ -135,8 +111,10 @@ auto ForwardPass::execute(Frame* frame, VkCommandBuffer cmdBuffer) -> void {
 
   const auto renderingInfo = VkRenderingInfo{
       .sType = VK_STRUCTURE_TYPE_RENDERING_INFO,
-      .renderArea =
-          (VkRect2D{.offset = {.x = 0, .y = 0}, .extent = {.width = 1920, .height = 1080}}),
+      .renderArea = (VkRect2D{.offset = {.x = 0, .y = 0},
+                              .extent = {.width = surfaceState.renderSize().width,
+                                         .height = surfaceState.renderSize().height}}),
+      .layerCount = 1,
       .colorAttachmentCount = 1,
       .pColorAttachments = &colorAttachmentInfo,
       .pDepthAttachment = &depthAttachmentInfo};
@@ -167,9 +145,7 @@ auto ForwardPass::execute(Frame* frame, VkCommandBuffer cmdBuffer) -> void {
   vkCmdBeginRendering(cmdBuffer, &renderingInfo);
   vkCmdBindPipeline(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineUnit.pipeline);
 
-  for (const auto& dispatcher : dispatchers) {
-    dispatcher->dispatch(frame, pipelineUnit.layout, cmdBuffer);
-  }
+  // Render stuff here.
 
   vkCmdEndRendering(cmdBuffer);
 }

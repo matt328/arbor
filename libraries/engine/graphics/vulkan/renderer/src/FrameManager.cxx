@@ -5,28 +5,26 @@
 #include "core/Device.hpp"
 #include "core/Swapchain.hpp"
 
-#include "graphics/common/GraphicsOptions.hpp"
+#include "engine/common/EngineOptions.hpp"
 
 #include "Frame.hpp"
 
 namespace arb {
-FrameManager::FrameManager(const GraphicsOptions& graphicsOptions,
-                           Device& newDevice,
-                           Swapchain& newSwapchain)
+FrameManager::FrameManager(const EngineOptions& options, Device& newDevice, Swapchain& newSwapchain)
     : device{newDevice}, swapchain{newSwapchain} {
   Log::trace("Constructing FrameManager");
-  frames.reserve(graphicsOptions.framesInFlight);
+  frames.reserve(FramesInFlight);
 
-  submittedFrames.reserve(graphicsOptions.framesInFlight);
-  swapchainImageIndices.reserve(graphicsOptions.framesInFlight);
-  inFlightFences.reserve(graphicsOptions.framesInFlight);
-  imageAvailableSemaphores.reserve(graphicsOptions.framesInFlight);
-  computeFinishedSemaphores.reserve(graphicsOptions.framesInFlight);
-  lastImageUses.reserve(graphicsOptions.framesInFlight);
-  lastBufferUses.reserve(graphicsOptions.framesInFlight);
-  imageTransitionInfo.reserve(graphicsOptions.framesInFlight);
+  submittedFrames.reserve(FramesInFlight);
+  swapchainImageIndices.reserve(FramesInFlight);
+  inFlightFences.reserve(FramesInFlight);
+  imageAvailableSemaphores.reserve(FramesInFlight);
+  computeFinishedSemaphores.reserve(FramesInFlight);
+  lastImageUses.reserve(FramesInFlight);
+  lastBufferUses.reserve(FramesInFlight);
+  imageTransitionInfo.reserve(FramesInFlight);
 
-  for (uint8_t i = 0; i < graphicsOptions.framesInFlight; ++i) {
+  for (uint8_t i = 0; i < FramesInFlight; ++i) {
     const auto fenceName = std::format("Fence-InFlight-Frame-{}", i);
     auto fence = Fence{newDevice, fenceName};
 
@@ -43,6 +41,7 @@ FrameManager::FrameManager(const GraphicsOptions& graphicsOptions,
     computeFinishedSemaphores.push_back(std::move(computeFinished));
     lastImageUses.emplace_back();
     lastBufferUses.emplace_back();
+    imageTransitionInfo.emplace_back();
 
     frames.push_back(std::make_unique<Frame>(this, i));
   }
@@ -117,21 +116,21 @@ auto FrameManager::getFrameSwapchainIndex(uint8_t index) -> uint32_t {
   return swapchainImageIndices[index];
 }
 
-auto FrameManager::setFrameLastImageUse(uint8_t index, std::string alias, LastImageUse use)
+auto FrameManager::setFrameLastImageUse(uint8_t index, const std::string& alias, LastImageUse use)
     -> void {
   lastImageUses[index][alias] = use;
 }
 
-auto FrameManager::getFrameLastImageUse(uint8_t index, std::string alias) -> LastImageUse {
+auto FrameManager::getFrameLastImageUse(uint8_t index, const std::string& alias) -> LastImageUse {
   return lastImageUses[index][alias];
 }
 
-auto FrameManager::setFrameLastBufferUse(uint8_t index, std::string alias, LastBufferUse use)
+auto FrameManager::setFrameLastBufferUse(uint8_t index, const std::string& alias, LastBufferUse use)
     -> void {
   lastBufferUses[index][alias] = use;
 }
 
-auto FrameManager::getFrameLastBufferUse(uint8_t index, std::string alias) -> LastBufferUse {
+auto FrameManager::getFrameLastBufferUse(uint8_t index, const std::string& alias) -> LastBufferUse {
   return lastBufferUses[index][alias];
 }
 

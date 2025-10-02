@@ -2,7 +2,7 @@
 
 #include <vector>
 #include "BufferRequest.hpp"
-#include "ImageRequest.hpp"
+#include "common/ImageRequirement.hpp"
 
 namespace arb {
 

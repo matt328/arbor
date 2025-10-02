@@ -5,7 +5,6 @@
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
-#include "graphics/common/GraphicsOptions.hpp"
 #include "common/ImageAcquireResult.hpp"
 #include "bk/NonCopyMove.hpp"
 
@@ -27,7 +26,7 @@ public:
             Surface* newSurface,
             VkDevice newDevice,
             std::shared_ptr<bk::IEventQueue> newEventQueue,
-            GraphicsOptions::Size initialSize);
+            VkExtent2D initialSize);
   ~Swapchain();
 
   auto acquireNextImage(const Semaphore& semaphore) -> std::variant<uint32_t, ImageAcquireResult>;

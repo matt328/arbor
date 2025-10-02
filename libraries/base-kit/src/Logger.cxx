@@ -10,7 +10,8 @@ auto LoggerManager::logStringTrace(std::string message) -> void {
 }
 
 auto LoggerManager::logStringDebug(std::string message) -> void {
-  getLogger()->debug(message);
+  const auto id = std::this_thread::get_id();
+  getLogger()->debug(std::format("id={}: {}", id, message));
 }
 
 auto LoggerManager::logStringInfo(std::string message) -> void {

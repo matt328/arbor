@@ -9,25 +9,24 @@
 #include "core/command-buffers/CommandBufferManager.hpp"
 
 #include "render-pass/pass/ForwardPass.hpp"
-#include "resources/ResourceSystem.hpp"
 #include "framegraph/render-pass/IRenderPass.hpp"
 
 #include "framegraph/AliasRegistry.hpp"
 #include "framegraph/barriers/Builders.hpp"
-#include "resources/images/ImageSpec.hpp"
+#include "common/ImageCreateDescription.hpp"
+#include "vulkan/vulkan_core.h"
 
 namespace arb {
 
-FrameGraph::FrameGraph(CommandBufferManager& newCommandBufferManager,
-                       PipelineManager& newPipelineManager,
-                       AliasRegistry& newAliasRegistry)
-    : commandBufferManager{newCommandBufferManager},
-      pipelineManager{newPipelineManager},
-      aliasRegistry{newAliasRegistry} {
+FrameGraph::FrameGraph(const FrameGraphDeps& deps, const FrameGraphConfig& config)
+    : commandBufferManager{deps.commandBufferManager},
+      pipelineManager{deps.pipelineManager},
+      aliasRegistry{deps.aliasRegistry} {
   Log::trace("Creating FrameGraph");
 
-  auto forwardPass = ForwardPass::create(
-      ForwardPassContext{.aliasRegistry = aliasRegistry, .pipelineManager = pipelineManager});
+  auto forwardPass = std::make_unique<ForwardPass>(
+      ForwardPassDeps{.aliasRegistry = aliasRegistry, .pipelineManager = pipelineManager},
+      ForwardPassConfig{.initialSurfaceState = config.initialSurfaceState});
 
   renderPasses.push_back(std::move(forwardPass));
 
@@ -39,6 +38,9 @@ FrameGraph::~FrameGraph() {
   Log::trace("Destroying FrameGraph");
 }
 
+void FrameGraph::resize(const RenderSurfaceState& newState) {
+}
+
 auto FrameGraph::bake() -> void {
   barrierPrecursorPlan = generatePrecursorPlan(renderPasses);
 }
@@ -47,14 +49,9 @@ void FrameGraph::compileResources() {
   for (const auto& pass : renderPasses) {
     const auto& desc = pass->getDescription();
     for (const auto& ir : desc.images) {
-      aliasRegistry.registerImageAlias(
-          ir.alias,
-          ImageSpec{
-              .imageLifetime = ir.isGlobal ? ImageLifetime::Persistent : ImageLifetime::Transient,
-              .format = ir.format,
-              .extent = ir.extent,
-              .usageFlags = ir.usage,
-          });
+      if (ir.createDesc) {
+        aliasRegistry.registerImageAlias(ir.alias, *ir.createDesc);
+      }
     }
   }
 
@@ -84,7 +81,7 @@ auto FrameGraph::execute(Frame* frame) -> FrameGraphResult {
           imageBarriers.push_back(*imageBarrier);
         }
         const auto newLastUse = LastImageUse{
-            .accessMode = precursor.accessMode,
+            .isWriteAccess = precursor.isWriteAccess,
             .access = precursor.accessFlags,
             .stage = precursor.stageFlags,
             .layout = precursor.layout,
@@ -130,7 +127,8 @@ auto FrameGraph::execute(Frame* frame) -> FrameGraphResult {
                                               .hashKey = std::hash<PassId>{}(passId),
                                               .queueType = QueueType::Graphics};
     auto& commandBuffer = commandBufferManager.requestCommandBuffer(request);
-    commandBuffer.begin(VkCommandBufferBeginInfo{});
+    commandBuffer.begin(
+        VkCommandBufferBeginInfo{.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO});
     commandBuffer.pipelineBarrier2(dependencyInfo);
     renderPass->execute(frame, commandBuffer);
 

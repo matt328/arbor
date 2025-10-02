@@ -5,14 +5,13 @@
 #include "bk/Logger.hpp"
 
 #include "common/ErrorUtils.hpp"
-#include "graphics/common/GraphicsOptions.hpp"
+#include "engine/common/EngineOptions.hpp"
 #include "PhysicalDevice.hpp"
 
 namespace arb {
 
-Instance::Instance(const GraphicsOptions& newOptions) {
+Instance::Instance(const EngineOptions& newOptions) : options{newOptions} {
   Log::trace("Creating Vulkan Instance");
-  graphicsOptions = newOptions;
   const auto appInfo = VkApplicationInfo{.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
                                          .pApplicationName = "Arbor Application",
                                          .applicationVersion = VK_MAKE_VERSION(0, 0, 1),
@@ -29,7 +28,7 @@ Instance::Instance(const GraphicsOptions& newOptions) {
 
   const auto* const validationLayerName = "VK_LAYER_KHRONOS_validation";
 
-  if (graphicsOptions.debugEnabled) {
+  if (options.debugEnabled) {
     if (!isLayerAvailable(validationLayerName)) {
       throw cpptrace::runtime_error(
           "Debug requested but VK_LAYER_KHRONOS_validation is not available");
@@ -42,7 +41,7 @@ Instance::Instance(const GraphicsOptions& newOptions) {
   checkVk(vkCreateInstance(&createInfo, nullptr, &vkInstance), "vkCreateInstance()");
   Log::trace("Created Vulkan Instance");
 
-  if (graphicsOptions.debugEnabled) {
+  if (options.debugEnabled) {
     auto debugCreateInfo = VkDebugUtilsMessengerCreateInfoEXT{
         .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
         .messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
@@ -71,7 +70,7 @@ Instance::Instance(const GraphicsOptions& newOptions) {
 Instance::~Instance() {
   Log::trace("Destroying Vulkan Instance");
   if (vkInstance != nullptr) {
-    if (graphicsOptions.debugEnabled && debugMessenger != nullptr) {
+    if (options.debugEnabled && debugMessenger != nullptr) {
       auto func = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(
           vkGetInstanceProcAddr(vkInstance, "vkDestroyDebugUtilsMessengerEXT"));
       if (func != nullptr) {
@@ -111,7 +110,7 @@ auto Instance::getInstanceExtensions() const -> std::vector<const char*> {
                                     VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
                                     VK_KHR_DEVICE_GROUP_CREATION_EXTENSION_NAME};
 
-  if (graphicsOptions.debugEnabled) {
+  if (options.debugEnabled) {
     extNames.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
   }
 
@@ -149,8 +148,8 @@ Instance::debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
                         VkDebugUtilsMessageTypeFlagsEXT type,
                         const VkDebugUtilsMessengerCallbackDataEXT* callbackData,
                         void* userData) -> VkBool32 {
-
-  Log::debug("Vulkan Validation: {}", callbackData->pMessage);
+  const auto id = std::this_thread::get_id();
+  Log::debug("ThreadId={}: Vulkan Validation: {}", id, callbackData->pMessage);
   return VK_FALSE;
 }
 

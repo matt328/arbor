@@ -34,7 +34,7 @@ public:
   auto allocateInBuffer(BufferHandle handle, size_t size) -> BufferRegion;
 
   // Images
-  auto createImage(const ImageSpec& imageSpec) -> ImageHandle;
+  auto createImage(const ImageCreateDescription& imageSpec) -> ImageHandle;
   auto createImageView(const ImageViewSpec& imageViewSpec) -> ImageViewHandle;
   auto resolveImageHandle(LogicalImageHandle logicalHandle, uint32_t frameIndex) -> ImageHandle;
   auto getImage(LogicalImageHandle logicalHandle, size_t frameIndex) -> const Image&;

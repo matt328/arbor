@@ -6,13 +6,14 @@
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
+#include "engine/common/RenderSurfaceState.hpp"
 #include "barriers/BarrierPrecursorPlan.hpp"
 #include "bk/NonCopyMove.hpp"
 #include "core/pipeline/PipelineManager.hpp"
 #include "resources/images/ImageHandle.hpp"
 
 #include "barriers/LastImageUse.hpp"
-#include "ComponentIds.hpp"
+#include "IResizable.hpp"
 
 namespace arb {
 
@@ -26,17 +27,26 @@ struct FrameGraphResult {
   std::vector<VkCommandBuffer> commandBuffers;
 };
 
-class FrameGraph : public NonCopyableMovable {
+struct FrameGraphDeps {
+  CommandBufferManager& commandBufferManager;
+  PipelineManager& pipelineManager;
+  AliasRegistry& aliasRegistry;
+};
+
+struct FrameGraphConfig {
+  RenderSurfaceState initialSurfaceState;
+};
+
+class FrameGraph : public NonCopyableMovable, IResizable {
 public:
-  FrameGraph(CommandBufferManager& newCommandBufferManager,
-             PipelineManager& newPipelineManager,
-             AliasRegistry& newAliasRegistry);
+  FrameGraph(const FrameGraphDeps& deps, const FrameGraphConfig& config);
   ~FrameGraph();
 
   auto execute(Frame* frame) -> FrameGraphResult;
   auto getSwapchainImageLastUse(ImageHandle handle) -> std::optional<LastImageUse>;
   void setSwapchainImageLastUse(ImageHandle handle, LastImageUse lastImageUse);
   void resetSwapchainUses();
+  void resize(const RenderSurfaceState& newState) override;
 
 private:
   CommandBufferManager& commandBufferManager;

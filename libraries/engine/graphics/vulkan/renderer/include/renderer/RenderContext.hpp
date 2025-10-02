@@ -1,5 +1,6 @@
 #pragma once
 
+#include "bk/IEventQueue.hpp"
 #include "bk/NonCopyMove.hpp"
 
 #include "core/pipeline/PipelineManager.hpp"
@@ -9,7 +10,7 @@
 
 namespace arb {
 
-struct GraphicsOptions;
+struct EngineOptions;
 class FrameManager;
 class Device;
 class Swapchain;
@@ -23,16 +24,20 @@ class FrameGraph;
 struct FrameGraphResult;
 class FrameRenderer;
 
+struct RenderContextDeps {
+  Device& device;
+  Swapchain& swapchain;
+  IStateBuffer<SimState>& simStateBuffer;
+  GeometryHandleMapper& geometryHandleMapper;
+  CommandBufferManager& commandBufferManager;
+  ResourceSystem& resourceSystem;
+  PipelineManager& pipelineManager;
+  bk::IEventQueue& eventQueue;
+};
+
 class RenderContext : public NonCopyableMovable {
 public:
-  RenderContext(const GraphicsOptions& graphicsOptions,
-                Device& newDevice,
-                Swapchain& newSwapchain,
-                IStateBuffer<SimState>& simStateBuffer,
-                GeometryHandleMapper& newGeometryHandleMapper,
-                CommandBufferManager& newCommandBufferManager,
-                ResourceSystem& newResourceSystem,
-                PipelineManager& newPipelineManager);
+  RenderContext(const EngineOptions& options, const RenderContextDeps& deps);
   ~RenderContext();
 
   void renderNextFrame();

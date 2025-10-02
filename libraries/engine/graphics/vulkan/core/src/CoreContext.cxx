@@ -6,7 +6,7 @@
 #include "core/AllocatorService.hpp"
 #include "core/command-buffers/CommandBufferManager.hpp"
 #include "core/pipeline/PipelineManager.hpp"
-#include "graphics/common/GraphicsOptions.hpp"
+#include "engine/common/EngineOptions.hpp"
 
 #include "core/Swapchain.hpp"
 #include "core/Device.hpp"
@@ -18,7 +18,7 @@
 namespace arb {
 
 CoreContext::CoreContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
-                         const GraphicsOptions& newOptions,
+                         const EngineOptions& newOptions,
                          bk::NativeWindowHandle newWindowHandle)
     : options{newOptions}, eventQueue{std::move(newEventQueue)} {
   Log::trace("Creating CoreContext");
@@ -42,11 +42,13 @@ CoreContext::CoreContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
   graphicsSemaphore = std::make_unique<Semaphore>(*device, true, "GraphicsQueueSemaphore");
   computeSemaphore = std::make_unique<Semaphore>(*device, true, "ComputeQueueSemaphore");
 
-  swapchain = std::make_unique<Swapchain>(physicalDevice.get(),
-                                          surface.get(),
-                                          *device,
-                                          eventQueue,
-                                          options.initialSize);
+  swapchain = std::make_unique<Swapchain>(
+      physicalDevice.get(),
+      surface.get(),
+      *device,
+      eventQueue,
+      VkExtent2D{.width = options.initialSurfaceState.swapchainExtent.width,
+                 .height = options.initialSurfaceState.swapchainExtent.height});
   allocatorService =
       std::make_unique<AllocatorService>(physicalDevice->handle(), *device, *vulkanInstance);
 
@@ -56,5 +58,4 @@ CoreContext::CoreContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
 CoreContext::~CoreContext() {
   Log::trace("Destroying CoreContext");
 }
-
 }

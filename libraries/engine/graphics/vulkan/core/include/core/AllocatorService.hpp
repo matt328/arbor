@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 // This include is full of warnings, but it's fine everything's fine.
 #include "vulkan/vulkan_core.h"
 #pragma clang diagnostic push
@@ -8,12 +10,13 @@
 #pragma clang diagnostic pop
 
 #include "bk/NonCopyMove.hpp"
+#include "Device.hpp"
 
 namespace arb {
 
 class AllocatorService : public NonCopyableMovable {
 public:
-  AllocatorService(VkPhysicalDevice physicalDevice, VkDevice device, VkInstance instance);
+  AllocatorService(VkPhysicalDevice physicalDevice, Device& newDevice, VkInstance instance);
   ~AllocatorService();
 
   void createBuffer(const VkBufferCreateInfo& bci,
@@ -31,6 +34,7 @@ public:
                    const VmaAllocationCreateInfo& aci,
                    VkImage& outImage,
                    VmaAllocation& outAllocation,
+                   std::string imageName,
                    VmaAllocationInfo* outAllocationInfo = nullptr) -> void;
 
   auto destroyImage(VkImage image, VmaAllocation allocation) -> void;
@@ -39,6 +43,7 @@ public:
 
 private:
   VmaAllocator allocator{VK_NULL_HANDLE};
+  Device& device;
 };
 
 }

@@ -5,7 +5,7 @@
 
 #include "gameplay/IGameplayContext.hpp"
 #include "graphics/base/IGraphicsContext.hpp"
-#include "graphics/common/GraphicsOptions.hpp"
+#include "engine/common/EngineOptions.hpp"
 #include "bk/EventQueue2.hpp"
 #include "engine/common/EngineOptions.hpp"
 #include "engine/common/TripleBuffer.hpp"
@@ -36,14 +36,11 @@ EngineContext::EngineContext(bk::NativeWindowHandle newWindowHandle, EngineOptio
     try {
       InitLogger("Graphics");
       Log::trace("Graphics Thread Started");
-      EngineOptions::Size size = engineOptions.initialSize;
       auto graphicsContext = makeGraphicsContext(
           eventQueue,
           *simStateBuffer,
-          GraphicsOptions{.debugEnabled = engineOptions.debugEnabled,
-                          .initialSize = {.width = engineOptions.initialSize.width,
-                                          .height = engineOptions.initialSize.height},
-                          .framesInFlight = 3},
+          EngineOptions{.debugEnabled = engineOptions.debugEnabled,
+                        .initialSurfaceState = engineOptions.initialSurfaceState},
 
           windowHandle);
       graphicsContext->run(token);

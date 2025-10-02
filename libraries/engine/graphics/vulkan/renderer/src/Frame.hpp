@@ -40,11 +40,11 @@ public:
     return frameManager->getFrameSwapchainIndex(index);
   }
 
-  auto setLastImageUse(std::string alias, LastImageUse use) {
+  auto setLastImageUse(const std::string& alias, LastImageUse use) {
     frameManager->setFrameLastImageUse(index, alias, use);
   }
 
-  auto getLastImageUse(std::string alias) {
+  auto getLastImageUse(const std::string& alias) {
     return frameManager->getFrameLastImageUse(index, alias);
   }
 

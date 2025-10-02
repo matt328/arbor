@@ -18,18 +18,13 @@
 
 namespace arb {
 
-FrameRenderer::FrameRenderer(Device& newDevice,
-                             Swapchain& newSwapchain,
-                             FrameManager& newFrameManager,
-                             PerFrameUploader& newPerFrameUploader,
-                             AliasRegistry& newAliasRegistry,
-                             FrameGraph& newFrameGraph)
-    : device{newDevice},
-      swapchain{newSwapchain},
-      frameManager{newFrameManager},
-      perFrameUploader{newPerFrameUploader},
-      aliasRegistry{newAliasRegistry},
-      frameGraph{newFrameGraph} {
+FrameRenderer::FrameRenderer(const FrameRendererDeps& deps, const FrameRendererCreateInfo& info)
+    : device{deps.device},
+      swapchain{deps.swapchain},
+      frameManager{deps.frameManager},
+      perFrameUploader{deps.perFrameUploader},
+      aliasRegistry{deps.aliasRegistry},
+      frameGraph{deps.frameGraph} {
   Log::trace("Creating FrameRenderer");
 }
 
@@ -62,6 +57,9 @@ void FrameRenderer::renderNextFrame() {
     Log::warn("PresentFrame resports swapchain needs resized");
     resizePending = true;
   }
+}
+
+void FrameRenderer::resize(const RenderSurfaceState& newState) {
 }
 
 auto FrameRenderer::presentFrame(Frame* frame) -> VkResult {

@@ -4,7 +4,7 @@
 #include <vulkan/vulkan_core.h>
 
 #include "bk/Logger.hpp"
-#include "resources/images/ImageSpec.hpp"
+#include "common/ImageCreateDescription.hpp"
 
 namespace arb {
 
@@ -13,7 +13,7 @@ AliasRegistry::AliasRegistry(ResourceSystem& newResourceSystem)
   Log::trace("Creating AliasRegistry");
 }
 
-void AliasRegistry::registerImageAlias(const std::string& alias, ImageSpec spec) {
+void AliasRegistry::registerImageAlias(const std::string& alias, ImageCreateDescription spec) {
   Log::trace("Registering ImageAlias {}", alias);
   if (aliasImageSpecMap.contains(alias)) {
     if (!(aliasImageSpecMap.at(alias) == spec)) {
@@ -86,31 +86,30 @@ auto AliasRegistry::getAttachmentInfo(const std::string& alias,
   return info;
 }
 
-auto AliasRegistry::createImageViewSpec(ImageHandle imageHandle, const ImageSpec& imageSpec)
-    -> ImageViewSpec {
+auto AliasRegistry::createImageViewSpec(ImageHandle imageHandle,
+                                        const ImageCreateDescription& imageSpec) -> ImageViewSpec {
   ImageViewSpec viewSpec{};
   viewSpec.image = imageHandle;
   viewSpec.format = imageSpec.format;
 
-  if ((imageSpec.usageFlags & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) != 0u) {
+  if ((imageSpec.usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) != 0u) {
     viewSpec.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-    if (((imageSpec.format & VK_FORMAT_D32_SFLOAT_S8_UINT) != 0u) ||
-        (imageSpec.format & VK_FORMAT_D24_UNORM_S8_UINT) != 0u) {
-      viewSpec.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
-    }
+    // if (((imageSpec.format & VK_FORMAT_D32_SFLOAT_S8_UINT) != 0u) ||
+    //     (imageSpec.format & VK_FORMAT_D24_UNORM_S8_UINT) != 0u) {
+    //   viewSpec.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
+    // }
     viewSpec.viewType = VK_IMAGE_VIEW_TYPE_2D;
   } else {
     viewSpec.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     viewSpec.viewType =
-        (imageSpec.layers == 1) ? VK_IMAGE_VIEW_TYPE_2D : VK_IMAGE_VIEW_TYPE_2D_ARRAY;
+        (imageSpec.arrayLayers == 1) ? VK_IMAGE_VIEW_TYPE_2D : VK_IMAGE_VIEW_TYPE_2D_ARRAY;
   }
 
   viewSpec.baseMipLevel = 0;
   viewSpec.levelCount = imageSpec.mipLevels;
   viewSpec.baseArrayLayer = 0;
-  viewSpec.layerCount = imageSpec.layers;
+  viewSpec.layerCount = imageSpec.arrayLayers;
   viewSpec.debugName = imageSpec.debugName;
-
   return viewSpec;
 }
 

@@ -15,7 +15,7 @@ class VulkanContext : public IGraphicsContext {
 public:
   VulkanContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
                 IStateBuffer<SimState>& newSimStateBuffer,
-                const GraphicsOptions& newOptions,
+                const EngineOptions& newOptions,
                 bk::NativeWindowHandle newWindowHandle);
   ~VulkanContext() override;
 

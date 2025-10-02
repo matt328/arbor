@@ -9,6 +9,7 @@ CommandBuffer::CommandBuffer(VkDevice newDevice, VkCommandPool pool, VkCommandBu
 CommandBuffer::~CommandBuffer() {
   if (handle != VK_NULL_HANDLE) {
     vkFreeCommandBuffers(device, pool, 1, &handle);
+    handle = VK_NULL_HANDLE;
   }
 }
 

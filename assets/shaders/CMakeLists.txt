@@ -1,4 +1,6 @@
 set(Shaders
+  forward2.vert
+  forward2.frag
   composition.vert
   composition.frag
   compute.comp

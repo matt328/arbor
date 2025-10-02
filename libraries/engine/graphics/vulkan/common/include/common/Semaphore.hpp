@@ -6,6 +6,7 @@
 
 #include "DebugUtils.hpp"
 #include "ErrorUtils.hpp"
+#include "vulkan/vulkan_core.h"
 
 namespace arb {
 
@@ -19,11 +20,14 @@ struct Semaphore {
                      bool timeline = false,
                      std::optional<std::string> name = std::nullopt)
       : device(d) {
-    VkSemaphoreCreateInfo createInfo{
-        .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO,
-    };
+    auto createInfo = VkSemaphoreCreateInfo{.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
     if (timeline) {
-      createInfo.flags |= VK_SEMAPHORE_TYPE_TIMELINE;
+      const auto typeCreateInfo =
+          VkSemaphoreTypeCreateInfo{.sType = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO,
+                                    .pNext = nullptr,
+                                    .semaphoreType = VK_SEMAPHORE_TYPE_TIMELINE,
+                                    .initialValue = 0};
+      createInfo.pNext = &typeCreateInfo;
     }
     checkVk(vkCreateSemaphore(device, &createInfo, nullptr, &handle), "vkCreateSemaphore");
     if (name) {

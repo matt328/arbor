@@ -17,7 +17,7 @@ namespace arb {
 
 VulkanContext::VulkanContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
                              IStateBuffer<SimState>& simStateBuffer,
-                             const GraphicsOptions& newOptions,
+                             const EngineOptions& newOptions,
                              bk::NativeWindowHandle newWindowHandle)
     : eventQueue{std::move(newEventQueue)} {
   Log::trace("Creating VulkanContext");
@@ -34,14 +34,16 @@ VulkanContext::VulkanContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
                     .transfer = coreContext->getTransferSemaphore(),
                     .compute = coreContext->getComputeSemaphore()});
 
-  renderContext = std::make_unique<RenderContext>(newOptions,
-                                                  coreContext->getDevice(),
-                                                  coreContext->getSwapchain(),
-                                                  simStateBuffer,
-                                                  *geometryHandleMapper,
-                                                  coreContext->getCommandBufferManager(),
-                                                  resourceContext->getResourceFacade(),
-                                                  coreContext->getPipelineManager());
+  renderContext = std::make_unique<RenderContext>(
+      newOptions,
+      RenderContextDeps{.device = coreContext->getDevice(),
+                        .swapchain = coreContext->getSwapchain(),
+                        .simStateBuffer = simStateBuffer,
+                        .geometryHandleMapper = *geometryHandleMapper,
+                        .commandBufferManager = coreContext->getCommandBufferManager(),
+                        .resourceSystem = resourceContext->getResourceFacade(),
+                        .pipelineManager = coreContext->getPipelineManager(),
+                        .eventQueue = *eventQueue});
 
   assetContext = std::make_unique<AssetContext>();
 }
@@ -70,7 +72,7 @@ void VulkanContext::run(std::stop_token token) {
 
 auto makeGraphicsContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
                          IStateBuffer<SimState>& newSimStateBuffer,
-                         const GraphicsOptions& newOptions,
+                         const EngineOptions& newOptions,
                          bk::NativeWindowHandle newWindowHandle)
     -> std::unique_ptr<IGraphicsContext> {
   return std::make_unique<VulkanContext>(std::move(newEventQueue),

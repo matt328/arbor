@@ -5,10 +5,10 @@
 #include <vulkan/vulkan_core.h>
 
 #include "bk/NonCopyMove.hpp"
+#include "common/ImageCreateDescription.hpp"
 #include "resources/BufferHandle.hpp"
 #include "resources/images/Image.hpp"
 #include "resources/images/ImageHandle.hpp"
-#include "resources/images/ImageSpec.hpp"
 #include "resources/ResourceSystem.hpp"
 
 namespace arb {
@@ -21,7 +21,7 @@ public:
   explicit AliasRegistry(ResourceSystem& newResourceSystem);
   ~AliasRegistry() = default;
 
-  void registerImageAlias(const std::string& alias, ImageSpec spec);
+  void registerImageAlias(const std::string& alias, ImageCreateDescription desc);
   void registerBufferAlias(std::string alias, BufferSpec spec);
 
   void buildResources(uint32_t frameCount);
@@ -46,10 +46,10 @@ public:
 private:
   ResourceSystem& resourceSystem;
 
-  std::unordered_map<std::string, ImageSpec> aliasImageSpecMap;
+  std::unordered_map<std::string, ImageCreateDescription> aliasImageSpecMap;
   std::unordered_map<std::string, std::vector<ImageViewHandle>> aliasImageViewMap;
 
-  static auto createImageViewSpec(ImageHandle imageHandle, const ImageSpec& imageSpec)
+  static auto createImageViewSpec(ImageHandle imageHandle, const ImageCreateDescription& desc)
       -> ImageViewSpec;
 };
 

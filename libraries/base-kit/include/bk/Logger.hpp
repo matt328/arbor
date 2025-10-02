@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <thread>
 #include <format>
 
 namespace spdlog {
@@ -57,8 +58,9 @@ public:
   }
 
 private:
-  static std::shared_ptr<spdlog::logger>& current_logger() {
-    static thread_local std::shared_ptr<spdlog::logger> logger;
+  static auto current_logger() -> std::shared_ptr<spdlog::logger>& {
+    static std::shared_ptr<spdlog::logger> logger;
+    const auto id = std::this_thread::get_id();
     return logger;
   }
 };

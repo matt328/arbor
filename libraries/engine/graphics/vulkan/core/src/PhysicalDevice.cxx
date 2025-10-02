@@ -21,6 +21,7 @@ DeviceFeatures PhysicalDevice::RequiredFeatures = [] {
   features.vk12.descriptorBindingPartiallyBound = VK_TRUE;
   features.vk12.runtimeDescriptorArray = VK_TRUE;
   features.vk12.descriptorIndexing = VK_TRUE;
+  features.vk12.timelineSemaphore = VK_TRUE;
 
   features.drawParams.shaderDrawParameters = VK_TRUE;
 

@@ -9,7 +9,7 @@ set(vulkancore_SRC
   src/Swapchain.cxx
   src/AllocatorService.cxx
   src/CommandBuffer.cxx
-  src/CommandBufferManager.cxx
+  src/command-buffer/CommandBufferManager.cxx
   src/shader-binding/DSLayout.cxx
 
   src/pipeline/PipelineManager.cxx

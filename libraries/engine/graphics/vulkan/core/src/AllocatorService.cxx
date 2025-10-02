@@ -2,6 +2,7 @@
 
 #include "bk/Logger.hpp"
 #include "common/ErrorUtils.hpp"
+#include "common/DebugUtils.hpp"
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wnullability-completeness"
@@ -12,8 +13,9 @@
 namespace arb {
 
 AllocatorService::AllocatorService(VkPhysicalDevice physicalDevice,
-                                   VkDevice device,
-                                   VkInstance instance) {
+                                   Device& newDevice,
+                                   VkInstance instance)
+    : device{newDevice} {
   Log::trace("Creating AllocatorService");
 
   constexpr auto vulkanFunctions =
@@ -31,6 +33,7 @@ AllocatorService::AllocatorService(VkPhysicalDevice physicalDevice,
 
 AllocatorService::~AllocatorService() {
   Log::trace("Destroying AllocatorService");
+  vmaDestroyAllocator(allocator);
 }
 
 void AllocatorService::createBuffer(const VkBufferCreateInfo& bci,
@@ -40,6 +43,7 @@ void AllocatorService::createBuffer(const VkBufferCreateInfo& bci,
                                     VmaAllocationInfo* outAllocInfo) {
   checkVk(vmaCreateBuffer(allocator, &bci, &aci, &outBuffer, &outAlloc, outAllocInfo),
           "vmaCreateBuffer");
+  dbg::setDebugName(device, outBuffer, "UnnamedBuffer");
 }
 
 void AllocatorService::destroyBuffer(VkBuffer buffer, VmaAllocation alloc) {
@@ -60,9 +64,10 @@ auto AllocatorService::createImage(const VkImageCreateInfo& ici,
                                    const VmaAllocationCreateInfo& aci,
                                    VkImage& outImage,
                                    VmaAllocation& outAllocation,
+                                   std::string imageName,
                                    VmaAllocationInfo* outAllocationInfo) -> void {
   checkVk(vmaCreateImage(allocator, &ici, &aci, &outImage, &outAllocation, outAllocationInfo),
-          "vmaCreateImage");
+          std::format("vmaCreateImage name={}", imageName).c_str());
 }
 
 auto AllocatorService::destroyImage(VkImage image, VmaAllocation allocation) -> void {

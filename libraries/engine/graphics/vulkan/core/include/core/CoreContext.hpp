@@ -5,7 +5,7 @@
 #include "bk/NonCopyMove.hpp"
 
 #include "common/Semaphore.hpp"
-#include "graphics/common/GraphicsOptions.hpp"
+#include "engine/common/EngineOptions.hpp"
 
 namespace arb {
 
@@ -21,7 +21,7 @@ class PipelineManager;
 class CoreContext : NonCopyableMovable {
 public:
   CoreContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
-              const GraphicsOptions& newOptions,
+              const EngineOptions& newOptions,
               bk::NativeWindowHandle newWindowHandle);
   ~CoreContext();
 
@@ -58,7 +58,7 @@ public:
   }
 
 private:
-  GraphicsOptions options;
+  EngineOptions options;
   std::unique_ptr<Instance> vulkanInstance;
   std::unique_ptr<Surface> surface;
   std::unique_ptr<PhysicalDevice> physicalDevice;

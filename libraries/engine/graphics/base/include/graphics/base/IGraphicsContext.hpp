@@ -10,7 +10,7 @@
 
 namespace arb {
 
-struct GraphicsOptions;
+struct EngineOptions;
 
 class IGraphicsContext : public NonCopyableMovable {
 public:
@@ -20,7 +20,7 @@ public:
 
 auto makeGraphicsContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
                          IStateBuffer<SimState>& newSimStateBuffer,
-                         const GraphicsOptions& newOptions,
+                         const EngineOptions& newOptions,
                          bk::NativeWindowHandle newWindowHandle)
     -> std::unique_ptr<IGraphicsContext>;
 

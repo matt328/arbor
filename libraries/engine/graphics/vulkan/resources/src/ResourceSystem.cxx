@@ -38,7 +38,7 @@ auto ResourceSystem::getBuffer(BufferHandle handle) -> Buffer& {
   return bufferManager.getBuffer(handle);
 }
 
-auto ResourceSystem::createImage(const ImageSpec& imageSpec) -> ImageHandle {
+auto ResourceSystem::createImage(const ImageCreateDescription& imageSpec) -> ImageHandle {
   return imageSystem.createImage(imageSpec);
 }
 

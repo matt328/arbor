@@ -10,6 +10,7 @@
 #include "bk/IEventQueue.hpp"
 #include "bk/Logger.hpp"
 #include "engine/common/EngineEvents.hpp"
+#include "vulkan/vulkan_core.h"
 
 namespace arb {
 
@@ -17,12 +18,12 @@ Swapchain::Swapchain(PhysicalDevice* newPhysicalDevice,
                      Surface* newSurface,
                      VkDevice newDevice,
                      std::shared_ptr<bk::IEventQueue> newEventQueue,
-                     GraphicsOptions::Size initialSize)
+                     VkExtent2D initialSize)
     : physicalDevice{newPhysicalDevice},
       surface{newSurface},
       device{newDevice},
       eventQueue{std::move(newEventQueue)},
-      windowSize{initialSize.width, initialSize.height},
+      windowSize{initialSize},
       swapchainExtent{},
       swapchainImageFormat{} {
   Log::trace("Creating Swapchain size: {}x{}", windowSize.width, windowSize.height);

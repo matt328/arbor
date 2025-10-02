@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cassert>
+#include <cpptrace/cpptrace.hpp>
+
 #include "framegraph/ComponentIds.hpp"
 #include "pass/reqs/PassDescription.hpp"
 

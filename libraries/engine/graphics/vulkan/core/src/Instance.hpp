@@ -4,7 +4,7 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 
-#include "graphics/common/GraphicsOptions.hpp"
+#include "engine/common/EngineOptions.hpp"
 #include "bk/NonCopyMove.hpp"
 
 namespace arb {
@@ -14,7 +14,7 @@ class PhysicalDevice;
 
 class Instance : public NonCopyable {
 public:
-  Instance(const GraphicsOptions& newOptions);
+  Instance(const EngineOptions& newOptions);
   ~Instance();
 
   Instance(Instance&& other) noexcept
@@ -43,7 +43,7 @@ public:
 private:
   VkInstance vkInstance{VK_NULL_HANDLE};
   VkDebugUtilsMessengerEXT debugMessenger{VK_NULL_HANDLE};
-  GraphicsOptions graphicsOptions;
+  EngineOptions options;
 
   [[nodiscard]] auto getInstanceExtensions() const -> std::vector<const char*>;
   [[nodiscard]] static auto getAvailableLayers() -> std::vector<VkLayerProperties>;

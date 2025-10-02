@@ -3,7 +3,7 @@
 #include <vulkan/vulkan_core.h>
 #include <vulkan/vk_enum_string_helper.h>
 
-#include "framegraph/barriers/AccessMode.hpp"
+#include "common/AccessMode.hpp"
 
 namespace arb {
 struct BufferBarrierPrecursor {

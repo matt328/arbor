@@ -24,12 +24,13 @@ ImageSystem::~ImageSystem() {
   Log::trace("Destroying ImageSystem");
 }
 
-auto ImageSystem::createImage(const ImageSpec& imageSpec) -> ImageHandle {
+auto ImageSystem::createImage(const ImageCreateDescription& imageSpec) -> ImageHandle {
   const auto [ici, aci] = fromImageSpec(imageSpec);
   return imageManager->createImage(ici, aci, imageSpec.debugName);
 }
 
-auto ImageSystem::createPerFrameImage(const ImageSpec& imageSpec) -> LogicalImageHandle {
+auto ImageSystem::createPerFrameImage(const ImageCreateDescription& imageSpec)
+    -> LogicalImageHandle {
   const auto [ici, aci] = fromImageSpec(imageSpec);
   return logicalImageAllocator->createPerFrameImage(ici, aci, imageSpec.debugName);
 }
@@ -92,7 +93,7 @@ auto ImageSystem::getSampler(SamplerHandle handle) -> const Sampler& {
   return samplerManager->getSampler(handle);
 }
 
-auto ImageSystem::fromImageSpec(const ImageSpec& imageSpec)
+auto ImageSystem::fromImageSpec(const ImageCreateDescription& imageSpec)
     -> std::tuple<VkImageCreateInfo, VmaAllocationCreateInfo> {
   const auto imageCreateInfo =
       VkImageCreateInfo{.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
@@ -102,10 +103,10 @@ auto ImageSystem::fromImageSpec(const ImageSpec& imageSpec)
                                              .height = imageSpec.extent.height,
                                              .depth = 1},
                         .mipLevels = imageSpec.mipLevels,
-                        .arrayLayers = imageSpec.layers,
+                        .arrayLayers = imageSpec.arrayLayers,
                         .samples = VK_SAMPLE_COUNT_1_BIT,
                         .tiling = VK_IMAGE_TILING_OPTIMAL,
-                        .usage = imageSpec.usageFlags,
+                        .usage = imageSpec.usage,
                         .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
                         .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED};
   constexpr auto imageAllocateCreateInfo =

@@ -3,13 +3,13 @@
 #include <vulkan/vulkan_core.h>
 #include <vulkan/vk_enum_string_helper.h>
 
-#include "framegraph/barriers/AccessMode.hpp"
+#include "common/AccessMode.hpp"
 
 namespace arb {
 
 struct ImageBarrierPrecursor {
   std::string alias;
-  AccessMode accessMode;
+  bool isWriteAccess{false};
   VkAccessFlags2 accessFlags;
   VkPipelineStageFlags2 stageFlags;
   VkImageLayout layout;
@@ -29,10 +29,11 @@ struct std::formatter<arb::ImageBarrierPrecursor> {
   auto format(const arb::ImageBarrierPrecursor& ibp, std::format_context& ctx) const {
     return std::format_to(
         ctx.out(),
-        "ImageBarrierPrecursor {{ alias={}, accessMode={}, accessFlags={}, stageFlags={}, "
-        "layout={}, aspectFlags={} }}",
+        "ImageBarrierPrecursor {{\n        alias={}\n        isWriteAccess={}\n     "
+        "   accessFlags={}\n        stageFlags={}\n        "
+        "layout={}\n        aspectFlags={}\n      }}",
         ibp.alias,
-        ibp.accessMode,
+        ibp.isWriteAccess,
         string_VkAccessFlagBits2(ibp.accessFlags),
         string_VkPipelineStageFlagBits2(ibp.stageFlags),
         string_VkImageLayout(ibp.layout),

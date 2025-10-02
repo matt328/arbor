@@ -1,10 +1,10 @@
 #pragma once
 
-namespace arb {
+#include <cstdint>
 
-struct ResizeEvent {
+namespace arb {
+struct Size {
   uint32_t width;
   uint32_t height;
 };
-
 }

@@ -1,12 +1,11 @@
 #pragma once
 
-#include "AccessMode.hpp"
 #include <vulkan/vulkan_core.h>
 
 namespace arb {
 
 struct LastImageUse {
-  AccessMode accessMode{};
+  bool isWriteAccess{false};
   VkAccessFlags2 access{};
   VkPipelineStageFlags2 stage{};
   VkImageLayout layout{};
