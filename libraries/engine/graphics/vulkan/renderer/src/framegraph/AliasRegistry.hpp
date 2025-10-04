@@ -37,14 +37,14 @@ public:
 
   [[nodiscard]] auto getImage(const std::string& alias, Frame* frame) const -> const Image&;
   [[nodiscard]] auto getImageHandle(const std::string& alias, Frame* frame) const -> ImageHandle;
-  [[nodiscard]] auto getImageViewHandle(const std::string& alias, uint32_t frameIndex) const
+  [[nodiscard]] auto getImageViewHandle(const std::string& alias, Frame* frame) const
       -> ImageViewHandle;
   [[nodiscard]] auto getBufferHandle(std::string_view alias, uint32_t frameIndex) const
       -> BufferHandle;
   [[nodiscard]] auto getBuffer(std::string_view alias, uint32_t frameIndex) const -> Buffer&;
 
   [[nodiscard]] auto getAttachmentInfo(const std::string& alias,
-                                       uint32_t frameIndex,
+                                       Frame* frame,
                                        VkImageLayout layout,
                                        VkAttachmentLoadOp loadOp,
                                        VkAttachmentStoreOp storeOp,

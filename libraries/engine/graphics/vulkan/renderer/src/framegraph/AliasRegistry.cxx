@@ -100,7 +100,7 @@ auto AliasRegistry::getSwapchainImageHandle(uint32_t index) const -> ImageHandle
   return swapchain.getImageHandle(index);
 }
 
-auto AliasRegistry::getImageViewHandle(const std::string& alias, uint32_t frameIndex) const
+auto AliasRegistry::getImageViewHandle(const std::string& alias, Frame* frame) const
     -> ImageViewHandle {
   if (aliasImageViewMap.contains(alias)) {
     const auto& entry = aliasImageViewMap.at(alias);
@@ -109,8 +109,8 @@ auto AliasRegistry::getImageViewHandle(const std::string& alias, uint32_t frameI
         return entry.imageViewHandles[0];
       case ImageLifetime::Transient:
       case ImageLifetime::Swapchain:
-        assert(frameIndex < entry.imageViewHandles.size());
-        return entry.imageViewHandles[frameIndex];
+        assert(frame->getIndex() < entry.imageViewHandles.size());
+        return entry.imageViewHandles[frame->getIndex()];
     }
     throw cpptrace::logic_error("Unhandled ImageLifetime");
   }
@@ -126,14 +126,22 @@ auto AliasRegistry::getBuffer(std::string_view alias, uint32_t frameIndex) const
 }
 
 auto AliasRegistry::getAttachmentInfo(const std::string& alias,
-                                      uint32_t frameIndex,
+                                      Frame* frame,
                                       VkImageLayout layout,
                                       VkAttachmentLoadOp loadOp,
                                       VkAttachmentStoreOp storeOp,
                                       std::optional<VkClearValue> clearValue) const
     -> VkRenderingAttachmentInfo {
-  const auto& imageViewHandle = getImageViewHandle(alias, frameIndex);
-  const auto& vkView = resourceSystem.getImageView(imageViewHandle);
+
+  auto getView = [&]() -> const ImageView& {
+    if (alias == Constants::SwapchainAlias) {
+      return swapchain.getImageView(frame->getSwapchainImageIndex());
+    }
+    const auto& imageViewHandle = getImageViewHandle(alias, frame);
+    return resourceSystem.getImageView(imageViewHandle);
+  };
+
+  const auto& vkView = getView();
   auto info = VkRenderingAttachmentInfo{.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
                                         .imageView = vkView,
                                         .imageLayout = layout,

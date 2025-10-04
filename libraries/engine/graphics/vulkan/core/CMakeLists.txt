@@ -9,6 +9,7 @@ set(vulkancore_SRC
   src/Swapchain.cxx
   src/AllocatorService.cxx
   src/Image.cxx
+  src/ImageView.cxx
   src/CommandBuffer.cxx
   src/command-buffer/CommandBufferManager.cxx
   src/shader-binding/DSLayout.cxx

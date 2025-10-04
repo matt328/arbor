@@ -1,4 +1,4 @@
-#include "resources/images/ImageView.hpp"
+#include "core/ImageView.hpp"
 
 #include "bk/Logger.hpp"
 #include "common/ErrorUtils.hpp"

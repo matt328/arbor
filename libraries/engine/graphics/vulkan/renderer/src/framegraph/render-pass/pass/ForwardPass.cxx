@@ -6,6 +6,7 @@
 #include "common/ImageLifetime.hpp"
 #include "core/pipeline/PipelineUnitCreateInfo.hpp"
 #include "common/ImageRequirement.hpp"
+#include "renderer/Constants.hpp"
 
 #include <cpptrace/cpptrace.hpp>
 #include <cpptrace/exceptions.hpp>
@@ -89,8 +90,8 @@ auto ForwardPass::getDescription() const -> PassDescription {
 auto ForwardPass::execute(Frame* frame, VkCommandBuffer cmdBuffer) -> void {
   ZoneScoped;
   const auto colorAttachmentInfo = aliasRegistry.getAttachmentInfo(
-      "SwapchainImage",
-      frame->getIndex(),
+      Constants::SwapchainAlias,
+      frame,
       VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
       VK_ATTACHMENT_LOAD_OP_CLEAR,
       VK_ATTACHMENT_STORE_OP_STORE,
@@ -98,7 +99,7 @@ auto ForwardPass::execute(Frame* frame, VkCommandBuffer cmdBuffer) -> void {
 
   const auto depthAttachmentInfo = aliasRegistry.getAttachmentInfo(
       "DepthBuffer",
-      frame->getIndex(),
+      frame,
       VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL,
       VK_ATTACHMENT_LOAD_OP_CLEAR,
       VK_ATTACHMENT_STORE_OP_STORE,
@@ -118,9 +119,9 @@ auto ForwardPass::execute(Frame* frame, VkCommandBuffer cmdBuffer) -> void {
     auto barriers = std::vector<VkImageMemoryBarrier2>{};
     for (const auto& info : frame->getImageTransitionInfo()) {
       barriers.push_back({.srcStageMask = VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT,
-                          .srcAccessMask = VK_ACCESS_2_NONE,
+                          .srcAccessMask = VK_ACCESS_2_MEMORY_READ_BIT,
                           .dstStageMask = VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT,
-                          .dstAccessMask = VK_ACCESS_2_NONE,
+                          .dstAccessMask = VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT,
                           .oldLayout = info.oldLayout,
                           .newLayout = info.newLayout,
                           .image = info.image,

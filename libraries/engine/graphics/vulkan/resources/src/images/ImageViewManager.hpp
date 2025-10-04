@@ -1,7 +1,7 @@
 #pragma once
 
 #include "bk/NonCopyMove.hpp"
-#include "resources/images/ImageView.hpp"
+#include "core/ImageView.hpp"
 #include "core/Device.hpp"
 #include "engine/common/HandleGenerator.hpp"
 #include "core/ImageHandle.hpp"

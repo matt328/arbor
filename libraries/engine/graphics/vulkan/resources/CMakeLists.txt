@@ -12,7 +12,6 @@ set(vulkanresources_SRC
 
   src/images/ImageManager.cxx
   src/images/ImageSystem.cxx
-  src/images/ImageView.cxx
   src/images/ImageViewManager.cxx
   src/images/LogicalImageAllocator.cxx
   src/images/LogicalImageViewAllocator.cxx

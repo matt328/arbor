@@ -6,7 +6,7 @@
 #include "BufferHandle.hpp"
 #include "bk/NonCopyMove.hpp"
 #include "BufferCreateInfo.hpp"
-#include "resources/images/ImageView.hpp"
+#include "core/ImageView.hpp"
 #include "resources/BufferRegion.hpp"
 #include "core/ImageHandle.hpp"
 #include "resources/PerFrameBufferHandles.hpp"

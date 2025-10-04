@@ -41,6 +41,7 @@ public:
 
   [[nodiscard]] auto getImageCount() const -> uint32_t;
   [[nodiscard]] auto getImage(uint32_t index) const -> Image&;
+  [[nodiscard]] auto getImageView(uint32_t index) const -> ImageView&;
   [[nodiscard]] auto getImageHandle(uint32_t index) const -> ImageHandle;
   [[nodiscard]] auto getExtent() const -> VkExtent2D;
   [[nodiscard]] auto getFormat() const -> VkFormat;
@@ -63,6 +64,7 @@ private:
   VkFormat swapchainImageFormat;
 
   std::vector<std::unique_ptr<Image>> swapchainImages;
+  std::vector<std::unique_ptr<ImageView>> swapchainImageViews;
   std::vector<ImageHandle> swapchainImageHandles;
   std::vector<Semaphore> imageSemaphores;
 

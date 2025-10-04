@@ -1,9 +1,9 @@
 #pragma once
 
-#include <string_view>
+#include <string>
 
 namespace arb::Constants {
 
-inline constexpr std::string_view SwapchainAlias = "SwapchainImage";
+inline const std::string SwapchainAlias = "SwapchainImage";
 
 }

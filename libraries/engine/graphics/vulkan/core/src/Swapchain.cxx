@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "core/Device.hpp"
+#include "core/ImageView.hpp"
 #include "common/ErrorUtils.hpp"
 #include "PhysicalDevice.hpp"
 #include "Surface.hpp"
@@ -70,6 +71,10 @@ auto Swapchain::getImageCount() const -> uint32_t {
 
 auto Swapchain::getImage(uint32_t index) const -> Image& {
   return *swapchainImages.at(index);
+}
+
+auto Swapchain::getImageView(uint32_t index) const -> ImageView& {
+  return *swapchainImageViews.at(index);
 }
 
 auto Swapchain::getImageHandle(uint32_t index) const -> ImageHandle {
@@ -154,10 +159,41 @@ auto Swapchain::createSwapchain() -> void {
                                   &currentImageCount,
                                   swapchainTempImages.data()),
           "vkGetSwapchainImagesKHR(data)");
-  for (const auto& img : swapchainTempImages) {
-    swapchainImages.emplace_back(
-        std::make_unique<Image>(&device, img, swapchainExtent, swapchainImageFormat));
-    swapchainImageHandles.push_back(imageHandleGenerator.requestHandle());
+  {
+    auto index = 0;
+    for (const auto& img : swapchainTempImages) {
+      swapchainImages.emplace_back(
+          std::make_unique<Image>(&device,
+                                  img,
+                                  swapchainExtent,
+                                  swapchainImageFormat,
+                                  std::format("SwapchainImage-{}", index)));
+      swapchainImageHandles.push_back(imageHandleGenerator.requestHandle());
+
+      const auto createInfo = VkImageViewCreateInfo{
+          .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+          .image = img,
+          .viewType = VK_IMAGE_VIEW_TYPE_2D,
+          .format = swapchainImageFormat,
+          .components =
+              VkComponentMapping{
+                  .r = VK_COMPONENT_SWIZZLE_R,
+                  .g = VK_COMPONENT_SWIZZLE_G,
+                  .b = VK_COMPONENT_SWIZZLE_B,
+                  .a = VK_COMPONENT_SWIZZLE_A,
+              },
+          .subresourceRange = VkImageSubresourceRange{.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                                                      .baseMipLevel = 0,
+                                                      .levelCount = 1,
+                                                      .baseArrayLayer = 0,
+                                                      .layerCount = 1}};
+      swapchainImageViews.push_back(
+          std::make_unique<ImageView>(device,
+                                      createInfo,
+                                      swapchainImageHandles.back(),
+                                      std::format("SwapchainImageView-{}", index)));
+      ++index;
+    }
   }
 
   constexpr VkComponentMapping components{

@@ -6,7 +6,7 @@
 #include "common/ImageCreateDescription.hpp"
 #include "ImageViewSpec.hpp"
 #include "SamplerSpec.hpp"
-#include "ImageView.hpp"
+#include "core/ImageView.hpp"
 #include "core/AllocatorService.hpp"
 #include "core/Device.hpp"
 #include "core/Image.hpp"
