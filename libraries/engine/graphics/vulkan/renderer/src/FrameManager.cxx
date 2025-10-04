@@ -53,7 +53,7 @@ auto FrameManager::acquireFrame() -> std::variant<Frame*, ImageAcquireResult> {
 
   if (frame->isSubmitted()) {
     const uint64_t timeout = 1'000'000; // 1ms
-    VkResult result;
+    VkResult result{};
     do {
       VkFence fence = frame->getInflightFence();
       result = vkWaitForFences(device, 1, &fence, VK_TRUE, timeout);
@@ -86,6 +86,7 @@ auto FrameManager::acquireFrame() -> std::variant<Frame*, ImageAcquireResult> {
 
 FrameManager::~FrameManager() {
   Log::trace("Destroying FrameManager");
+  device.waitIdle();
 }
 
 auto FrameManager::setSubmittedFrame(uint8_t index, bool newSubmitted) -> void {

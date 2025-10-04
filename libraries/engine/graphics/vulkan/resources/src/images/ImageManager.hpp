@@ -2,8 +2,8 @@
 
 #include "core/AllocatorService.hpp"
 #include "engine/common/HandleGenerator.hpp"
-#include "resources/images/Image.hpp"
-#include "resources/images/ImageHandle.hpp"
+#include "core/Image.hpp"
+#include "core/ImageHandle.hpp"
 #include <vulkan/vulkan_core.h>
 
 #pragma clang diagnostic push

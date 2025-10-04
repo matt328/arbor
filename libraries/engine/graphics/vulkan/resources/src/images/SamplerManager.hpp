@@ -3,7 +3,7 @@
 #include "common/Handles.hpp"
 #include "core/Device.hpp"
 #include "engine/common/HandleGenerator.hpp"
-#include "resources/images/ImageHandle.hpp"
+#include "core/ImageHandle.hpp"
 #include "resources/images/Sampler.hpp"
 
 #include <string>

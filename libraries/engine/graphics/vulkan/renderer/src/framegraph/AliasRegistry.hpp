@@ -6,19 +6,28 @@
 
 #include "bk/NonCopyMove.hpp"
 #include "common/ImageCreateDescription.hpp"
+#include "common/ImageLifetime.hpp"
+#include "core/Swapchain.hpp"
 #include "resources/BufferHandle.hpp"
-#include "resources/images/Image.hpp"
-#include "resources/images/ImageHandle.hpp"
+#include "core/Image.hpp"
+#include "core/ImageHandle.hpp"
 #include "resources/ResourceSystem.hpp"
 
 namespace arb {
 
+class Frame;
+
 struct BufferSpec {};
+
+struct AliasRegistryDeps {
+  ResourceSystem& resourceSystem;
+  Swapchain& swapchain;
+};
 
 /// Contains mappings of resource Aliases used in the FrameGraph to their (Logical)Handles.
 class AliasRegistry : public NonCopyableMovable {
 public:
-  explicit AliasRegistry(ResourceSystem& newResourceSystem);
+  explicit AliasRegistry(const AliasRegistryDeps& deps);
   ~AliasRegistry() = default;
 
   void registerImageAlias(const std::string& alias, ImageCreateDescription desc);
@@ -26,9 +35,10 @@ public:
 
   void buildResources(uint32_t frameCount);
 
-  [[nodiscard]] auto getImage(std::string_view alias, uint32_t frameIndex) const -> Image&;
-  [[nodiscard]] auto getImageHandle(std::string_view alias, uint32_t frameIndex) const
-      -> ImageHandle;
+  [[nodiscard]] auto getImage(const std::string& alias, Frame* frame) const -> const Image&;
+  [[nodiscard]] auto getImageHandle(const std::string& alias, Frame* frame) const -> ImageHandle;
+  [[nodiscard]] auto getImageViewHandle(const std::string& alias, uint32_t frameIndex) const
+      -> ImageViewHandle;
   [[nodiscard]] auto getBufferHandle(std::string_view alias, uint32_t frameIndex) const
       -> BufferHandle;
   [[nodiscard]] auto getBuffer(std::string_view alias, uint32_t frameIndex) const -> Buffer&;
@@ -45,9 +55,24 @@ public:
 
 private:
   ResourceSystem& resourceSystem;
+  Swapchain& swapchain;
+
+  [[nodiscard]] auto getSwapchainImage(uint32_t index) const -> Image&;
+  [[nodiscard]] auto getSwapchainImageHandle(uint32_t index) const -> ImageHandle;
+
+  struct AliasImageEntry {
+    ImageLifetime lifetime;
+    std::vector<ImageHandle> imageHandles;
+  };
+
+  struct AliasImageViewEntry {
+    ImageLifetime lifetime;
+    std::vector<ImageViewHandle> imageViewHandles;
+  };
 
   std::unordered_map<std::string, ImageCreateDescription> aliasImageSpecMap;
-  std::unordered_map<std::string, std::vector<ImageViewHandle>> aliasImageViewMap;
+  std::unordered_map<std::string, AliasImageEntry> aliasImageHandleMap;
+  std::unordered_map<std::string, AliasImageViewEntry> aliasImageViewMap;
 
   static auto createImageViewSpec(ImageHandle imageHandle, const ImageCreateDescription& desc)
       -> ImageViewSpec;

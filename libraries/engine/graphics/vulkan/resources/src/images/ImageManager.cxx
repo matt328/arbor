@@ -19,9 +19,12 @@ auto ImageManager::createImage(const VkImageCreateInfo& ici,
                                const VmaAllocationCreateInfo& aci,
                                const std::optional<std::string>& name) -> ImageHandle {
   const auto handle = handleGenerator.requestHandle();
-  imageMap.emplace(
-      handle,
-      std::make_unique<Image>(&device, allocatorService, ici, aci, name.value_or("Unnamed Image")));
+  imageMap.emplace(handle,
+                   std::make_unique<Image>(&device,
+                                           &allocatorService,
+                                           ici,
+                                           aci,
+                                           name.value_or("Unnamed Image")));
   return handle;
 }
 

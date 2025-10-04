@@ -9,8 +9,8 @@
 #include "ImageView.hpp"
 #include "core/AllocatorService.hpp"
 #include "core/Device.hpp"
-#include "resources/images/Image.hpp"
-#include "resources/images/ImageHandle.hpp"
+#include "core/Image.hpp"
+#include "core/ImageHandle.hpp"
 #include "resources/images/Sampler.hpp"
 
 namespace arb {

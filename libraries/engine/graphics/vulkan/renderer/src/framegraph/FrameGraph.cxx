@@ -5,6 +5,7 @@
 #include "Frame.hpp"
 #include "barriers/PrecursorGenerator.hpp"
 #include "bk/Logger.hpp"
+#include "renderer/Constants.hpp"
 #include "core/command-buffers/CommandBuffer.hpp"
 #include "core/command-buffers/CommandBufferManager.hpp"
 
@@ -14,6 +15,7 @@
 #include "framegraph/AliasRegistry.hpp"
 #include "framegraph/barriers/Builders.hpp"
 #include "common/ImageCreateDescription.hpp"
+#include "render-pass/pass/PresentPass.hpp"
 #include "vulkan/vulkan_core.h"
 
 namespace arb {
@@ -28,7 +30,11 @@ FrameGraph::FrameGraph(const FrameGraphDeps& deps, const FrameGraphConfig& confi
       ForwardPassDeps{.aliasRegistry = aliasRegistry, .pipelineManager = pipelineManager},
       ForwardPassConfig{.initialSurfaceState = config.initialSurfaceState});
 
+  auto presentPass = std::make_unique<PresentPass>(
+      PresentPassConfig{.initialSurfaceState = config.initialSurfaceState});
+
   renderPasses.push_back(std::move(forwardPass));
+  renderPasses.push_back(std::move(presentPass));
 
   compileResources();
   bake();
@@ -67,16 +73,16 @@ auto FrameGraph::execute(Frame* frame) -> FrameGraphResult {
 
     if (barrierPrecursorPlan.imagePrecursors.contains(passId)) {
       for (const auto& precursor : barrierPrecursorPlan.imagePrecursors.at(passId)) {
-        const auto handle = aliasRegistry.getImageHandle(precursor.alias, frame->getIndex());
+        const auto handle = aliasRegistry.getImageHandle(precursor.alias, frame);
         auto lastUse = std::optional<LastImageUse>();
-        if (precursor.alias == "SwapchainImage") {
+        if (precursor.alias == Constants::SwapchainAlias) {
           lastUse = getSwapchainImageLastUse(handle);
         } else {
           lastUse = frame->getLastImageUse(precursor.alias);
         }
         auto imageBarrier = barriers::build(precursor, lastUse);
         if (imageBarrier) {
-          const auto& image = aliasRegistry.getImage(precursor.alias, frame->getIndex());
+          const auto& image = aliasRegistry.getImage(precursor.alias, frame);
           imageBarrier->image = image;
           imageBarriers.push_back(*imageBarrier);
         }
@@ -86,7 +92,7 @@ auto FrameGraph::execute(Frame* frame) -> FrameGraphResult {
             .stage = precursor.stageFlags,
             .layout = precursor.layout,
         };
-        if (precursor.alias == "SwapchainImage") {
+        if (precursor.alias == Constants::SwapchainAlias) {
           setSwapchainImageLastUse(handle, newLastUse);
         } else {
           frame->setLastImageUse(precursor.alias, newLastUse);

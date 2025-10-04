@@ -59,28 +59,23 @@ auto ForwardPass::getDescription() const -> PassDescription {
   // Pass Resources
   desc.images = {
       ImageRequirement{.alias = "SwapchainImage",
-                       .createDesc = std::make_optional<ImageCreateDescription>(
-                           {.format = VK_FORMAT_R8G8B8A8_UNORM,
-                            .extent = {.width = surfaceState.swapchainExtent.width,
-                                       .height = surfaceState.swapchainExtent.height},
-                            .usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-                            .imageLifetime = ImageLifetime::Swapchain}),
                        .useDesc = {.accessFlags = VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT,
                                    .stageFlags = VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT,
                                    .imageLayout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL,
-                                   .aspectFlags = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT}},
+                                   .aspectFlags = VK_IMAGE_ASPECT_COLOR_BIT}},
       ImageRequirement{.alias = "DepthBuffer",
                        .createDesc = std::make_optional<ImageCreateDescription>(
                            {.format = VK_FORMAT_D32_SFLOAT,
                             .extent = {.width = surfaceState.swapchainExtent.width,
                                        .height = surfaceState.swapchainExtent.height},
                             .usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
-                            .imageLifetime = ImageLifetime::Persistent}),
+                            .imageLifetime = ImageLifetime::Persistent,
+                            .debugName = "DepthBuffer"}),
                        .useDesc = {.accessFlags = VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
                                    .stageFlags = VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT |
                                                  VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT,
                                    .imageLayout = VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL,
-                                   .aspectFlags = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT}}};
+                                   .aspectFlags = VK_IMAGE_ASPECT_DEPTH_BIT}}};
   desc.buffers = {};
   desc.dependsOn = {};
 

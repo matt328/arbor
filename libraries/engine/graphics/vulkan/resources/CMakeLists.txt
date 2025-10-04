@@ -10,7 +10,6 @@ set(vulkanresources_SRC
   src/buffers/LinearAllocator.cxx
   src/buffers/BufferPool.cxx
 
-  src/images/Image.cxx
   src/images/ImageManager.cxx
   src/images/ImageSystem.cxx
   src/images/ImageView.cxx

@@ -4,7 +4,7 @@
 #include "resources/images/ImageView.hpp"
 #include "core/Device.hpp"
 #include "engine/common/HandleGenerator.hpp"
-#include "resources/images/ImageHandle.hpp"
+#include "core/ImageHandle.hpp"
 #include "vulkan/vulkan_core.h"
 
 namespace arb {

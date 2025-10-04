@@ -8,9 +8,9 @@
 #include "BufferCreateInfo.hpp"
 #include "resources/images/ImageView.hpp"
 #include "resources/BufferRegion.hpp"
-#include "resources/images/ImageHandle.hpp"
+#include "core/ImageHandle.hpp"
 #include "resources/PerFrameBufferHandles.hpp"
-#include "resources/images/Image.hpp"
+#include "core/Image.hpp"
 #include "resources/ResizeRequest.hpp"
 #include "resources/images/ImageSystem.hpp"
 
@@ -36,6 +36,7 @@ public:
   // Images
   auto createImage(const ImageCreateDescription& imageSpec) -> ImageHandle;
   auto createImageView(const ImageViewSpec& imageViewSpec) -> ImageViewHandle;
+
   auto resolveImageHandle(LogicalImageHandle logicalHandle, uint32_t frameIndex) -> ImageHandle;
   auto getImage(LogicalImageHandle logicalHandle, size_t frameIndex) -> const Image&;
   auto getImage(ImageHandle handle) -> const Image&;

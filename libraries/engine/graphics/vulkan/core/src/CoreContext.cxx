@@ -57,5 +57,7 @@ CoreContext::CoreContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
 
 CoreContext::~CoreContext() {
   Log::trace("Destroying CoreContext");
+  device->waitIdle();
 }
+
 }

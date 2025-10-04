@@ -16,10 +16,17 @@ namespace arb {
 class Image : NonCopyableMovable {
 public:
   Image(Device* newDevice,
-        AllocatorService& newAllocatorService,
+        AllocatorService* newAllocatorService,
         const VkImageCreateInfo& ici,
         const VmaAllocationCreateInfo& aci,
         const std::optional<std::string>& name = std::nullopt);
+
+  Image(Device* newDevice,
+        VkImage existingImage,
+        VkExtent2D extent,
+        VkFormat format,
+        const std::optional<std::string>& name = std::nullopt);
+
   ~Image();
 
   operator VkImage() const {
@@ -30,15 +37,20 @@ public:
     return imageCreateInfo.extent;
   }
 
+  [[nodiscard]] auto getFormat() const -> VkFormat {
+    return imageCreateInfo.format;
+  }
+
 private:
   Device* device;
-  AllocatorService& allocatorService;
-  VkImage vkImage;
-  VmaAllocation allocation;
-  VkImageCreateInfo imageCreateInfo;
-  VmaAllocationCreateInfo allocationCreateInfo;
-  VmaAllocationInfo allocationInfo;
+  AllocatorService* allocatorService = nullptr;
+  VkImage vkImage = VK_NULL_HANDLE;
+  VmaAllocation allocation = VK_NULL_HANDLE;
+  VkImageCreateInfo imageCreateInfo{};
+  VmaAllocationCreateInfo allocationCreateInfo{};
+  VmaAllocationInfo allocationInfo{};
   std::string debugName;
+  bool ownsMemory = true;
 };
 
 }

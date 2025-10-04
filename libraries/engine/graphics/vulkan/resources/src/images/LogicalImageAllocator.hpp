@@ -2,7 +2,7 @@
 
 #include "bk/NonCopyMove.hpp"
 #include "engine/common/HandleGenerator.hpp"
-#include "resources/images/ImageHandle.hpp"
+#include "core/ImageHandle.hpp"
 #include "ImageManager.hpp"
 
 namespace arb {

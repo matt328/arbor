@@ -2,7 +2,7 @@
 
 #include "bk/NonCopyMove.hpp"
 #include "core/Device.hpp"
-#include "resources/images/ImageHandle.hpp"
+#include "core/ImageHandle.hpp"
 
 #include <string>
 #include <vulkan/vulkan_core.h>

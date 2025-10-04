@@ -23,10 +23,12 @@ namespace arb {
 RenderContext::RenderContext(const EngineOptions& options, const RenderContextDeps& deps)
     : device{deps.device}, swapchain{deps.swapchain}, pipelineManager{deps.pipelineManager} {
   Log::trace("Creating RenderContext");
+
   frameManager = std::make_unique<FrameManager>(options, device, swapchain);
   perFrameUploader =
       std::make_unique<PerFrameUploader>(deps.simStateBuffer, deps.geometryHandleMapper);
-  aliasRegistry = std::make_unique<AliasRegistry>(deps.resourceSystem);
+  aliasRegistry = std::make_unique<AliasRegistry>(
+      AliasRegistryDeps{.resourceSystem = deps.resourceSystem, .swapchain = swapchain});
 
   frameGraph = std::make_unique<FrameGraph>(
       FrameGraphDeps{.commandBufferManager = deps.commandBufferManager,

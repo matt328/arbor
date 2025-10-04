@@ -10,13 +10,13 @@
 #include "bk/IEventQueue.hpp"
 #include "bk/Logger.hpp"
 #include "engine/common/EngineEvents.hpp"
-#include "vulkan/vulkan_core.h"
+#include <vulkan/vulkan.h>
 
 namespace arb {
 
 Swapchain::Swapchain(PhysicalDevice* newPhysicalDevice,
                      Surface* newSurface,
-                     VkDevice newDevice,
+                     Device& newDevice,
                      std::shared_ptr<bk::IEventQueue> newEventQueue,
                      VkExtent2D initialSize)
     : physicalDevice{newPhysicalDevice},
@@ -62,6 +62,26 @@ auto Swapchain::recreate() -> void {
 
 auto Swapchain::getImageSemaphore(uint32_t index) -> const Semaphore& {
   return imageSemaphores.at(index);
+}
+
+auto Swapchain::getImageCount() const -> uint32_t {
+  return swapchainImages.size();
+}
+
+auto Swapchain::getImage(uint32_t index) const -> Image& {
+  return *swapchainImages.at(index);
+}
+
+auto Swapchain::getImageHandle(uint32_t index) const -> ImageHandle {
+  return swapchainImageHandles.at(index);
+}
+
+auto Swapchain::getExtent() const -> VkExtent2D {
+  return swapchainExtent;
+}
+
+auto Swapchain::getFormat() const -> VkFormat {
+  return swapchainImageFormat;
 }
 
 auto Swapchain::createSwapchain() -> void {
@@ -126,10 +146,19 @@ auto Swapchain::createSwapchain() -> void {
   uint32_t currentImageCount{};
   checkVk(vkGetSwapchainImagesKHR(device, currentSwapchain, &currentImageCount, nullptr),
           "vkGetSwapchainImagesKHR(count)");
-  swapchainImages.resize(currentImageCount);
-  checkVk(
-      vkGetSwapchainImagesKHR(device, currentSwapchain, &currentImageCount, swapchainImages.data()),
-      "vkGetSwapchainImagesKHR(data)");
+
+  auto swapchainTempImages = std::vector<VkImage>{};
+  swapchainTempImages.resize(currentImageCount);
+  checkVk(vkGetSwapchainImagesKHR(device,
+                                  currentSwapchain,
+                                  &currentImageCount,
+                                  swapchainTempImages.data()),
+          "vkGetSwapchainImagesKHR(data)");
+  for (const auto& img : swapchainTempImages) {
+    swapchainImages.emplace_back(
+        std::make_unique<Image>(&device, img, swapchainExtent, swapchainImageFormat));
+    swapchainImageHandles.push_back(imageHandleGenerator.requestHandle());
+  }
 
   constexpr VkComponentMapping components{
       .r = VK_COMPONENT_SWIZZLE_R,
@@ -146,7 +175,7 @@ auto Swapchain::createSwapchain() -> void {
   size_t index{};
   for (const auto& image : swapchainImages) {
     const auto createInfo = VkImageViewCreateInfo{.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-                                                  .image = image,
+                                                  .image = *image,
                                                   .viewType = VK_IMAGE_VIEW_TYPE_2D,
                                                   .format = swapchainImageFormat,
                                                   .components = components,

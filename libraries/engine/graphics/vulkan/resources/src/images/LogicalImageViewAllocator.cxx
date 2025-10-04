@@ -3,7 +3,7 @@
 #include <cassert>
 
 #include "bk/Logger.hpp"
-#include "resources/images/ImageHandle.hpp"
+#include "core/ImageHandle.hpp"
 
 namespace arb {
 

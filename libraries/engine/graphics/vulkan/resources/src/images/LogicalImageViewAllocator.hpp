@@ -3,7 +3,7 @@
 #include "bk/NonCopyMove.hpp"
 #include "ImageViewManager.hpp"
 #include "common/Handles.hpp"
-#include "resources/images/ImageHandle.hpp"
+#include "core/ImageHandle.hpp"
 
 namespace arb {
 

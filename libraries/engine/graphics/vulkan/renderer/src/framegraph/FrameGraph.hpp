@@ -10,7 +10,7 @@
 #include "barriers/BarrierPrecursorPlan.hpp"
 #include "bk/NonCopyMove.hpp"
 #include "core/pipeline/PipelineManager.hpp"
-#include "resources/images/ImageHandle.hpp"
+#include "core/ImageHandle.hpp"
 
 #include "barriers/LastImageUse.hpp"
 #include "IResizable.hpp"
