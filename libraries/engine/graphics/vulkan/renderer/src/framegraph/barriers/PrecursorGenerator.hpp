@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-#include <bk/Logger.hpp>
+#include <bk/Log.hpp>
 #include "framegraph/barriers/BarrierPrecursorPlan.hpp"
 #include "framegraph/render-pass/IRenderPass.hpp"
 
@@ -35,7 +35,7 @@ static inline auto generatePrecursorPlan(const std::vector<std::unique_ptr<IRend
            .aspectFlags = imageReq.useDesc.aspectFlags});
     }
 
-    Log::trace("Generated BarrierPrecursorPlan:\n{}", result);
+    // LOG_TRACE_L1(Log::Renderer, "Generated BarrierPrecursorPlan:\n{}", result);
   }
   return result;
 }

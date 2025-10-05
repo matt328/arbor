@@ -56,6 +56,7 @@ target_link_libraries(${PROJECT_NAME}
   engine::base
   engine::common
   cpptrace::cpptrace
+  quill::quill
 )
 
 target_compile_definitions(${PROJECT_NAME}

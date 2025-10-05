@@ -1,7 +1,8 @@
 #include "ForwardPass.hpp"
 
 #include "Frame.hpp"
-#include "bk/Logger.hpp"
+
+#include "bk/Log.hpp"
 #include "common/ImageCreateDescription.hpp"
 #include "common/ImageLifetime.hpp"
 #include "core/pipeline/PipelineUnitCreateInfo.hpp"
@@ -21,7 +22,7 @@ ForwardPass::ForwardPass(const ForwardPassDeps& deps, const ForwardPassConfig& c
     : aliasRegistry{deps.aliasRegistry},
       pipelineManager{deps.pipelineManager},
       surfaceState{config.initialSurfaceState} {
-  Log::trace("Creating ForwardPass");
+  LOG_TRACE_L1(Log::Renderer, "Creating ForwardPass");
 
   const auto pipelineLayoutInfo = PipelineLayoutInfo{
       .pushConstantInfoList = {
@@ -52,13 +53,10 @@ ForwardPass::ForwardPass(const ForwardPassDeps& deps, const ForwardPassConfig& c
 }
 
 ForwardPass::~ForwardPass() {
-  Log::trace("Destroying ForwardPass");
+  LOG_TRACE_L1(Log::Renderer, "Destroying ForwardPass");
 }
 
 void ForwardPass::resize(const RenderSurfaceState& newState) {
-  Log::debug("Forward Pas setting surface state: {}x{}",
-             newState.swapchainExtent.width,
-             newState.swapchainExtent.height);
   surfaceState = newState;
 }
 

@@ -4,7 +4,8 @@
 #include <utility>
 
 #include "PhysicalDevice.hpp"
-#include "bk/Logger.hpp"
+
+#include "bk/Log.hpp"
 
 namespace arb {
 
@@ -14,7 +15,7 @@ Device::Device(VkDevice newDevice,
     : vkDevice{newDevice},
       physicalDevice{newPhysicalDevice},
       queueFamilyIndices{std::move(newQueueFamilyIndices)} {
-  Log::trace("Creating Device");
+  LOG_TRACE_L1(Log::Core, "Creating Device");
 
   assert(queueFamilyIndices.graphicsFamily.has_value());
   vkGetDeviceQueue(vkDevice, *queueFamilyIndices.graphicsFamily, 0, &graphics);
@@ -32,7 +33,7 @@ Device::Device(VkDevice newDevice,
 Device::~Device() {
   if (vkDevice != nullptr) {
     vkDestroyDevice(vkDevice, nullptr);
-    Log::trace("Destroyed Device");
+    LOG_TRACE_L1(Log::Core, "Destroyed Device");
   }
 }
 

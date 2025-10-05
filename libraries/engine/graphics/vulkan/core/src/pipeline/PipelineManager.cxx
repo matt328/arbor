@@ -1,7 +1,8 @@
 #include "core/pipeline/PipelineManager.hpp"
 
 #include "SpirvShaderModuleFactory.hpp"
-#include "bk/Logger.hpp"
+
+#include "bk/Log.hpp"
 #include "engine/common/HandleGenerator.hpp"
 
 #include <array>
@@ -11,11 +12,11 @@
 namespace arb {
 
 PipelineManager::PipelineManager(Device& newDevice) : device{newDevice} {
-  Log::trace("Creating PipelineManager");
+  LOG_TRACE_L1(Log::Core, "Creating PipelineManager");
 }
 
 PipelineManager::~PipelineManager() {
-  Log::trace("Destroying PipelineManager");
+  LOG_TRACE_L1(Log::Core, "Destroying PipelineManager");
   pipelineMap.clear();
 }
 

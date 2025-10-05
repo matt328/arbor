@@ -3,7 +3,7 @@
 #include "IEventQueue.hpp"
 #include <mutex>
 #include <deque>
-#include "Logger.hpp"
+#include "Log.hpp"
 
 namespace bk {
 
@@ -19,10 +19,10 @@ struct ThreadLocalData {
 class EventQueue : public IEventQueue {
 public:
   EventQueue() {
-    Log::trace("Constructing EventQueue");
+    LOG_TRACE_L1(Log::Core, "Constructing EventQueue");
   }
   ~EventQueue() {
-    Log::trace("Destroying EventQueue");
+    LOG_TRACE_L1(Log::Core, "Destroying EventQueue");
   }
 
   void emitErased(std::type_index type,

@@ -3,7 +3,7 @@
 #include <cpptrace/cpptrace.hpp>
 #include <fstream>
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 #include "ShaderModule.hpp"
 #include "vulkan/vulkan_core.h"
 
@@ -25,7 +25,7 @@ auto SpirvShaderModuleFactory::readSPIRVFile(const std::string& filename) -> std
   std::ifstream file(filename, std::ios::binary | std::ios::ate);
 
   if (!file) {
-    Log::error("Failed to open SPIR-V file: {}", filename);
+    LOG_ERROR(Log::Core, "Failed to open SPIR-V file: {}", filename);
     throw cpptrace::runtime_error("Failed to open SPIR-V file: " + filename);
   }
 

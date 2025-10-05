@@ -4,7 +4,7 @@
 #include <cpptrace/from_current.hpp>
 #include <cpptrace/formatting.hpp>
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 #include "commands/ImportModelCommand.hpp"
 #include "engine/common/EngineOptions.hpp"
 #include "ui_MainWindow.h"
@@ -27,9 +27,6 @@ MainWindow::MainWindow(QWidget* parent)
   ui->setupUi(this);
 
   undoStack = new QUndoStack(this);
-
-  InitLogger("Main");
-  Log::info("Logger Initialized");
 
   setupActions();
   installWindowAgent();
@@ -71,7 +68,10 @@ void MainWindow::startEngine() {
       formatter.addresses(cpptrace::formatter::address_mode::none);
       formatter.paths(cpptrace::formatter::path_mode::basename);
       formatter.hide_exception_machinery(true);
-      Log::error("Engine exception: {} {}", e.message(), formatter.format(e.trace()));
+      LOG_ERROR(Log::Application,
+                "Engine exception: {} {}",
+                e.message(),
+                formatter.format(e.trace()));
       QMessageBox::critical(this, "Engine Error", e.message());
       qApp->quit();
     }

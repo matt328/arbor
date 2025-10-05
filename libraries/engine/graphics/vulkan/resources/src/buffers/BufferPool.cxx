@@ -5,7 +5,8 @@
 #include <ranges>
 
 #include "resources/Buffer.hpp"
-#include "bk/Logger.hpp"
+
+#include "bk/Log.hpp"
 #include "core/Device.hpp"
 #include "core/AllocatorService.hpp"
 #include "BufferAllocator.hpp"
@@ -14,12 +15,12 @@ namespace arb {
 
 BufferPool::BufferPool(Device& newDevice, AllocatorService& newAllocatorService)
     : device{newDevice}, allocatorService{newAllocatorService} {
-  Log::trace("Creating BufferPool");
+  LOG_TRACE_L1(Log::Resources, "Creating BufferPool");
   bufferAllocator = std::make_unique<BufferAllocator>();
 }
 
 BufferPool::~BufferPool() {
-  Log::trace("Destroying BufferPool");
+  LOG_TRACE_L1(Log::Resources, "Destroying BufferPool");
 }
 
 auto BufferPool::registerBuffer(const BufferCreateInfo& createInfo) -> BufferHandle {
@@ -73,7 +74,7 @@ auto BufferPool::insert(BufferHandle handle, void* data, const BufferRegion& tar
     auto* mappedMemory = allocatorService.mapMemory(buf->allocation);
     assert(data != nullptr);
     if (targetRegion.offset + targetRegion.size > buf->bufferMeta.bufferCreateInfo.size) {
-      Log::warn("Buffer {} Full", buf->bufferMeta.debugName);
+      LOG_WARNING(Log::Core, "Buffer {} Full", buf->bufferMeta.debugName);
     }
     assert(targetRegion.offset + targetRegion.size > buf->bufferMeta.bufferCreateInfo.size);
     char* dest = static_cast<char*>(mappedMemory);

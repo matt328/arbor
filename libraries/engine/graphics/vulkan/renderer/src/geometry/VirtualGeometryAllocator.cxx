@@ -1,17 +1,17 @@
 #include "VirtualGeometryAllocator.hpp"
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 #include "geometry/GeometryStream.hpp"
 
 namespace arb {
 
 VirtualAllocationManager::VirtualAllocationManager(GeometryStream& newGeometryStream)
     : geometryStream{newGeometryStream} {
-  Log::trace("Creating VirtualAllocationManager");
+  LOG_TRACE_L1(Log::Renderer, "Creating VirtualAllocationManager");
 }
 
 VirtualAllocationManager::~VirtualAllocationManager() {
-  Log::trace("Destroying VirtualAllocationManager");
+  LOG_TRACE_L1(Log::Renderer, "Destroying VirtualAllocationManager");
 }
 
 auto VirtualAllocationManager::checkSizes(const GeometryData& data, size_t size)

@@ -1,6 +1,6 @@
 #include "core/shader-binding/DSLayout.hpp"
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 #include "common/ErrorUtils.hpp"
 #include "common/DebugUtils.hpp"
 
@@ -28,14 +28,14 @@ DSLayout::DSLayout(Device& newDevice,
                    const VkDescriptorSetLayoutCreateInfo& info,
                    std::string_view name)
     : device{newDevice}, vkLayout{VK_NULL_HANDLE} {
-  Log::trace("Creating DSLayout: {}", name);
+  LOG_TRACE_L1(Log::Core, "Creating DSLayout: {}", name);
   checkVk(vkCreateDescriptorSetLayout(device, &info, nullptr, &vkLayout),
           "vkCreateDescriptorSetLayout");
   dbg::setDebugName(device, vkLayout, name);
 }
 
 DSLayout::~DSLayout() noexcept {
-  Log::trace("Destroying DSLayout");
+  LOG_TRACE_L1(Log::Core, "Destroying DSLayout");
   vkDestroyDescriptorSetLayout(device, vkLayout, nullptr);
 }
 

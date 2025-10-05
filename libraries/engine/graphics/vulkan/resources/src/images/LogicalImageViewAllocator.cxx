@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 #include "core/ImageHandle.hpp"
 
 namespace arb {
@@ -10,11 +10,11 @@ namespace arb {
 LogicalImageViewAllocator::LogicalImageViewAllocator(ImageViewManager& newImageViewManager,
                                                      uint32_t frameCount)
     : imageViewManager{newImageViewManager}, framesInFlight{frameCount} {
-  Log::trace("Creating LogicalImageViewAllocator");
+  LOG_TRACE_L1(Log::Resources, "Creating LogicalImageViewAllocator");
 }
 
 LogicalImageViewAllocator::~LogicalImageViewAllocator() {
-  Log::trace("Destroying LogicalImageViewAllocator");
+  LOG_TRACE_L1(Log::Resources, "Destroying LogicalImageViewAllocator");
 }
 
 auto LogicalImageViewAllocator::createPerFrameImageView(const VkImageViewCreateInfo& ivci,

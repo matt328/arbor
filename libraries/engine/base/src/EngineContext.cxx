@@ -14,28 +14,28 @@ namespace arb {
 
 EngineContext::EngineContext(bk::NativeWindowHandle newWindowHandle, EngineOptions engineOptions)
     : windowHandle{newWindowHandle} {
-  Log::trace("Creating EngineContext");
+  LOG_TRACE_L1(Log::Core, "Creating EngineContext");
 
   eventQueue = std::make_shared<bk::EventQueue>();
   simStateBuffer = std::make_unique<TripleBuffer<SimState>>();
 
   gameThread = std::jthread([this](std::stop_token token) {
+    SetThreadDescription(GetCurrentThread(), L"Gameplay");
     try {
-      InitLogger("Game");
-      Log::trace("Game Thread Started");
+      LOG_TRACE_L1(Log::Core, "Game Thread Started");
       auto gameplayContext = makeGameplayContext(eventQueue, *simStateBuffer);
       gameplayContext->run(token);
     } catch (const std::exception& e) {
-      Log::trace("Gameplay Thread Exception: {}", e.what());
+      LOG_TRACE_L1(Log::Core, "Gameplay Thread Exception: {}", e.what());
       engineError = std::current_exception();
       requestStop();
     }
   });
 
   graphicsThread = std::jthread([this, engineOptions](std::stop_token token) {
+    SetThreadDescription(GetCurrentThread(), L"Graphics");
     try {
-      InitLogger("Graphics");
-      Log::trace("Graphics Thread Started");
+      LOG_TRACE_L1(Log::Core, "Graphics Thread Started");
       auto graphicsContext = makeGraphicsContext(
           eventQueue,
           *simStateBuffer,
@@ -52,7 +52,7 @@ EngineContext::EngineContext(bk::NativeWindowHandle newWindowHandle, EngineOptio
 }
 
 EngineContext::~EngineContext() {
-  Log::trace("Destroying EngineContext");
+  LOG_TRACE_L1(Log::Core, "Destroying EngineContext");
 }
 
 auto EngineContext::update() -> void {
@@ -62,13 +62,10 @@ auto EngineContext::update() -> void {
 }
 
 auto EngineContext::requestStop() -> void {
-  Log::trace("Stop Requested");
   if (gameThread.joinable()) {
-    Log::trace("GameThread joinable");
     gameThread.request_stop();
   }
   if (graphicsThread.joinable()) {
-    Log::trace("GraphicsThread joinable");
     graphicsThread.request_stop();
   }
 }

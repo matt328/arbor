@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 #include "resources/ResourceSystem.hpp"
 
 namespace arb {
@@ -45,11 +45,11 @@ GeometryStream::GeometryStream(ResourceSystem& newResourceFacade)
                            .initialSize = AnimationBufferInitialSize,
                            .itemStride = sizeof(glm::vec4),
                            .debugName = "Buffer-AnimationData"})} {
-  Log::trace("Constructing Geometry Stream");
+  LOG_TRACE_L1(Log::Renderer, "Constructing Geometry Stream");
 }
 
 GeometryStream::~GeometryStream() {
-  Log::trace("Destroying Geometry Stream");
+  LOG_TRACE_L1(Log::Renderer, "Destroying Geometry Stream");
 }
 
 auto GeometryStream::checkSizes(const GeometryData& data) -> std::vector<ResizeRequest> {

@@ -1,7 +1,8 @@
 #pragma once
 
 #include "bk/NonCopyMove.hpp"
-#include "bk/Logger.hpp"
+
+#include "bk/Log.hpp"
 #include "core/images/ImageView.hpp"
 #include "images/Sampler.hpp"
 
@@ -17,10 +18,10 @@ public:
       : imageView{std::move(newImageView)},
         sampler{std::move(newSampler)},
         debugName{name.value_or("Unnamed Texture")} {
-    Log::trace("Creating Texture {}", debugName);
+    LOG_TRACE_L1(Log::Resources, "Creating Texture {}", debugName);
   }
   ~Texture() {
-    Log::trace("Destroying Texture {}", debugName);
+    LOG_TRACE_L1(Log::Resources, "Destroying Texture {}", debugName);
   }
 
   [[nodiscard]] auto vkView() const {

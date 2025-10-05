@@ -2,18 +2,18 @@
 
 #include <cassert>
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 #include "common/ResizePolicy.hpp"
 
 namespace arb {
 
 LogicalImageAllocator::LogicalImageAllocator(ImageManager& newImageManager, uint32_t frameCount)
     : imageManager{newImageManager}, framesInFlight{frameCount} {
-  Log::trace("Creating LogicalImageAllocator");
+  LOG_TRACE_L1(Log::Resources, "Creating LogicalImageAllocator");
 }
 
 LogicalImageAllocator::~LogicalImageAllocator() {
-  Log::trace("Destroying LogicalImageAllocator");
+  LOG_TRACE_L1(Log::Resources, "Destroying LogicalImageAllocator");
 }
 
 auto LogicalImageAllocator::createPerFrameImage(const VkImageCreateInfo& ici,

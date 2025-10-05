@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 
 #include "IStateBuffer.hpp"
 
@@ -57,7 +57,9 @@ public:
       }
       std::this_thread::sleep_for(std::chrono::microseconds(DefaultSleep));
     }
-    Log::warn("Couldn't checkout for read after {} retries, returning nullopt", maxRetries);
+    LOG_TRACE_L1(Log::Core,
+                 "Couldn't checkout for read after {} retries, returning nullopt",
+                 maxRetries);
     TracyPlot("TripleBuffer_ReadFailures", (int64_t)1);
     return std::nullopt;
   }

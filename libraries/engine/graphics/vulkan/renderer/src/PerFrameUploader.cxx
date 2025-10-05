@@ -2,18 +2,18 @@
 
 #include <Tracy.hpp>
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 
 namespace arb {
 
 PerFrameUploader::PerFrameUploader(IStateBuffer<SimState>& newStateBuffer,
                                    GeometryHandleMapper& newGeometryHandleMapper)
     : stateBuffer(newStateBuffer), geometryHandleMapper{newGeometryHandleMapper} {
-  Log::trace("Constructing PerFrameUploader");
+  LOG_TRACE_L1(Log::Renderer, "Constructing PerFrameUploader");
 }
 
 PerFrameUploader::~PerFrameUploader() {
-  Log::trace("Destroying PerFrameUploader");
+  LOG_TRACE_L1(Log::Renderer, "Destroying PerFrameUploader");
 }
 
 auto PerFrameUploader::upload() -> void {

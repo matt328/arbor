@@ -4,7 +4,8 @@
 
 #include "Frame.hpp"
 #include "barriers/PrecursorGenerator.hpp"
-#include "bk/Logger.hpp"
+
+#include "bk/Log.hpp"
 #include "renderer/Constants.hpp"
 #include "core/command-buffers/CommandBuffer.hpp"
 #include "core/command-buffers/CommandBufferManager.hpp"
@@ -24,7 +25,7 @@ FrameGraph::FrameGraph(const FrameGraphDeps& deps, const FrameGraphConfig& confi
     : commandBufferManager{deps.commandBufferManager},
       pipelineManager{deps.pipelineManager},
       aliasRegistry{deps.aliasRegistry} {
-  Log::trace("Creating FrameGraph");
+  LOG_TRACE_L1(Log::Renderer, "Creating FrameGraph");
 
   auto forwardPass = std::make_unique<ForwardPass>(
       ForwardPassDeps{.aliasRegistry = aliasRegistry, .pipelineManager = pipelineManager},
@@ -41,7 +42,7 @@ FrameGraph::FrameGraph(const FrameGraphDeps& deps, const FrameGraphConfig& confi
 }
 
 FrameGraph::~FrameGraph() {
-  Log::trace("Destroying FrameGraph");
+  LOG_TRACE_L1(Log::Renderer, "Destroying FrameGraph");
 }
 
 void FrameGraph::resize(const RenderSurfaceState& newState) {

@@ -1,6 +1,6 @@
 #include "core/CoreContext.hpp"
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 #include "bk/IEventQueue.hpp"
 
 #include "core/AllocatorService.hpp"
@@ -21,7 +21,7 @@ CoreContext::CoreContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
                          const EngineOptions& newOptions,
                          bk::NativeWindowHandle newWindowHandle)
     : options{newOptions}, eventQueue{std::move(newEventQueue)} {
-  Log::trace("Creating CoreContext");
+  LOG_TRACE_L1(Log::Core, "Creating CoreContext");
 
   vulkanInstance = std::make_unique<Instance>(newOptions);
   surface = std::make_unique<Surface>(*vulkanInstance, newWindowHandle.get<HWND>());
@@ -56,7 +56,7 @@ CoreContext::CoreContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
 }
 
 CoreContext::~CoreContext() {
-  Log::trace("Destroying CoreContext");
+  LOG_TRACE_L1(Log::Core, "Destroying CoreContext");
   device->waitIdle();
 }
 

@@ -2,7 +2,8 @@
 
 #include "common/ErrorUtils.hpp"
 #include "common/DebugUtils.hpp"
-#include "bk/Logger.hpp"
+
+#include "bk/Log.hpp"
 
 #include <vulkan/vulkan_core.h>
 
@@ -14,7 +15,7 @@ PipelineLayout::PipelineLayout(Device* newDevice,
     : device{newDevice},
       pipelineLayout{VK_NULL_HANDLE},
       debugName{newName.value_or("Unnamed PipelineLayout")} {
-  Log::trace("Creating Pipeline Layout: {}", debugName);
+  LOG_TRACE_L1(Log::Core, "Creating Pipeline Layout: {}", debugName);
 
   checkVk(vkCreatePipelineLayout(*device, &createInfo, nullptr, &pipelineLayout),
           "vkCreatePipelinelayout");
@@ -22,7 +23,7 @@ PipelineLayout::PipelineLayout(Device* newDevice,
 }
 
 PipelineLayout::~PipelineLayout() {
-  Log::trace("Destroying PipelineLayout: {}", debugName);
+  LOG_TRACE_L1(Log::Core, "Destroying PipelineLayout: {}", debugName);
   cleanup();
 }
 

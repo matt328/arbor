@@ -5,7 +5,7 @@
 #include <cpptrace/exceptions.hpp>
 #include <vulkan/vulkan_core.h>
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 #include "common/ImageCreateDescription.hpp"
 #include "common/ImageLifetime.hpp"
 #include "renderer/Constants.hpp"
@@ -15,19 +15,19 @@ namespace arb {
 
 AliasRegistry::AliasRegistry(const AliasRegistryDeps& deps)
     : resourceSystem{deps.resourceSystem}, swapchain{deps.swapchain} {
-  Log::trace("Creating AliasRegistry");
+  LOG_TRACE_L1(Log::Renderer, "Creating AliasRegistry");
 }
 
 void AliasRegistry::registerImageAlias(const std::string& alias, ImageCreateDescription desc) {
-  Log::trace("Registering ImageAlias {}", alias);
+  LOG_TRACE_L1(Log::Renderer, "Registering ImageAlias {}", alias);
   if (aliasImageSpecMap.contains(alias)) {
     if (!(aliasImageSpecMap.at(alias) == desc)) {
       throw cpptrace::runtime_error("Alias " + alias + " registered with a different spec");
     }
-    Log::trace("Alias already existd: {}", alias);
+    LOG_TRACE_L1(Log::Renderer, "Alias already existd: {}", alias);
     return;
   }
-  Log::trace("Registering new alias {}", alias);
+  LOG_TRACE_L1(Log::Renderer, "Registering new alias {}", alias);
   aliasImageSpecMap.emplace(alias, desc);
 }
 

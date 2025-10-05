@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <unordered_set>
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 
 #include "core/Device.hpp"
 #include "DeviceFeatures.hpp"
@@ -34,22 +34,23 @@ DeviceFeatures PhysicalDevice::RequiredFeatures = [] {
 }();
 
 PhysicalDevice::PhysicalDevice(VkPhysicalDevice handle) : vkPhysicalDevice{handle} {
-  Log::trace("Constructed PhysicalDevice");
+  LOG_TRACE_L1(Log::Core, "Constructed PhysicalDevice");
   vkGetPhysicalDeviceProperties(vkPhysicalDevice, &properties);
-  Log::info("Using GPU: {} (API version {}.{}.{}), Driver version {}, Vendor ID: {}, Device ID: "
-            "{}, Type: {}",
-            properties.deviceName,
-            VK_VERSION_MAJOR(properties.apiVersion),
-            VK_VERSION_MINOR(properties.apiVersion),
-            VK_VERSION_PATCH(properties.apiVersion),
-            properties.driverVersion,
-            properties.vendorID,
-            properties.deviceID,
-            static_cast<int>(properties.deviceType));
+  LOG_INFO(Log::Core,
+           "Using GPU: {} (API version {}.{}.{}), Driver version {}, Vendor ID: {}, Device ID: "
+           "{}, Type: {}",
+           properties.deviceName,
+           VK_VERSION_MAJOR(properties.apiVersion),
+           VK_VERSION_MINOR(properties.apiVersion),
+           VK_VERSION_PATCH(properties.apiVersion),
+           properties.driverVersion,
+           properties.vendorID,
+           properties.deviceID,
+           static_cast<int>(properties.deviceType));
 }
 
 PhysicalDevice::~PhysicalDevice() {
-  Log::trace("Destroyed PhysicalDevice");
+  LOG_TRACE_L1(Log::Core, "Destroyed PhysicalDevice");
 }
 
 auto PhysicalDevice::isSuitable(const Surface& surface) const -> bool {
@@ -71,7 +72,7 @@ auto PhysicalDevice::supportsExtensions() const -> bool {
       return std::strcmp(ext.extensionName, req) == 0;
     });
     if (!found) {
-      Log::warn("Device {}, Required Extension {} not present", deviceName, req);
+      LOG_WARNING(Log::Core, "Device {}, Required Extension {} not present", deviceName, req);
       return false;
     }
   }
@@ -284,7 +285,7 @@ auto PhysicalDevice::getQueueCreateInfo(std::vector<VkDeviceQueueCreateInfo>& qu
       queueFamilyIndices.presentFamilyCount.has_value()) {
     const uint32_t index = queueFamilyIndices.presentFamily.value();
     if (!usedQueueFamilies.contains(index)) {
-      Log::trace("Device supports separate present queue");
+      LOG_TRACE_L1(Log::Core, "Device supports separate present queue");
 
       usedQueueFamilies.insert(index);
       const auto presentFamilyCreateInfo = VkDeviceQueueCreateInfo{
@@ -339,9 +340,14 @@ void PhysicalDevice::logQueueFamilyIndices(const QueueFamilyIndices& qf) {
         if (i + 1 < priorities.size())
           prioStr += ", ";
       }
-      Log::trace("{}: index={} count={} priorities=[{}]", name, *index, *count, prioStr);
+      LOG_TRACE_L1(Log::Core,
+                   "{}: index={} count={} priorities=[{}]",
+                   name,
+                   *index,
+                   *count,
+                   prioStr);
     } else {
-      Log::trace("{}: not found", name);
+      LOG_TRACE_L1(Log::Core, "{}: not found", name);
     }
   };
 

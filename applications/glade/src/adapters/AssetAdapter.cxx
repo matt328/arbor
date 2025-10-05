@@ -1,6 +1,6 @@
 #include "AssetAdapter.hpp"
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 
 #include "ImportModelDetails.hpp"
 
@@ -11,13 +11,14 @@ AssetAdapter::AssetAdapter(std::shared_ptr<bk::IEventQueue> newEventQueue, QObje
 }
 
 auto AssetAdapter::importModel(const ImportModelDetails& details) -> void {
-  Log::trace("adapter importing model details: filename={}, id={}",
-             details.filename.toStdString(),
-             details.identifier.toStdString());
+  LOG_TRACE_L1(Log::Assets,
+               "adapter importing model details: filename={}, id={}",
+               details.filename.toStdString(),
+               details.identifier.toStdString());
 }
 
 auto AssetAdapter::removeModel(uint32_t id) -> void {
-  Log::trace("adapter removing model with id={}", id);
+  LOG_TRACE_L1(Log::Assets, "adapter removing model with id={}", id);
 }
 
 }

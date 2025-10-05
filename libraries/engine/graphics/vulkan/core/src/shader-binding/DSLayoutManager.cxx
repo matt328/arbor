@@ -2,18 +2,18 @@
 
 #include <cassert>
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 #include "core/Device.hpp"
 #include "vulkan/vulkan_core.h"
 
 namespace arb {
 
 DSLayoutManager::DSLayoutManager(Device& newDevice) : device{newDevice} {
-  Log::trace("Creating DSLayoutManager");
+  LOG_TRACE_L1(Log::Core, "Creating DSLayoutManager");
 }
 
 DSLayoutManager::~DSLayoutManager() {
-  Log::trace("Destroying DSLayoutManager");
+  LOG_TRACE_L1(Log::Core, "Destroying DSLayoutManager");
 }
 
 auto DSLayoutManager::createLayout(const std::vector<VkDescriptorSetLayoutBinding>& bindings,

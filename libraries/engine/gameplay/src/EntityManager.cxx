@@ -1,17 +1,17 @@
 #include "EntityManager.hpp"
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 
 namespace arb {
 
 EntityManager::EntityManager(std::shared_ptr<bk::IEventQueue> newEventQueue,
                              IStateBuffer<SimState>& newSimStateBuffer)
     : eventQueue{std::move(newEventQueue)}, simStateBuffer(newSimStateBuffer) {
-  Log::trace("Creating EntityManager");
+  LOG_TRACE_L1(Log::Gameplay, "Creating EntityManager");
 }
 
 EntityManager::~EntityManager() {
-  Log::trace("Destroying EntityManager");
+  LOG_TRACE_L1(Log::Gameplay, "Destroying EntityManager");
 }
 
 void EntityManager::update() {
@@ -21,7 +21,7 @@ void EntityManager::update() {
     if (simStateSlot.has_value()) {
       simStateSlot.value()->data = SimState{1};
     } else {
-      Log::warn("EntityManager can't checkout for write");
+      LOG_WARNING(Log::Gameplay, "EntityManager can't checkout for write");
     }
     // FinalizerSystem::update(*registry, simStateSlot.value()->data, currentTime);
     simStateBuffer.commitWrite(simStateSlot.value());

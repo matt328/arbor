@@ -1,6 +1,6 @@
 #include "ShaderModule.hpp"
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 #include "common/ErrorUtils.hpp"
 #include "common/DebugUtils.hpp"
 #include "vulkan/vulkan_core.h"
@@ -18,7 +18,7 @@ ShaderModule::ShaderModule(Device* newDevice,
 }
 
 ShaderModule::~ShaderModule() {
-  Log::trace("Destroying ShaderModule: {}", debugName);
+  LOG_TRACE_L1(Log::Core, "Destroying ShaderModule: {}", debugName);
   cleanup();
 }
 

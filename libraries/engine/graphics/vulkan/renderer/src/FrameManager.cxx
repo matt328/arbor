@@ -1,6 +1,6 @@
 #include "FrameManager.hpp"
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 
 #include "common/ImageAcquireResult.hpp"
 #include "core/Device.hpp"
@@ -15,7 +15,7 @@
 namespace arb {
 FrameManager::FrameManager(const EngineOptions& options, Device& newDevice, Swapchain& newSwapchain)
     : device{newDevice}, swapchain{newSwapchain} {
-  Log::trace("Constructing FrameManager");
+  LOG_TRACE_L1(Log::Renderer, "Constructing FrameManager");
   frames.reserve(FramesInFlight);
 
   submittedFrames.reserve(FramesInFlight);
@@ -61,7 +61,7 @@ auto FrameManager::acquireFrame() -> std::variant<Frame*, ImageAcquireResult> {
 
     result = vkWaitForFences(device, 1, &fence, VK_TRUE, UINT64_MAX);
     if (result == VK_ERROR_DEVICE_LOST) {
-      Log::error("Device lost while waiting for frame fence");
+      LOG_ERROR(Log::Renderer, "Device lost while waiting for frame fence");
       throw cpptrace::runtime_error("Device Lost while waiting for fence");
     }
 
@@ -69,7 +69,7 @@ auto FrameManager::acquireFrame() -> std::variant<Frame*, ImageAcquireResult> {
       vkResetFences(device, 1, &fence);
       frame->setSubmitted(false);
     } else {
-      Log::warn("Waiting on fence timed out");
+      LOG_WARNING(Log::Renderer, "Waiting on fence timed out");
     }
   } else {
     VkFence fence = frame->getInflightFence();
@@ -95,7 +95,7 @@ auto FrameManager::acquireFrame() -> std::variant<Frame*, ImageAcquireResult> {
 }
 
 FrameManager::~FrameManager() {
-  Log::trace("Destroying FrameManager");
+  LOG_TRACE_L1(Log::Renderer, "Destroying FrameManager");
   device.waitIdle();
 }
 

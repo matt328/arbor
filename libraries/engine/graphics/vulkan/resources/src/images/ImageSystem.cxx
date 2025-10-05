@@ -2,7 +2,8 @@
 
 #include "LogicalImageAllocator.hpp"
 #include "LogicalImageViewAllocator.hpp"
-#include "bk/Logger.hpp"
+
+#include "bk/Log.hpp"
 #include "ImageManager.hpp"
 #include "ImageViewManager.hpp"
 #include "SamplerManager.hpp"
@@ -12,7 +13,7 @@
 namespace arb {
 
 ImageSystem::ImageSystem(Device& device, AllocatorService& allocatorService) {
-  Log::trace("Creating ImageSystem");
+  LOG_TRACE_L1(Log::Resources, "Creating ImageSystem");
   imageManager = std::make_unique<ImageManager>(device, allocatorService);
   imageViewManager = std::make_unique<ImageViewManager>(device, *imageManager);
   samplerManager = std::make_unique<SamplerManager>(device);
@@ -21,7 +22,7 @@ ImageSystem::ImageSystem(Device& device, AllocatorService& allocatorService) {
 }
 
 ImageSystem::~ImageSystem() {
-  Log::trace("Destroying ImageSystem");
+  LOG_TRACE_L1(Log::Resources, "Destroying ImageSystem");
 }
 
 void ImageSystem::resize(const RenderSurfaceState& surfaceState) {

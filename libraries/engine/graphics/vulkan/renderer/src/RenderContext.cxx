@@ -1,6 +1,6 @@
 #include "renderer/RenderContext.hpp"
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 
 #include "core/Device.hpp"
 #include "core/Swapchain.hpp"
@@ -27,7 +27,7 @@ RenderContext::RenderContext(const EngineOptions& options, const RenderContextDe
       swapchain{deps.swapchain},
       pipelineManager{deps.pipelineManager},
       resourceSystem{deps.resourceSystem} {
-  Log::trace("Creating RenderContext");
+  LOG_TRACE_L1(Log::Renderer, "Creating RenderContext");
 
   frameManager = std::make_unique<FrameManager>(options, device, swapchain);
   perFrameUploader =
@@ -54,7 +54,7 @@ RenderContext::RenderContext(const EngineOptions& options, const RenderContextDe
 }
 
 RenderContext::~RenderContext() {
-  Log::trace("Destroying RenderContext");
+  LOG_TRACE_L1(Log::Renderer, "Destroying RenderContext");
 }
 
 void RenderContext::renderNextFrame() {

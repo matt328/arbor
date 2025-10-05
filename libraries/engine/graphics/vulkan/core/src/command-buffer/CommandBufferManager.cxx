@@ -3,7 +3,7 @@
 #include <cassert>
 #include <set>
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 #include "core/Device.hpp"
 #include "core/command-buffers/CommandBuffer.hpp"
 #include "common/ErrorUtils.hpp"
@@ -12,7 +12,7 @@
 namespace arb {
 
 CommandBufferManager::CommandBufferManager(Device& newDevice) : device{newDevice} {
-  Log::trace("Constructing CommandBufferManager");
+  LOG_TRACE_L1(Log::Core, "Constructing CommandBufferManager");
   const auto transferCommandPoolCreateInfo =
       VkCommandPoolCreateInfo{.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
                               .flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT |
@@ -25,7 +25,7 @@ CommandBufferManager::CommandBufferManager(Device& newDevice) : device{newDevice
 }
 
 CommandBufferManager::~CommandBufferManager() {
-  Log::trace("Destroying CommandBufferManager");
+  LOG_TRACE_L1(Log::Core, "Destroying CommandBufferManager");
   vkDestroyCommandPool(device, transferCommandPool, nullptr);
 
   bufferMap.clear();

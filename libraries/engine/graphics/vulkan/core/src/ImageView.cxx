@@ -1,6 +1,6 @@
 #include "core/ImageView.hpp"
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 #include "common/ErrorUtils.hpp"
 #include "common/DebugUtils.hpp"
 #include "core/Device.hpp"
@@ -18,7 +18,7 @@ ImageView::ImageView(Device& newDevice,
       sourceImage{imageHandle},
       createInfo{newCreateInfo},
       debugName{name.value_or("Unnamed ImageView")} {
-  Log::trace("Creating ImageView {}", debugName);
+  LOG_TRACE_L1(Log::Core, "Creating ImageView {}", debugName);
   checkVk(vkCreateImageView(device, &createInfo, nullptr, &handle), "vkCreateImageView");
   dbg::setDebugName(device, handle, debugName);
 }
@@ -34,7 +34,7 @@ void ImageView::recreate(Image& image) {
 }
 
 ImageView::~ImageView() {
-  Log::trace("Destroying ImageView {}", debugName);
+  LOG_TRACE_L1(Log::Core, "Destroying ImageView {}", debugName);
   if (handle != VK_NULL_HANDLE) {
     vkDestroyImageView(device, handle, nullptr);
     handle = VK_NULL_HANDLE;

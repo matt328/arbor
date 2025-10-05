@@ -1,0 +1,9 @@
+includedir=C:/Users/matt/quill/include
+
+Name: quill
+Description: Low Latency C++ Logging Library
+URL: https://github.com/odygrd/quill
+Version: 10.2.0
+CFlags: -I${includedir}
+Libs: 
+Requires: 

@@ -1,6 +1,6 @@
 #include "ImageTransitionQueue.hpp"
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 
 namespace arb {
 
@@ -12,7 +12,7 @@ auto ImageTransitionQueue::dequeue() -> std::vector<ImageTransitionInfo> {
   auto batch = std::vector<ImageTransitionInfo>{};
   queue.try_dequeue(batch);
   if (!batch.empty()) {
-    Log::trace("ImageTransitionQueue not empty, size={}", batch.size());
+    LOG_TRACE_L1(Log::Renderer, "ImageTransitionQueue not empty, size={}", batch.size());
   }
   return batch;
 }

@@ -2,7 +2,8 @@
 
 #include "Tracy.hpp"
 #include "common/DebugUtils.hpp"
-#include "bk/Logger.hpp"
+
+#include "bk/Log.hpp"
 #include "common/ResizePolicy.hpp"
 #include "vulkan/vulkan_core.h"
 
@@ -37,10 +38,8 @@ Image::Image(Device* newDevice,
 }
 
 Image::~Image() {
-  Log::trace("Destroying Image {}", debugName);
-  // If allocation == VK_NULL_HANDLE, we know it's an externally managed image
   if (vkImage != VK_NULL_HANDLE && allocation != VK_NULL_HANDLE) {
-    Log::trace("Freeing Image Resources: {}", debugName);
+    LOG_TRACE_L1(Log::Core, "Freeing Image Resources: {}", debugName);
     allocatorService->destroyImage(vkImage, allocation);
     vkImage = VK_NULL_HANDLE;
     allocation = VK_NULL_HANDLE;

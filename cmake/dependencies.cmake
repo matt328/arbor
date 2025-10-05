@@ -26,17 +26,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glm)
 
-# spdlog
-set(SPDLOG_USE_STD_FORMAT ON)
-set(SPDLOG_BUILD_SHARED OFF)
-FetchContent_Declare(
-  spdlog
-  GIT_REPOSITORY https://github.com/gabime/spdlog.git
-  GIT_TAG ${SPDLOG_VERSION}
-  SYSTEM
-)
-FetchContent_MakeAvailable(spdlog)
-
 # Cereal
 set(JUST_INSTALL_CEREAL ON)
 set(BUILD_DOC OFF)

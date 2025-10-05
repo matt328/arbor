@@ -1,6 +1,6 @@
 #include "ImageManager.hpp"
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 #include "common/ResizePolicy.hpp"
 
 #include <cassert>
@@ -9,11 +9,11 @@ namespace arb {
 
 ImageManager::ImageManager(Device& newDevice, AllocatorService& newAllocatorService)
     : device{newDevice}, allocatorService{newAllocatorService} {
-  Log::trace("Creating ImageManager");
+  LOG_TRACE_L1(Log::Resources, "Creating ImageManager");
 }
 
 ImageManager::~ImageManager() {
-  Log::trace("Destroying ImageManager");
+  LOG_TRACE_L1(Log::Resources, "Destroying ImageManager");
 }
 
 void ImageManager::resize(const RenderSurfaceState& newState) {

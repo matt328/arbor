@@ -1,6 +1,6 @@
 #include "bk/Preferences.hpp"
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 
 #include <fstream>
 
@@ -21,7 +21,7 @@ Preferences::Preferences(std::filesystem::path newPath) : path{std::move(newPath
       cereal::BinaryOutputArchive output(o);
       output(preferencesData);
     } else {
-      Log::warn("Failed to create preferences file");
+      LOG_WARNING(Log::Core, "Failed to create preferences file");
     }
   }
 
@@ -31,12 +31,15 @@ Preferences::Preferences(std::filesystem::path newPath) : path{std::move(newPath
       input(preferencesData);
       loaded = true;
     } else {
-      Log::error("Error reading application preferences from: {0}", path.string());
+      LOG_ERROR(Log::Core, "Error reading application preferences from: {0}", path.string());
     }
   } catch (const std::exception& ex) {
-    Log::warn("Error reading application preferences from: {0}, {1}", path.string(), ex.what());
+    LOG_WARNING(Log::Core,
+                "Error reading application preferences from: {0}, {1}",
+                path.string(),
+                ex.what());
   }
-  Log::trace("Loaded preferences");
+  LOG_TRACE_L1(Log::Core, "Loaded preferences");
 }
 
 auto Preferences::put(const std::string& key, const std::string& value) -> void {
@@ -50,7 +53,7 @@ void Preferences::save() const {
     cereal::BinaryOutputArchive output{o};
     output(preferencesData);
   } else {
-    Log::info("Error saving application preferences to file: {0}", path.string());
+    LOG_INFO(Log::Core, "Error saving application preferences to file: {0}", path.string());
   }
 }
 

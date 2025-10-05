@@ -1,6 +1,6 @@
 #include "BufferManager.hpp"
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 #include "buffers/BufferPool.hpp"
 #include "core/AllocatorService.hpp"
 #include "core/Device.hpp"
@@ -10,12 +10,12 @@ namespace arb {
 BufferManager::BufferManager(Device& newDevice,
                              AllocatorService& newAllocatorService,
                              SemaphorePack semaphores) {
-  Log::trace("Creating BufferManager");
+  LOG_TRACE_L1(Log::Resources, "Creating BufferManager");
   bufferPool = std::make_unique<BufferPool>(newDevice, newAllocatorService);
 }
 
 BufferManager::~BufferManager() {
-  Log::trace("Destroying BufferManager");
+  LOG_TRACE_L1(Log::Resources, "Destroying BufferManager");
 }
 
 auto BufferManager::registerBuffer(const BufferCreateInfo& createInfo) -> BufferHandle {

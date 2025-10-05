@@ -2,15 +2,16 @@
 
 #include "ArenaAllocator.hpp"
 #include "LinearAllocator.hpp"
-#include "bk/Logger.hpp"
+
+#include "bk/Log.hpp"
 
 namespace arb {
 BufferAllocator::BufferAllocator() {
-  Log::trace("Constructing BufferAllocator");
+  LOG_TRACE_L1(Log::Resources, "Constructing BufferAllocator");
 }
 
 BufferAllocator::~BufferAllocator() {
-  Log::trace("Destroying BufferAllocator");
+  LOG_TRACE_L1(Log::Resources, "Destroying BufferAllocator");
 }
 
 auto BufferAllocator::registerBuffer(BufferHandle bufferHandle,

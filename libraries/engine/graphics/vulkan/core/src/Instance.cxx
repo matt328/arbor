@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 
 #include "common/ErrorUtils.hpp"
 #include "engine/common/EngineOptions.hpp"
@@ -11,7 +11,7 @@
 namespace arb {
 
 Instance::Instance(const EngineOptions& newOptions) : options{newOptions} {
-  Log::trace("Creating Vulkan Instance");
+  LOG_TRACE_L1(Log::Core, "Creating Vulkan Instance");
   const auto appInfo = VkApplicationInfo{.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
                                          .pApplicationName = "Arbor Application",
                                          .applicationVersion = VK_MAKE_VERSION(0, 0, 1),
@@ -39,7 +39,7 @@ Instance::Instance(const EngineOptions& newOptions) : options{newOptions} {
   }
 
   checkVk(vkCreateInstance(&createInfo, nullptr, &vkInstance), "vkCreateInstance()");
-  Log::trace("Created Vulkan Instance");
+  LOG_TRACE_L1(Log::Core, "Created Vulkan Instance");
 
   if (options.debugEnabled) {
     auto debugCreateInfo = VkDebugUtilsMessengerCreateInfoEXT{
@@ -63,12 +63,12 @@ Instance::Instance(const EngineOptions& newOptions) : options{newOptions} {
       throw cpptrace::runtime_error(
           "vkGetInstanceProcAddr failed to acquire vkCreateDebugUtilsMessengerEXT");
     }
-    Log::trace("Registered Debug Messenger");
+    LOG_TRACE_L1(Log::Core, "Registered Debug Messenger");
   }
 }
 
 Instance::~Instance() {
-  Log::trace("Destroying Vulkan Instance");
+  LOG_TRACE_L1(Log::Core, "Destroying Vulkan Instance");
   if (vkInstance != nullptr) {
     if (options.debugEnabled && debugMessenger != nullptr) {
       auto func = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(
@@ -76,7 +76,8 @@ Instance::~Instance() {
       if (func != nullptr) {
         func(vkInstance, debugMessenger, nullptr);
       } else {
-        Log::warn("vkGetInstanceProcAddr failed to acquire vkDestroyDebugUtilsMessengerEXT");
+        LOG_WARNING(Log::Core,
+                    "vkGetInstanceProcAddr failed to acquire vkDestroyDebugUtilsMessengerEXT");
       }
     }
     vkDestroyInstance(vkInstance, nullptr);
@@ -148,8 +149,7 @@ Instance::debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
                         VkDebugUtilsMessageTypeFlagsEXT type,
                         const VkDebugUtilsMessengerCallbackDataEXT* callbackData,
                         void* userData) -> VkBool32 {
-  const auto id = std::this_thread::get_id();
-  Log::debug("ThreadId={}: Vulkan Validation: {}", id, callbackData->pMessage);
+  LOG_DEBUG(Log::Core, "Vulkan Validation: {}", callbackData->pMessage);
   return VK_FALSE;
 }
 

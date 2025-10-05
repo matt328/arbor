@@ -1,13 +1,14 @@
 #include "GameplayContext.hpp"
 
-#include "bk/Logger.hpp"
 #include "bk/IEventQueue.hpp"
+#include "bk/Log.hpp"
 #include "engine/common/IStateBuffer.hpp"
 #include "engine/common/SimState.hpp"
 
 #include "EntityManager.hpp"
 
 #include <Tracy.hpp>
+#include <windows.h>
 
 namespace arb {
 
@@ -20,12 +21,12 @@ auto makeGameplayContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
 GameplayContext::GameplayContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
                                  IStateBuffer<SimState>& newSimStateBuffer)
     : eventQueue{std::move(newEventQueue)}, simStateBuffer(newSimStateBuffer) {
-  Log::trace("Creating GameplayContext");
+  LOG_TRACE_L1(Log::Gameplay, "Creating GameplayContext");
   entityManager = std::make_unique<EntityManager>(eventQueue, simStateBuffer);
 }
 
 GameplayContext::~GameplayContext() {
-  Log::trace("Destroying GameplayContext");
+  LOG_TRACE_L1(Log::Gameplay, "Destroying GameplayContext");
 }
 
 void GameplayContext::run(std::stop_token token) {

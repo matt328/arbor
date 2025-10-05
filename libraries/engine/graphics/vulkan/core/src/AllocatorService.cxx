@@ -1,6 +1,6 @@
 #include "core/AllocatorService.hpp"
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 #include "common/ErrorUtils.hpp"
 #include "common/DebugUtils.hpp"
 
@@ -16,7 +16,7 @@ AllocatorService::AllocatorService(VkPhysicalDevice physicalDevice,
                                    Device& newDevice,
                                    VkInstance instance)
     : device{newDevice} {
-  Log::trace("Creating AllocatorService");
+  LOG_TRACE_L1(Log::Core, "Creating AllocatorService");
 
   constexpr auto vulkanFunctions =
       VmaVulkanFunctions{.vkGetInstanceProcAddr = vkGetInstanceProcAddr,
@@ -32,7 +32,7 @@ AllocatorService::AllocatorService(VkPhysicalDevice physicalDevice,
 }
 
 AllocatorService::~AllocatorService() {
-  Log::trace("Destroying AllocatorService");
+  LOG_TRACE_L1(Log::Core, "Destroying AllocatorService");
   vmaDestroyAllocator(allocator);
 }
 

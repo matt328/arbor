@@ -2,7 +2,8 @@
 
 #include "common/ErrorUtils.hpp"
 #include "common/DebugUtils.hpp"
-#include "bk/Logger.hpp"
+
+#include "bk/Log.hpp"
 #include "vulkan/vulkan_core.h"
 
 namespace arb {
@@ -10,7 +11,7 @@ Pipeline::Pipeline(Device* newDevice,
                    const VkGraphicsPipelineCreateInfo& createInfo,
                    const std::optional<std::string>& newName)
     : device{newDevice}, debugName{newName.value_or("Unnamed Pipeline")}, pipeline{VK_NULL_HANDLE} {
-  Log::trace("Creating Pipeline: {}", debugName);
+  LOG_TRACE_L1(Log::Core, "Creating Pipeline: {}", debugName);
 
   checkVk(vkCreateGraphicsPipelines(*device, VK_NULL_HANDLE, 1, &createInfo, nullptr, &pipeline),
           "vkCreateGraphicsPipelines");
@@ -28,7 +29,7 @@ Pipeline::Pipeline(Device* newDevice,
 }
 
 Pipeline::~Pipeline() {
-  Log::trace("Destroying Pipeline: {}", debugName);
+  LOG_TRACE_L1(Log::Core, "Destroying Pipeline: {}", debugName);
   cleanup();
 }
 

@@ -9,7 +9,8 @@
 #include "Surface.hpp"
 #include "common/Semaphore.hpp"
 #include "bk/IEventQueue.hpp"
-#include "bk/Logger.hpp"
+
+#include "bk/Log.hpp"
 #include "engine/common/EngineEvents.hpp"
 #include "vulkan/vulkan_core.h"
 #include <vulkan/vulkan.h>
@@ -28,14 +29,14 @@ Swapchain::Swapchain(PhysicalDevice* newPhysicalDevice,
       windowSize{initialSize},
       swapchainExtent{},
       swapchainImageFormat{} {
-  Log::trace("Creating Swapchain size: {}x{}", windowSize.width, windowSize.height);
+  LOG_TRACE_L1(Log::Core, "Creating Swapchain size: {}x{}", windowSize.width, windowSize.height);
   createSwapchain();
 }
 
 Swapchain::~Swapchain() {
-  Log::trace("Destroying Swapchain");
+  LOG_TRACE_L1(Log::Core, "Destroying Swapchain");
   if (currentSwapchain != VK_NULL_HANDLE) {
-    Log::trace("Destroying CurrentSwapchain");
+    LOG_TRACE_L1(Log::Core, "Destroying CurrentSwapchain");
     vkDestroySwapchainKHR(device, currentSwapchain, nullptr);
   }
 }
@@ -97,7 +98,7 @@ auto Swapchain::createSwapchain() -> void {
   vkDeviceWaitIdle(device);
   if (oldSwapchain != VK_NULL_HANDLE) {
     // Clear out any images/views/semaphores
-    Log::trace("Recreating swapchain");
+    LOG_TRACE_L1(Log::Core, "Recreating swapchain");
     swapchainImages.clear();
     swapchainImageViews.clear();
     swapchainImageHandles.clear();
@@ -150,11 +151,9 @@ auto Swapchain::createSwapchain() -> void {
     swapchainCreateInfo.pQueueFamilyIndices = &queueFamilyInfo.graphicsFamily.value();
   }
 
-  Log::trace("Setting currentSwapchain");
   checkVk(vkCreateSwapchainKHR(device, &swapchainCreateInfo, nullptr, &currentSwapchain),
           "vkCreateSwapchainKHR");
 
-  Log::trace("Destroying oldSwapchain");
   vkDestroySwapchainKHR(device, oldSwapchain, nullptr);
 
   uint32_t currentImageCount{};

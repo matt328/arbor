@@ -6,7 +6,8 @@
 #include <utility>
 
 #include "Frame.hpp"
-#include "bk/Logger.hpp"
+
+#include "bk/Log.hpp"
 
 #include "common/ErrorUtils.hpp"
 #include "core/Device.hpp"
@@ -29,11 +30,11 @@ FrameRenderer::FrameRenderer(const FrameRendererDeps& deps, const FrameRendererC
       perFrameUploader{deps.perFrameUploader},
       aliasRegistry{deps.aliasRegistry},
       frameGraph{deps.frameGraph} {
-  Log::trace("Creating FrameRenderer");
+  LOG_TRACE_L1(Log::Renderer, "Creating FrameRenderer");
 }
 
 FrameRenderer::~FrameRenderer() {
-  Log::trace("Destroying FrameRenderer");
+  LOG_TRACE_L1(Log::Renderer, "Destroying FrameRenderer");
 }
 
 void FrameRenderer::setOnSwapchainResized(std::function<void(RenderSurfaceState)> cb) {
@@ -75,11 +76,11 @@ void FrameRenderer::renderNextFrame() {
   switch (presentResult) {
     case FrameStatus::SwapchainOutOfDate:
     case FrameStatus::SwapchainSuboptimal:
-      Log::warn("PresentFrame reports swapchain needs resized");
+      LOG_WARNING(Log::Renderer, "PresentFrame reports swapchain needs resized");
       beginResize();
       break;
     case FrameStatus::PresentFailed:
-      Log::warn("Failed to present frame");
+      LOG_WARNING(Log::Renderer, "Failed to present frame");
       break;
     default:
       break;
@@ -96,13 +97,13 @@ auto FrameRenderer::tryAcquireFrame() -> std::expected<Frame*, FrameStatus> {
 
   switch (std::get<ImageAcquireResult>(result)) {
     case ImageAcquireResult::Error:
-      Log::warn("Failed to acquire swapchain image, skipping frame");
+      LOG_WARNING(Log::Renderer, "Failed to acquire swapchain image, skipping frame");
       return std::unexpected(FrameStatus::AcquireFailed);
     case ImageAcquireResult::NeedsResize:
-      Log::warn("Image Acquisition reports swapchain needs resized");
+      LOG_WARNING(Log::Renderer, "Image Acquisition reports swapchain needs resized");
       return std::unexpected(FrameStatus::NeedsResize);
     default:
-      Log::warn("Unexpected result acquiring swapchain image");
+      LOG_WARNING(Log::Renderer, "Unexpected result acquiring swapchain image");
       return std::unexpected(FrameStatus::AcquireFailed);
   }
 }
@@ -130,7 +131,7 @@ auto FrameRenderer::presentFrame(Frame* frame) -> FrameStatus {
     case VK_ERROR_OUT_OF_DATE_KHR:
       return FrameStatus::SwapchainOutOfDate;
     default:
-      Log::warn("vkPresentQueueKHR failed with error code {}", int(result));
+      LOG_WARNING(Log::Renderer, "vkPresentQueueKHR failed with error code {}", int(result));
       return FrameStatus::PresentFailed;
   }
 }
@@ -164,14 +165,11 @@ void FrameRenderer::submitFrame(Frame* frame, const FrameGraphResult& frameResul
 }
 
 void FrameRenderer::beginResize() {
-  Log::debug("Pausing FrameRenderer");
   resizePending = true;
   device.waitIdle();
-  Log::debug("Paused FrameRenderer");
 }
 
 void FrameRenderer::commitResize() {
-  Log::debug("Resume FrameRenderer");
   resizePending = false;
 }
 

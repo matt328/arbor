@@ -2,7 +2,7 @@
 
 #include "LinearAllocator.hpp"
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 
 namespace arb {
 
@@ -20,12 +20,13 @@ auto LinearAllocator::allocate(const BufferRequest& bufferRequest) -> BufferRegi
 
 auto LinearAllocator::checkSize(const BufferRequest& requestData) -> std::optional<ResizeRequest> {
   if (currentOffset + requestData.size > maxBufferSize) {
-    Log::warn("Allocator: {}, current buffer size={} + requested size={} ({})> maxBufferSize={}",
-              *name,
-              currentOffset,
-              requestData.size,
-              currentOffset + requestData.size,
-              maxBufferSize);
+    LOG_WARNING(Log::Core,
+                "Allocator: {}, current buffer size={} + requested size={} ({})> maxBufferSize={}",
+                *name,
+                currentOffset,
+                requestData.size,
+                currentOffset + requestData.size,
+                maxBufferSize);
     return ResizeRequest{.bufferHandle = bufferHandle, .newSize = currentOffset + requestData.size};
   }
   return std::nullopt;

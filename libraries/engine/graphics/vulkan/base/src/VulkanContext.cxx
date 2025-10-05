@@ -4,7 +4,7 @@
 #include "Tracy.hpp"
 #include <memory>
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 #include "bk/IEventQueue.hpp"
 #include "core/CoreContext.hpp"
 #include "engine/common/SimState.hpp"
@@ -20,7 +20,7 @@ VulkanContext::VulkanContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
                              const EngineOptions& newOptions,
                              bk::NativeWindowHandle newWindowHandle)
     : eventQueue{std::move(newEventQueue)} {
-  Log::trace("Creating VulkanContext");
+  LOG_TRACE_L1(Log::Core, "Creating VulkanContext");
 
   // TODO: Consider promoting to a SharedContext if too many of these start to accumulate here
   geometryHandleMapper = std::make_unique<GeometryHandleMapper>();
@@ -49,11 +49,11 @@ VulkanContext::VulkanContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
 }
 
 VulkanContext::~VulkanContext() {
-  Log::trace("Destroying Vulkan Context");
+  LOG_TRACE_L1(Log::Core, "Destroying Vulkan Context");
 }
 
 void VulkanContext::run(std::stop_token token) {
-  Log::trace("GraphicsContext::run()");
+  LOG_TRACE_L1(Log::Core, "GraphicsContext::run()");
   using Clock = std::chrono::steady_clock;
   auto currentTime = Clock::now();
 

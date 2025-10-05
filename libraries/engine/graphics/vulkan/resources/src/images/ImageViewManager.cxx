@@ -3,7 +3,8 @@
 #include <cassert>
 
 #include "core/Device.hpp"
-#include "bk/Logger.hpp"
+
+#include "bk/Log.hpp"
 #include "ImageManager.hpp"
 #include "engine/common/RenderSurfaceState.hpp"
 
@@ -11,11 +12,11 @@ namespace arb {
 
 ImageViewManager::ImageViewManager(Device& newDevice, ImageManager& newImageManager)
     : device{newDevice}, imageManager{newImageManager} {
-  Log::trace("Creating ImageViewManager");
+  LOG_TRACE_L1(Log::Resources, "Creating ImageViewManager");
 }
 
 ImageViewManager::~ImageViewManager() {
-  Log::trace("Destroying ImageViewManager");
+  LOG_TRACE_L1(Log::Resources, "Destroying ImageViewManager");
 }
 
 void ImageViewManager::resize(const RenderSurfaceState& newState) {

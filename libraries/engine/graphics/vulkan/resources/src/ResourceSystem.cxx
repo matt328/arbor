@@ -1,6 +1,6 @@
 #include "resources/ResourceSystem.hpp"
 
-#include "bk/Logger.hpp"
+#include "bk/Log.hpp"
 
 #include "buffers/BufferManager.hpp"
 
@@ -8,11 +8,11 @@ namespace arb {
 
 ResourceSystem::ResourceSystem(BufferManager& newBufferManager, ImageSystem& newImageSystem)
     : bufferManager{newBufferManager}, imageSystem{newImageSystem} {
-  Log::trace("Creating ResourceSystem");
+  LOG_TRACE_L1(Log::Resources, "Creating ResourceSystem");
 }
 
 ResourceSystem::~ResourceSystem() {
-  Log::trace("Destroying Resource Facade");
+  LOG_TRACE_L1(Log::Resources, "Destroying Resource Facade");
 }
 
 void ResourceSystem::resize(const RenderSurfaceState& surfaceState) {
