@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cpptrace/cpptrace.hpp>
 
+#include "core/IResizable.hpp"
 #include "framegraph/ComponentIds.hpp"
 #include "pass/reqs/PassDescription.hpp"
 
@@ -11,7 +12,7 @@ namespace arb {
 class Frame;
 class IDispatchContext;
 
-class IRenderPass {
+class IRenderPass : public IResizable {
 public:
   IRenderPass() = default;
   virtual ~IRenderPass() = default;

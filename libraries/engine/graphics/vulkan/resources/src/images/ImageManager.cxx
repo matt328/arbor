@@ -1,6 +1,7 @@
 #include "ImageManager.hpp"
 
 #include "bk/Logger.hpp"
+#include "common/ResizePolicy.hpp"
 
 #include <cassert>
 
@@ -15,8 +16,19 @@ ImageManager::~ImageManager() {
   Log::trace("Destroying ImageManager");
 }
 
+void ImageManager::resize(const RenderSurfaceState& newState) {
+  for (auto& [handle, image] : imageMap) {
+    auto newExtent = newState.swapchainExtent;
+    if (image->getResizePolicy() == ResizePolicy::RenderScale) {
+      newExtent = newState.renderSize();
+    }
+    image->resize(VkExtent2D{.width = newExtent.width, .height = newExtent.height});
+  }
+}
+
 auto ImageManager::createImage(const VkImageCreateInfo& ici,
                                const VmaAllocationCreateInfo& aci,
+                               ResizePolicy resizePolicy,
                                const std::optional<std::string>& name) -> ImageHandle {
   const auto handle = handleGenerator.requestHandle();
   imageMap.emplace(handle,
@@ -24,6 +36,7 @@ auto ImageManager::createImage(const VkImageCreateInfo& ici,
                                            &allocatorService,
                                            ici,
                                            aci,
+                                           resizePolicy,
                                            name.value_or("Unnamed Image")));
   return handle;
 }

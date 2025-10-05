@@ -45,6 +45,9 @@ FrameGraph::~FrameGraph() {
 }
 
 void FrameGraph::resize(const RenderSurfaceState& newState) {
+  for (const auto& pass : renderPasses) {
+    pass->resize(newState);
+  }
 }
 
 auto FrameGraph::bake() -> void {

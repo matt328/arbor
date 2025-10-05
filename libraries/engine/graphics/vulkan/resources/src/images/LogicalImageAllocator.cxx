@@ -3,6 +3,7 @@
 #include <cassert>
 
 #include "bk/Logger.hpp"
+#include "common/ResizePolicy.hpp"
 
 namespace arb {
 
@@ -23,7 +24,7 @@ auto LogicalImageAllocator::createPerFrameImage(const VkImageCreateInfo& ici,
   auto handleList = std::vector<ImageHandle>{framesInFlight};
   for (auto i = 0; i < framesInFlight; ++i) {
     auto indexedName = std::format("{}-Frame-{}", name.value_or("Unnamed Image"), i);
-    const auto handle = imageManager.createImage(ici, aci, indexedName);
+    const auto handle = imageManager.createImage(ici, aci, ResizePolicy::Fixed, indexedName);
     handleList.push_back(handle);
   }
   handleTable.emplace(logicalHandle, handleList);

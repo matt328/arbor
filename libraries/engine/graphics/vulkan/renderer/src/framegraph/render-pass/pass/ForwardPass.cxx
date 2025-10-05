@@ -6,6 +6,7 @@
 #include "common/ImageLifetime.hpp"
 #include "core/pipeline/PipelineUnitCreateInfo.hpp"
 #include "common/ImageRequirement.hpp"
+#include "engine/common/RenderSurfaceState.hpp"
 #include "renderer/Constants.hpp"
 
 #include <cpptrace/cpptrace.hpp>
@@ -52,6 +53,13 @@ ForwardPass::ForwardPass(const ForwardPassDeps& deps, const ForwardPassConfig& c
 
 ForwardPass::~ForwardPass() {
   Log::trace("Destroying ForwardPass");
+}
+
+void ForwardPass::resize(const RenderSurfaceState& newState) {
+  Log::debug("Forward Pas setting surface state: {}x{}",
+             newState.swapchainExtent.width,
+             newState.swapchainExtent.height);
+  surfaceState = newState;
 }
 
 auto ForwardPass::getDescription() const -> PassDescription {
@@ -108,8 +116,8 @@ auto ForwardPass::execute(Frame* frame, VkCommandBuffer cmdBuffer) -> void {
   const auto renderingInfo = VkRenderingInfo{
       .sType = VK_STRUCTURE_TYPE_RENDERING_INFO,
       .renderArea = (VkRect2D{.offset = {.x = 0, .y = 0},
-                              .extent = {.width = surfaceState.renderSize().width,
-                                         .height = surfaceState.renderSize().height}}),
+                              .extent = {.width = surfaceState.swapchainExtent.width,
+                                         .height = surfaceState.swapchainExtent.height}}),
       .layerCount = 1,
       .colorAttachmentCount = 1,
       .pColorAttachments = &colorAttachmentInfo,

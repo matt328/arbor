@@ -12,6 +12,10 @@ PresentPass::PresentPass(const PresentPassConfig& config)
   return PassId::Present;
 }
 
+void PresentPass::resize(const RenderSurfaceState& newState) {
+  // NOOP
+}
+
 auto PresentPass::execute(Frame* frame, VkCommandBuffer cmdBuffer) -> void {
   // NOOP
 }

@@ -39,7 +39,13 @@ MainWindow::MainWindow(QWidget* parent)
   ui->tabWidget->addTab(new QTextEdit("Game Objects Here"), "Game Objects");
   ui->tabWidget->addTab(assetsPanel, "Assets");
   ui->tabWidget->addTab(new QTextEdit("Tool 3"), "Asset Tool");
+}
 
+MainWindow::~MainWindow() {
+  delete ui;
+}
+
+void MainWindow::startEngine() {
   auto handle = bk::NativeWindowHandle{};
   handle.set<WId>(ui->displayWidget->winId());
 
@@ -83,10 +89,6 @@ MainWindow::MainWindow(QWidget* parent)
   });
 }
 
-MainWindow::~MainWindow() {
-  delete ui;
-}
-
 auto MainWindow::showEvent(QShowEvent* event) -> void {
   auto settings = QSettings{};
   restoreGeometry(settings.value("geometry").toByteArray());
@@ -94,6 +96,8 @@ auto MainWindow::showEvent(QShowEvent* event) -> void {
   ui->tabWidget->setCurrentIndex(settings.value("tabWidgetIndex", 0).toInt());
   ui->horizontalSplitter->restoreState(settings.value("horizontalSplitter").toByteArray());
   ui->verticalSplitter->restoreState(settings.value("verticalSplitter").toByteArray());
+
+  startEngine();
 }
 
 auto MainWindow::setupActions() -> void {

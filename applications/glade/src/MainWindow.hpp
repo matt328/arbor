@@ -47,6 +47,8 @@ private:
   auto installWindowAgent() -> void;
   auto loadStyleSheet(Theme theme) -> void;
 
+  void startEngine();
+
   QUndoStack* undoStack;
 
   Theme currentTheme{};

@@ -11,6 +11,7 @@
 #include "core/Device.hpp"
 #include "core/Image.hpp"
 #include "core/ImageHandle.hpp"
+#include "engine/common/RenderSurfaceState.hpp"
 #include "resources/images/Sampler.hpp"
 
 namespace arb {
@@ -25,6 +26,8 @@ class ImageSystem {
 public:
   ImageSystem(Device& device, AllocatorService& allocatorService);
   ~ImageSystem();
+
+  void resize(const RenderSurfaceState& surfaceState);
 
   auto createImage(const ImageCreateDescription& imageSpec) -> ImageHandle;
   auto createPerFrameImage(const ImageCreateDescription& imageSpec) -> LogicalImageHandle;

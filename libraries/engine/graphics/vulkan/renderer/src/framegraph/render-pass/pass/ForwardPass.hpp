@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vector>
-
 #include "core/pipeline/PipelineManager.hpp"
 #include "engine/common/RenderSurfaceState.hpp"
 #include "framegraph/AliasRegistry.hpp"
@@ -26,6 +24,8 @@ public:
   [[nodiscard]] auto getId() const -> PassId override;
   auto execute(Frame* frame, VkCommandBuffer cmdBuffer) -> void override;
   [[nodiscard]] auto getDescription() const -> PassDescription override;
+
+  void resize(const RenderSurfaceState& newState) override;
 
 private:
   AliasRegistry& aliasRegistry;

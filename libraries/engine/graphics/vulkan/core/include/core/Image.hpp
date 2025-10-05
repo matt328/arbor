@@ -1,6 +1,7 @@
 #pragma once
 
 #include "bk/NonCopyMove.hpp"
+#include "common/ResizePolicy.hpp"
 #include "core/AllocatorService.hpp"
 #include "core/Device.hpp"
 
@@ -19,6 +20,7 @@ public:
         AllocatorService* newAllocatorService,
         const VkImageCreateInfo& ici,
         const VmaAllocationCreateInfo& aci,
+        ResizePolicy newResizePolicy,
         const std::optional<std::string>& name = std::nullopt);
 
   Image(Device* newDevice,
@@ -33,12 +35,18 @@ public:
     return vkImage;
   }
 
+  void resize(VkExtent2D newExtent);
+
   [[nodiscard]] auto getExtent() const -> VkExtent3D {
     return imageCreateInfo.extent;
   }
 
   [[nodiscard]] auto getFormat() const -> VkFormat {
     return imageCreateInfo.format;
+  }
+
+  [[nodiscard]] auto getResizePolicy() const -> ResizePolicy {
+    return resizePolicy;
   }
 
 private:
@@ -49,6 +57,7 @@ private:
   VkImageCreateInfo imageCreateInfo{};
   VmaAllocationCreateInfo allocationCreateInfo{};
   VmaAllocationInfo allocationInfo{};
+  ResizePolicy resizePolicy;
   std::string debugName;
   bool ownsMemory = true;
 };

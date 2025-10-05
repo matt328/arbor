@@ -11,6 +11,7 @@
 #include "bk/IEventQueue.hpp"
 #include "bk/Logger.hpp"
 #include "engine/common/EngineEvents.hpp"
+#include "vulkan/vulkan_core.h"
 #include <vulkan/vulkan.h>
 
 namespace arb {
@@ -34,6 +35,7 @@ Swapchain::Swapchain(PhysicalDevice* newPhysicalDevice,
 Swapchain::~Swapchain() {
   Log::trace("Destroying Swapchain");
   if (currentSwapchain != VK_NULL_HANDLE) {
+    Log::trace("Destroying CurrentSwapchain");
     vkDestroySwapchainKHR(device, currentSwapchain, nullptr);
   }
 }
@@ -59,6 +61,8 @@ auto Swapchain::acquireNextImage(const Semaphore& semaphore)
 }
 
 auto Swapchain::recreate() -> void {
+  oldSwapchain = currentSwapchain;
+  createSwapchain();
 }
 
 auto Swapchain::getImageSemaphore(uint32_t index) -> const Semaphore& {
@@ -91,9 +95,13 @@ auto Swapchain::getFormat() const -> VkFormat {
 
 auto Swapchain::createSwapchain() -> void {
   vkDeviceWaitIdle(device);
-  if (oldSwapchain != nullptr) {
+  if (oldSwapchain != VK_NULL_HANDLE) {
     // Clear out any images/views/semaphores
+    Log::trace("Recreating swapchain");
     swapchainImages.clear();
+    swapchainImageViews.clear();
+    swapchainImageHandles.clear();
+    imageSemaphores.clear();
   }
 
   const auto queueFamilyInfo = physicalDevice->findQueueFamilies(surface);
@@ -142,11 +150,12 @@ auto Swapchain::createSwapchain() -> void {
     swapchainCreateInfo.pQueueFamilyIndices = &queueFamilyInfo.graphicsFamily.value();
   }
 
+  Log::trace("Setting currentSwapchain");
   checkVk(vkCreateSwapchainKHR(device, &swapchainCreateInfo, nullptr, &currentSwapchain),
           "vkCreateSwapchainKHR");
 
-  // TODO: shift swapchain imageview creation/ownership into the renderer.
-  // renderer will just query the swapchain for its VkImage handles.
+  Log::trace("Destroying oldSwapchain");
+  vkDestroySwapchainKHR(device, oldSwapchain, nullptr);
 
   uint32_t currentImageCount{};
   checkVk(vkGetSwapchainImagesKHR(device, currentSwapchain, &currentImageCount, nullptr),
@@ -196,26 +205,8 @@ auto Swapchain::createSwapchain() -> void {
     }
   }
 
-  constexpr VkComponentMapping components{
-      .r = VK_COMPONENT_SWIZZLE_R,
-      .g = VK_COMPONENT_SWIZZLE_G,
-      .b = VK_COMPONENT_SWIZZLE_B,
-      .a = VK_COMPONENT_SWIZZLE_A,
-  };
-
-  constexpr VkImageSubresourceRange subersourceRange{.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-                                                     .baseMipLevel = 0,
-                                                     .levelCount = 1,
-                                                     .baseArrayLayer = 0,
-                                                     .layerCount = 1};
   size_t index{};
   for (const auto& image : swapchainImages) {
-    const auto createInfo = VkImageViewCreateInfo{.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-                                                  .image = *image,
-                                                  .viewType = VK_IMAGE_VIEW_TYPE_2D,
-                                                  .format = swapchainImageFormat,
-                                                  .components = components,
-                                                  .subresourceRange = subersourceRange};
     std::optional<std::string> semaphoreName{};
 #ifdef DEBUG
     semaphoreName.emplace(std::format("Swapchain Image Semaphore {}", index));

@@ -6,6 +6,7 @@
 #include "core/Swapchain.hpp"
 #include "core/command-buffers/CommandBufferManager.hpp"
 #include "engine/common/EngineOptions.hpp"
+#include "engine/common/RenderSurfaceState.hpp"
 #include "resources/ResourceSystem.hpp"
 
 #include "framegraph/FrameGraph.hpp"
@@ -15,13 +16,17 @@
 #include "PerFrameUploader.hpp"
 #include "framegraph/AliasRegistry.hpp"
 #include "engine/common/ResizeEvent.hpp"
+#include "vulkan/vulkan_core.h"
 
 namespace arb {
 
 // Pass eventQueue in here and subscribe to resize events and call method on frameRenderer and let
 // it call resize on frameGraph
 RenderContext::RenderContext(const EngineOptions& options, const RenderContextDeps& deps)
-    : device{deps.device}, swapchain{deps.swapchain}, pipelineManager{deps.pipelineManager} {
+    : device{deps.device},
+      swapchain{deps.swapchain},
+      pipelineManager{deps.pipelineManager},
+      resourceSystem{deps.resourceSystem} {
   Log::trace("Creating RenderContext");
 
   frameManager = std::make_unique<FrameManager>(options, device, swapchain);
@@ -44,8 +49,8 @@ RenderContext::RenderContext(const EngineOptions& options, const RenderContextDe
                         .aliasRegistry = *aliasRegistry,
                         .frameGraph = *frameGraph},
       FrameRendererCreateInfo{.renderSurfaceState = options.initialSurfaceState});
-
-  deps.eventQueue.subscribe<ResizeEvent>([&](auto event) { frameRenderer->resize({}); });
+  frameRenderer->setOnSwapchainResized(
+      [&](RenderSurfaceState state) { resourceSystem.resize(state); });
 }
 
 RenderContext::~RenderContext() {

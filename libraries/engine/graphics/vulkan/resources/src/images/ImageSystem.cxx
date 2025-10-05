@@ -24,9 +24,16 @@ ImageSystem::~ImageSystem() {
   Log::trace("Destroying ImageSystem");
 }
 
+void ImageSystem::resize(const RenderSurfaceState& surfaceState) {
+  if (imageManager && imageViewManager) {
+    imageManager->resize(surfaceState);
+    imageViewManager->resize(surfaceState);
+  }
+}
+
 auto ImageSystem::createImage(const ImageCreateDescription& imageSpec) -> ImageHandle {
   const auto [ici, aci] = fromImageSpec(imageSpec);
-  return imageManager->createImage(ici, aci, imageSpec.debugName);
+  return imageManager->createImage(ici, aci, imageSpec.resizePolicy, imageSpec.debugName);
 }
 
 auto ImageSystem::createPerFrameImage(const ImageCreateDescription& imageSpec)

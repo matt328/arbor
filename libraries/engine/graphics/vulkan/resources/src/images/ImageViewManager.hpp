@@ -5,13 +5,15 @@
 #include "core/Device.hpp"
 #include "engine/common/HandleGenerator.hpp"
 #include "core/ImageHandle.hpp"
+#include "core/IResizable.hpp"
+
 #include "vulkan/vulkan_core.h"
 
 namespace arb {
 
 class ImageManager;
 
-class ImageViewManager : NonCopyableMovable {
+class ImageViewManager : IResizable, NonCopyableMovable {
 public:
   explicit ImageViewManager(Device& newDevice, ImageManager& newImageManager);
   ~ImageViewManager();
@@ -22,6 +24,8 @@ public:
   auto destroyImageView(ImageViewHandle handle) -> void;
   auto getImageView(ImageViewHandle handle) -> const ImageView&;
 
+  void resize(const RenderSurfaceState& newState) override;
+
 private:
   Device& device;
   ImageManager& imageManager;
@@ -29,4 +33,5 @@ private:
   HandleGenerator<ImageViewTag> handleGenerator;
   std::unordered_map<ImageViewHandle, std::unique_ptr<ImageView>> imageViewMap;
 };
+
 }

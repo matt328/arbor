@@ -7,6 +7,7 @@
 #include "bk/NonCopyMove.hpp"
 #include "BufferCreateInfo.hpp"
 #include "core/ImageView.hpp"
+#include "engine/common/RenderSurfaceState.hpp"
 #include "resources/BufferRegion.hpp"
 #include "core/ImageHandle.hpp"
 #include "resources/PerFrameBufferHandles.hpp"
@@ -22,6 +23,8 @@ class ResourceSystem : public NonCopyableMovable {
 public:
   explicit ResourceSystem(BufferManager& newBufferManager, ImageSystem& newImageSystem);
   ~ResourceSystem();
+
+  void resize(const RenderSurfaceState& surfaceState);
 
   // Buffers
   auto createBuffer(const BufferCreateInfo& info) -> BufferHandle;

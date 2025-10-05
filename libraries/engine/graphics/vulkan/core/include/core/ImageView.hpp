@@ -9,10 +9,12 @@
 
 namespace arb {
 
+class Image;
+
 class ImageView : NonCopyableMovable {
 public:
   ImageView(Device& newDevice,
-            const VkImageViewCreateInfo& createInfo,
+            const VkImageViewCreateInfo& newCreateInfo,
             ImageHandle imageHandle,
             const std::optional<std::string>& name = std::nullopt);
   ~ImageView();
@@ -25,10 +27,13 @@ public:
     return sourceImage;
   }
 
+  void recreate(Image& image);
+
 private:
   Device& device;
   VkImageView handle;
   ImageHandle sourceImage;
+  VkImageViewCreateInfo createInfo;
   std::string debugName;
 };
 

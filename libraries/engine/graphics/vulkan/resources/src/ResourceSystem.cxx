@@ -15,6 +15,10 @@ ResourceSystem::~ResourceSystem() {
   Log::trace("Destroying Resource Facade");
 }
 
+void ResourceSystem::resize(const RenderSurfaceState& surfaceState) {
+  imageSystem.resize(surfaceState);
+}
+
 auto ResourceSystem::createBuffer(const BufferCreateInfo& info) -> BufferHandle {
   return bufferManager.registerBuffer(info);
 }

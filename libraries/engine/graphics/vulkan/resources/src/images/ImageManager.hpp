@@ -1,9 +1,11 @@
 #pragma once
 
+#include "common/ResizePolicy.hpp"
 #include "core/AllocatorService.hpp"
 #include "engine/common/HandleGenerator.hpp"
 #include "core/Image.hpp"
 #include "core/ImageHandle.hpp"
+#include "core/IResizable.hpp"
 #include <vulkan/vulkan_core.h>
 
 #pragma clang diagnostic push
@@ -13,18 +15,21 @@
 
 namespace arb {
 
-class ImageManager {
+class ImageManager : public IResizable {
 public:
   explicit ImageManager(Device& newDevice, AllocatorService& newAllocatorService);
   ~ImageManager();
 
   auto createImage(const VkImageCreateInfo& ici,
                    const VmaAllocationCreateInfo& aci,
+                   ResizePolicy resizePolicy,
                    const std::optional<std::string>& name) -> ImageHandle;
   auto destroyImage(ImageHandle handle) -> void;
   auto getImage(ImageHandle handle) -> Image&;
   auto incrementImageUse(ImageHandle handle) -> void;
   auto decrementImageUse(ImageHandle handle) -> void;
+
+  void resize(const RenderSurfaceState& newState) override;
 
 private:
   Device& device;

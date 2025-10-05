@@ -2,12 +2,15 @@
 
 #include "bk/Logger.hpp"
 
+#include "common/ImageAcquireResult.hpp"
 #include "core/Device.hpp"
 #include "core/Swapchain.hpp"
 
 #include "engine/common/EngineOptions.hpp"
 
 #include "Frame.hpp"
+#include "vulkan/vulkan_core.h"
+#include <cpptrace/exceptions.hpp>
 
 namespace arb {
 FrameManager::FrameManager(const EngineOptions& options, Device& newDevice, Swapchain& newSwapchain)
@@ -53,17 +56,24 @@ auto FrameManager::acquireFrame() -> std::variant<Frame*, ImageAcquireResult> {
 
   if (frame->isSubmitted()) {
     const uint64_t timeout = 1'000'000; // 1ms
+    VkFence fence = frame->getInflightFence();
     VkResult result{};
-    do {
-      VkFence fence = frame->getInflightFence();
-      result = vkWaitForFences(device, 1, &fence, VK_TRUE, timeout);
-    } while (result == VK_TIMEOUT);
+
+    result = vkWaitForFences(device, 1, &fence, VK_TRUE, UINT64_MAX);
+    if (result == VK_ERROR_DEVICE_LOST) {
+      Log::error("Device lost while waiting for frame fence");
+      throw cpptrace::runtime_error("Device Lost while waiting for fence");
+    }
 
     if (result == VK_SUCCESS) {
-      VkFence fence = frame->getInflightFence();
       vkResetFences(device, 1, &fence);
       frame->setSubmitted(false);
+    } else {
+      Log::warn("Waiting on fence timed out");
     }
+  } else {
+    VkFence fence = frame->getInflightFence();
+    vkResetFences(device, 1, &fence);
   }
 
   std::variant<uint32_t, ImageAcquireResult> result{};

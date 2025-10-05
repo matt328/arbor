@@ -19,6 +19,8 @@ public:
   auto execute(Frame* frame, VkCommandBuffer cmdBuffer) -> void override;
   [[nodiscard]] auto getDescription() const -> PassDescription override;
 
+  void resize(const RenderSurfaceState& newState) override;
+
 private:
   RenderSurfaceState surfaceState;
 };

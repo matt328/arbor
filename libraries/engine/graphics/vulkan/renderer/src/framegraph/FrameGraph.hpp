@@ -13,7 +13,7 @@
 #include "core/ImageHandle.hpp"
 
 #include "barriers/LastImageUse.hpp"
-#include "IResizable.hpp"
+#include "core/IResizable.hpp"
 
 namespace arb {
 

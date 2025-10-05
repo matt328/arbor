@@ -46,6 +46,7 @@ private:
   Device& device;
   Swapchain& swapchain;
   PipelineManager& pipelineManager;
+  ResourceSystem& resourceSystem;
   bool resizePending{false};
   std::unique_ptr<FrameManager> frameManager;
   std::unique_ptr<PerFrameUploader> perFrameUploader;

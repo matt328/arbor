@@ -1,7 +1,9 @@
 #include "FrameRenderer.hpp"
 
 #include <array>
+#include <expected>
 #include <Tracy.hpp>
+#include <utility>
 
 #include "Frame.hpp"
 #include "bk/Logger.hpp"
@@ -11,10 +13,12 @@
 #include "core/Swapchain.hpp"
 #include "FrameManager.hpp"
 #include "PerFrameUploader.hpp"
+#include "engine/common/RenderSurfaceState.hpp"
 #include "framegraph/AliasRegistry.hpp"
 #include "framegraph/FrameGraph.hpp"
 #include "framegraph/render-pass/IRenderPass.hpp"
-#include "vulkan/vulkan_core.h"
+
+#include <vulkan/vulkan_core.h>
 
 namespace arb {
 
@@ -32,19 +36,33 @@ FrameRenderer::~FrameRenderer() {
   Log::trace("Destroying FrameRenderer");
 }
 
+void FrameRenderer::setOnSwapchainResized(std::function<void(RenderSurfaceState)> cb) {
+  onResize = std::move(cb);
+}
+
 void FrameRenderer::renderNextFrame() {
   ZoneScoped;
-  if (resizePending) {
-    recreateSwapchain();
-    resizePending = false;
+
+  if (resizeInProgress()) {
+    device.waitIdle();
+    swapchain.recreate();
+    auto newSurfaceState =
+        RenderSurfaceState{.swapchainExtent = Size{.width = swapchain.getExtent().width,
+                                                   .height = swapchain.getExtent().height}};
+    frameGraph.resize(newSurfaceState);
+    onResize(newSurfaceState);
+    commitResize();
+  }
+
+  auto frameResult = tryAcquireFrame();
+  if (!frameResult.has_value()) {
+    if (frameResult.error() == FrameStatus::NeedsResize) {
+      beginResize();
+    }
     return;
   }
 
-  auto* frame = tryAcquireFrame();
-
-  if (frame == nullptr) {
-    return;
-  }
+  auto* frame = *frameResult;
 
   perFrameUploader.upload();
 
@@ -53,34 +71,22 @@ void FrameRenderer::renderNextFrame() {
   submitFrame(frame, results);
 
   const auto presentResult = presentFrame(frame);
-  if (presentResult == VK_SUBOPTIMAL_KHR || presentResult == VK_ERROR_OUT_OF_DATE_KHR) {
-    Log::warn("PresentFrame resports swapchain needs resized");
-    resizePending = true;
+
+  switch (presentResult) {
+    case FrameStatus::SwapchainOutOfDate:
+    case FrameStatus::SwapchainSuboptimal:
+      Log::warn("PresentFrame reports swapchain needs resized");
+      beginResize();
+      break;
+    case FrameStatus::PresentFailed:
+      Log::warn("Failed to present frame");
+      break;
+    default:
+      break;
   }
 }
 
-void FrameRenderer::resize(const RenderSurfaceState& newState) {
-}
-
-auto FrameRenderer::presentFrame(Frame* frame) -> VkResult {
-  ZoneScoped;
-  const auto swapchainImageIndex = frame->getSwapchainImageIndex();
-  VkSemaphore swapchainImageSemaphore = swapchain.getImageSemaphore(swapchainImageIndex);
-  VkSwapchainKHR chain = swapchain;
-  const auto presentInfo = VkPresentInfoKHR{.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-                                            .waitSemaphoreCount = 1,
-                                            .pWaitSemaphores = &swapchainImageSemaphore,
-                                            .swapchainCount = 1,
-                                            .pSwapchains = &chain,
-                                            .pImageIndices = &swapchainImageIndex};
-
-  return vkQueuePresentKHR(device.presentQueue(), &presentInfo);
-}
-
-void FrameRenderer::recreateSwapchain() {
-}
-
-auto FrameRenderer::tryAcquireFrame() -> Frame* {
+auto FrameRenderer::tryAcquireFrame() -> std::expected<Frame*, FrameStatus> {
   ZoneScoped;
   const auto result = frameManager.acquireFrame();
 
@@ -91,13 +97,41 @@ auto FrameRenderer::tryAcquireFrame() -> Frame* {
   switch (std::get<ImageAcquireResult>(result)) {
     case ImageAcquireResult::Error:
       Log::warn("Failed to acquire swapchain image, skipping frame");
-      return nullptr;
+      return std::unexpected(FrameStatus::AcquireFailed);
     case ImageAcquireResult::NeedsResize:
-      resizePending = true;
-      return nullptr;
+      Log::warn("Image Acquisition reports swapchain needs resized");
+      return std::unexpected(FrameStatus::NeedsResize);
     default:
       Log::warn("Unexpected result acquiring swapchain image");
-      return nullptr;
+      return std::unexpected(FrameStatus::AcquireFailed);
+  }
+}
+
+auto FrameRenderer::presentFrame(Frame* frame) -> FrameStatus {
+  ZoneScoped;
+  const auto swapchainImageIndex = frame->getSwapchainImageIndex();
+  VkSemaphore swapchainImageSemaphore = swapchain.getImageSemaphore(swapchainImageIndex);
+  VkSwapchainKHR chain = swapchain;
+
+  const auto presentInfo = VkPresentInfoKHR{.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+                                            .waitSemaphoreCount = 1,
+                                            .pWaitSemaphores = &swapchainImageSemaphore,
+                                            .swapchainCount = 1,
+                                            .pSwapchains = &chain,
+                                            .pImageIndices = &swapchainImageIndex};
+
+  const auto result = vkQueuePresentKHR(device.presentQueue(), &presentInfo);
+
+  switch (result) {
+    case VK_SUCCESS:
+      return FrameStatus::Success;
+    case VK_SUBOPTIMAL_KHR:
+      return FrameStatus::SwapchainSuboptimal;
+    case VK_ERROR_OUT_OF_DATE_KHR:
+      return FrameStatus::SwapchainOutOfDate;
+    default:
+      Log::warn("vkPresentQueueKHR failed with error code {}", int(result));
+      return FrameStatus::PresentFailed;
   }
 }
 
@@ -127,6 +161,22 @@ void FrameRenderer::submitFrame(Frame* frame, const FrameGraphResult& frameResul
   auto* graphicsQueue = device.graphicsQueue();
   checkVk(vkQueueSubmit(graphicsQueue, 1, &submitInfo, frame->getInflightFence()), "vkQueueSubmit");
   // frameState->advanceFrame();
+}
+
+void FrameRenderer::beginResize() {
+  Log::debug("Pausing FrameRenderer");
+  resizePending = true;
+  device.waitIdle();
+  Log::debug("Paused FrameRenderer");
+}
+
+void FrameRenderer::commitResize() {
+  Log::debug("Resume FrameRenderer");
+  resizePending = false;
+}
+
+auto FrameRenderer::resizeInProgress() const noexcept -> bool {
+  return resizePending;
 }
 
 }

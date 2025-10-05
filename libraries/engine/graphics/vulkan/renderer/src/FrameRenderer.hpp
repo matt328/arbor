@@ -1,9 +1,12 @@
 #pragma once
 
-#include "IResizable.hpp"
+#include "core/IResizable.hpp"
 #include "engine/common/RenderSurfaceState.hpp"
 #include "bk/NonCopyMove.hpp"
-#include "vulkan/vulkan_core.h"
+
+#include <expected>
+#include <functional>
+#include <vulkan/vulkan_core.h>
 
 namespace arb {
 
@@ -29,13 +32,28 @@ struct FrameRendererCreateInfo {
   RenderSurfaceState renderSurfaceState;
 };
 
-class FrameRenderer : public NonCopyableMovable, IResizable {
+enum class FrameStatus : uint8_t {
+  Success,
+  SwapchainOutOfDate,
+  SwapchainSuboptimal,
+  AcquireFailed,
+  PresentFailed,
+  NeedsResize,
+  NoFrame
+};
+
+class FrameRenderer : public NonCopyableMovable {
 public:
   explicit FrameRenderer(const FrameRendererDeps& deps, const FrameRendererCreateInfo& info);
   ~FrameRenderer();
 
   void renderNextFrame();
-  void resize(const RenderSurfaceState& newState) override;
+
+  void beginResize();
+  void commitResize();
+  [[nodiscard]] auto resizeInProgress() const noexcept -> bool;
+
+  void setOnSwapchainResized(std::function<void(RenderSurfaceState)> cb);
 
 private:
   Device& device;
@@ -46,11 +64,11 @@ private:
   FrameGraph& frameGraph;
 
   bool resizePending{false};
+  std::function<void(RenderSurfaceState)> onResize;
 
-  void recreateSwapchain();
-  auto tryAcquireFrame() -> Frame*;
+  auto tryAcquireFrame() -> std::expected<Frame*, FrameStatus>;
   void submitFrame(Frame* frame, const FrameGraphResult& frameResult);
-  auto presentFrame(Frame* frame) -> VkResult;
+  auto presentFrame(Frame* frame) -> FrameStatus;
 };
 
 }

@@ -5,6 +5,7 @@
 #include "core/Device.hpp"
 #include "bk/Logger.hpp"
 #include "ImageManager.hpp"
+#include "engine/common/RenderSurfaceState.hpp"
 
 namespace arb {
 
@@ -15,6 +16,13 @@ ImageViewManager::ImageViewManager(Device& newDevice, ImageManager& newImageMana
 
 ImageViewManager::~ImageViewManager() {
   Log::trace("Destroying ImageViewManager");
+}
+
+void ImageViewManager::resize(const RenderSurfaceState& newState) {
+  for (const auto& [handle, imageView] : imageViewMap) {
+    auto& image = imageManager.getImage(imageView->getSourceImageHandle());
+    imageView->recreate(image);
+  }
 }
 
 auto ImageViewManager::createImageView(const VkImageViewCreateInfo& createInfo,
