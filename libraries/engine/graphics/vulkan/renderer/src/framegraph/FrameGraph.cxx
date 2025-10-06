@@ -6,6 +6,7 @@
 #include "barriers/PrecursorGenerator.hpp"
 
 #include "bk/Log.hpp"
+#include "render-pass/pass/CullingPass.hpp"
 #include "renderer/Constants.hpp"
 #include "core/command-buffers/CommandBuffer.hpp"
 #include "core/command-buffers/CommandBufferManager.hpp"
@@ -27,6 +28,10 @@ FrameGraph::FrameGraph(const FrameGraphDeps& deps, const FrameGraphConfig& confi
       aliasRegistry{deps.aliasRegistry} {
   LOG_TRACE_L1(Log::Renderer, "Creating FrameGraph");
 
+  auto cullingPass = std::make_unique<CullingPass>(
+      CullingPassDeps{.aliasRegistry = aliasRegistry, .pipelineManager = pipelineManager},
+      CullingPassConfig{});
+
   auto forwardPass = std::make_unique<ForwardPass>(
       ForwardPassDeps{.aliasRegistry = aliasRegistry, .pipelineManager = pipelineManager},
       ForwardPassConfig{.initialSurfaceState = config.initialSurfaceState});
@@ -34,6 +39,7 @@ FrameGraph::FrameGraph(const FrameGraphDeps& deps, const FrameGraphConfig& confi
   auto presentPass = std::make_unique<PresentPass>(
       PresentPassConfig{.initialSurfaceState = config.initialSurfaceState});
 
+  renderPasses.push_back(std::move(cullingPass));
   renderPasses.push_back(std::move(forwardPass));
   renderPasses.push_back(std::move(presentPass));
 
@@ -61,6 +67,11 @@ void FrameGraph::compileResources() {
     for (const auto& ir : desc.images) {
       if (ir.createDesc) {
         aliasRegistry.registerImageAlias(ir.alias, *ir.createDesc);
+      }
+    }
+    for (const auto& br : desc.buffers) {
+      if (br.createDesc) {
+        aliasRegistry.registerBufferAlias(br.alias, *br.createDesc);
       }
     }
   }
@@ -108,7 +119,7 @@ auto FrameGraph::execute(Frame* frame) -> FrameGraphResult {
     if (barrierPrecursorPlan.bufferPrecursors.contains(passId)) {
 
       for (const auto& precursor : barrierPrecursorPlan.bufferPrecursors.at(passId)) {
-        const auto& buffer = aliasRegistry.getBuffer(precursor.alias, frame->getIndex());
+        const auto& buffer = aliasRegistry.getBuffer(precursor.alias, frame);
         auto lastUse = frame->getLastBufferUse(precursor.alias);
         auto bufferBarrier = barriers::build(precursor, lastUse);
         if (bufferBarrier) {

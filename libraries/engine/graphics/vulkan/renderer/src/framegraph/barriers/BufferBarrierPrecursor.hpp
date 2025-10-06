@@ -1,14 +1,12 @@
 #pragma once
 
+#include <format>
 #include <vulkan/vulkan_core.h>
 #include <vulkan/vk_enum_string_helper.h>
-
-#include "common/AccessMode.hpp"
 
 namespace arb {
 struct BufferBarrierPrecursor {
   std::string alias;
-  AccessMode accessMode;
   VkAccessFlags2 accessFlags;
   VkPipelineStageFlags2 stageFlags;
 };
@@ -23,12 +21,10 @@ struct std::formatter<arb::BufferBarrierPrecursor> {
 
   // NOLINTNEXTLINE
   auto format(const arb::BufferBarrierPrecursor& bbp, std::format_context& ctx) const {
-    return std::format_to(
-        ctx.out(),
-        "BufferBarrierPrecursor {{ alias={}, accessMode={}, accessFlags={}, stageFlags={} }}",
-        bbp.alias,
-        bbp.accessMode,
-        string_VkAccessFlags2(bbp.accessFlags),
-        string_VkPipelineStageFlags2(bbp.stageFlags));
+    return std::format_to(ctx.out(),
+                          "BufferBarrierPrecursor {{ alias={}, accessFlags={}, stageFlags={} }}",
+                          bbp.alias,
+                          string_VkAccessFlags2(bbp.accessFlags),
+                          string_VkPipelineStageFlags2(bbp.stageFlags));
   }
 };

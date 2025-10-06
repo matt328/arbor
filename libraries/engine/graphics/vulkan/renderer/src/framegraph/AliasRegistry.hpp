@@ -8,6 +8,7 @@
 #include "common/ImageCreateDescription.hpp"
 #include "common/ImageLifetime.hpp"
 #include "core/Swapchain.hpp"
+#include "common/BufferCreateInfo.hpp"
 #include "resources/BufferHandle.hpp"
 #include "core/Image.hpp"
 #include "core/ImageHandle.hpp"
@@ -16,8 +17,6 @@
 namespace arb {
 
 class Frame;
-
-struct BufferSpec {};
 
 struct AliasRegistryDeps {
   ResourceSystem& resourceSystem;
@@ -31,7 +30,7 @@ public:
   ~AliasRegistry() = default;
 
   void registerImageAlias(const std::string& alias, ImageCreateDescription desc);
-  void registerBufferAlias(std::string alias, BufferSpec spec);
+  void registerBufferAlias(const std::string& alias, const BufferCreateInfo& spec);
 
   void buildResources(uint32_t frameCount);
 
@@ -39,9 +38,9 @@ public:
   [[nodiscard]] auto getImageHandle(const std::string& alias, Frame* frame) const -> ImageHandle;
   [[nodiscard]] auto getImageViewHandle(const std::string& alias, Frame* frame) const
       -> ImageViewHandle;
-  [[nodiscard]] auto getBufferHandle(std::string_view alias, uint32_t frameIndex) const
+  [[nodiscard]] auto getBufferHandle(const std::string& alias, const Frame* frame) const
       -> BufferHandle;
-  [[nodiscard]] auto getBuffer(std::string_view alias, uint32_t frameIndex) const -> Buffer&;
+  [[nodiscard]] auto getBuffer(const std::string& alias, const Frame* frame) const -> Buffer&;
 
   [[nodiscard]] auto getAttachmentInfo(const std::string& alias,
                                        Frame* frame,
@@ -73,6 +72,14 @@ private:
   std::unordered_map<std::string, ImageCreateDescription> aliasImageSpecMap;
   std::unordered_map<std::string, AliasImageEntry> aliasImageHandleMap;
   std::unordered_map<std::string, AliasImageViewEntry> aliasImageViewMap;
+
+  struct AliasBufferEntry {
+    BufferLifetime lifetime;
+    std::vector<BufferHandle> bufferHandles;
+  };
+
+  std::unordered_map<std::string, BufferCreateInfo> aliasBufferSpecMap;
+  std::unordered_map<std::string, AliasBufferEntry> aliasBufferHandleMap;
 
   static auto createImageViewSpec(ImageHandle imageHandle, const ImageCreateDescription& desc)
       -> ImageViewSpec;

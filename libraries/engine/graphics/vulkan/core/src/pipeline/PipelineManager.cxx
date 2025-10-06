@@ -170,9 +170,9 @@ auto PipelineManager::createGraphicsPipeline(const PipelineCreateInfo& createInf
 
 auto PipelineManager::createComputePipeline(const PipelineCreateInfo& createInfo)
     -> std::unique_ptr<PipelineUnit> {
-  std::vector<VkPushConstantRange> pushConstantRanges{
-      createInfo.pipelineLayoutInfo.pushConstantInfoList.size()};
+  std::vector<VkPushConstantRange> pushConstantRanges{};
 
+  pushConstantRanges.reserve(createInfo.pipelineLayoutInfo.pushConstantInfoList.size());
   for (const auto& pcrInfo : createInfo.pipelineLayoutInfo.pushConstantInfoList) {
     pushConstantRanges.emplace_back(VkPushConstantRange{
         .stageFlags = pcrInfo.stageFlags,
@@ -203,9 +203,11 @@ auto PipelineManager::createComputePipeline(const PipelineCreateInfo& createInfo
   }
 
   const auto pipelineCreateInfo =
-      VkComputePipelineCreateInfo{.stage = shaderStages.front(), .layout = pipelineLayout};
+      VkComputePipelineCreateInfo{.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO,
+                                  .stage = shaderStages.front(),
+                                  .layout = pipelineLayout};
 
-  auto pipeline = Pipeline{&device, pipelineCreateInfo};
+  auto pipeline = Pipeline{&device, pipelineCreateInfo, createInfo.debugName};
   return std::make_unique<PipelineUnit>(std::move(pipeline), std::move(pipelineLayout));
 }
 

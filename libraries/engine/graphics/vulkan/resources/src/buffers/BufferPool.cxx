@@ -151,6 +151,44 @@ auto BufferPool::tick() -> void {
   }
 }
 
+auto BufferPool::resolve(LogicalBufferHandle logicalHandle) const -> BufferHandle {
+}
+
+auto BufferPool::getVkBuffer(BufferHandle handle) const -> VkBuffer {
+  return getBuffer(handle);
+}
+
+auto BufferPool::getBuffer(BufferHandle handle) const -> Buffer& {
+  assert(bufferMap.contains(handle));
+  const auto& entry = bufferMap.at(handle);
+
+  // Transient buffers: always single version, safe to return
+  if (entry->lifetime == BufferLifetime::Transient) {
+    assert(!entry->versions.empty());
+    return *entry->versions.front();
+  }
+
+  // Persistent buffers: return the latest version that’s no longer in flight
+  for (const auto& buf : entry->versions | std::views::reverse) {
+    bool ready = true;
+    for (auto& [sem, val] : buf->pendingValues) {
+      uint64_t current{};
+      vkGetSemaphoreCounterValue(device, sem, &current);
+      if (current < val) {
+        ready = false;
+        break;
+      }
+    }
+    if (ready) {
+      return *buf;
+    }
+  }
+
+  // Fallback: if all are in-flight (should be rare), return latest
+  assert(!entry->versions.empty());
+  return *entry->versions.back();
+}
+
 auto BufferPool::fromCreateInfo(const BufferCreateInfo& info)
     -> std::tuple<VkBufferCreateInfo, VmaAllocationCreateInfo> {
   auto bci = VkBufferCreateInfo{.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,

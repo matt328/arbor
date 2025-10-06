@@ -1,6 +1,7 @@
 #include "PresentPass.hpp"
 #include "common/ImageRequirement.hpp"
 #include "vulkan/vulkan_core.h"
+#include <optional>
 
 namespace arb {
 

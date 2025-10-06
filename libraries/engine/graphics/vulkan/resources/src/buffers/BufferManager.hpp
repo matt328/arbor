@@ -8,7 +8,7 @@
 #include "resources/ResizeRequest.hpp"
 #include "bk/NonCopyMove.hpp"
 #include "resources/Buffer.hpp"
-#include "resources/BufferCreateInfo.hpp"
+#include "common/BufferCreateInfo.hpp"
 #include "resources/BufferHandle.hpp"
 #include "common/SemaphorePack.hpp"
 #include "resources/PerFrameBufferHandles.hpp"

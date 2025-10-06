@@ -47,7 +47,8 @@ ForwardPass::ForwardPass(const ForwardPassDeps& deps, const ForwardPassConfig& c
                          .pipelineLayoutInfo = pipelineLayoutInfo,
                          .colorAttachmentFormats =
                              {VK_FORMAT_R8G8B8A8_UNORM}, // Get swapchain attachment format somehow
-                         .shaderStageInfo = {vertexStage, fragmentStage}};
+                         .shaderStageInfo = {vertexStage, fragmentStage},
+                         .debugName = "ForwardPipeline"};
 
   pipelineHandle = deps.pipelineManager.createPipeline(pipelineCreateInfo);
 }

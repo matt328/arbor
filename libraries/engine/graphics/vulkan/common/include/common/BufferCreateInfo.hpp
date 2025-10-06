@@ -36,6 +36,10 @@ struct BufferCreateInfo {
   size_t itemStride = 0;
   std::string debugName;
   bool indirect{false};
+
+  // clang-format off
+  auto operator<=> (const BufferCreateInfo&) const = default;
+  // clang-format on
 };
 
 }

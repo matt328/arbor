@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <bk/Log.hpp>
+#include "BufferBarrierPrecursor.hpp"
 #include "framegraph/barriers/BarrierPrecursorPlan.hpp"
 #include "framegraph/render-pass/IRenderPass.hpp"
 
@@ -20,8 +21,6 @@ static inline auto isWriteAccess(VkAccessFlags2 flags) -> bool {
 static inline auto generatePrecursorPlan(const std::vector<std::unique_ptr<IRenderPass>>& passes)
     -> BarrierPrecursorPlan {
   BarrierPrecursorPlan result{};
-  // TODO: need to deduplicate here because images in the descriptions will be duplicated from the
-  // Pass and Dispatcher's requirements
   for (const auto& pass : passes) {
     const auto& passId = pass->getId();
     const auto desc = pass->getDescription();
@@ -33,6 +32,12 @@ static inline auto generatePrecursorPlan(const std::vector<std::unique_ptr<IRend
            .stageFlags = imageReq.useDesc.stageFlags,
            .layout = imageReq.useDesc.imageLayout,
            .aspectFlags = imageReq.useDesc.aspectFlags});
+    }
+    for (const auto& bufferReq : desc.buffers) {
+      result.bufferPrecursors[passId].push_back(
+          BufferBarrierPrecursor{.alias = bufferReq.alias,
+                                 .accessFlags = bufferReq.useDesc.accessFlags,
+                                 .stageFlags = bufferReq.useDesc.stageFlags});
     }
 
     // LOG_TRACE_L1(Log::Renderer, "Generated BarrierPrecursorPlan:\n{}", result);

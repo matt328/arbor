@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/pipeline/PipelineManager.hpp"
+#include "engine/common/RenderSurfaceState.hpp"
 #include "framegraph/AliasRegistry.hpp"
 #include "framegraph/render-pass/IRenderPass.hpp"
 #include "resources/BufferHandle.hpp"
@@ -13,8 +14,9 @@ struct CullingPassDeps {
 };
 
 struct CullingPassConfig {
-  LogicalBufferHandle resourceTable;
-  LogicalBufferHandle frameData;
+  RenderSurfaceState initialState{};
+  LogicalBufferHandle resourceTable{};
+  LogicalBufferHandle frameData{};
 };
 
 class CullingPass : public IRenderPass {
@@ -27,6 +29,8 @@ public:
   auto execute(Frame* frame, VkCommandBuffer cmdBuffer) -> void override;
   [[nodiscard]] auto getDescription() const -> PassDescription override;
 
+  void resize(const RenderSurfaceState& newState) override;
+
 private:
   AliasRegistry& aliasRegistry;
   PipelineManager& pipelineManager;
@@ -35,6 +39,8 @@ private:
 
   LogicalBufferHandle resourceTable;
   LogicalBufferHandle frameData;
+
+  RenderSurfaceState surfaceState{};
 
   struct PushConstants {
     uint64_t resourceTableAddress;

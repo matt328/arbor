@@ -5,7 +5,7 @@
 #include "Buffer.hpp"
 #include "BufferHandle.hpp"
 #include "bk/NonCopyMove.hpp"
-#include "BufferCreateInfo.hpp"
+#include "common/BufferCreateInfo.hpp"
 #include "core/ImageView.hpp"
 #include "engine/common/RenderSurfaceState.hpp"
 #include "resources/BufferRegion.hpp"

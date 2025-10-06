@@ -13,7 +13,8 @@ Checks: >
   -google-readability-namespace-comments,
   -cppcoreguidelines-special-member-functions,
   -cppcoreguidelines-avoid-const-or-ref-data-members,
-  -bugprone-reserved-identifier
+  -bugprone-reserved-identifier,
+  -clang-diagnostic-c++98-compat*
 
 WarningsAsErrors: "false"
 HeaderFilterRegex: ""
@@ -30,3 +31,5 @@ CheckOptions:
     value: "2"
   - key: modernize-use-nullptr.NullMacros
     value: "NULL"
+  - key: modernize-use-equals-default.IgnoreMacros
+    value: true

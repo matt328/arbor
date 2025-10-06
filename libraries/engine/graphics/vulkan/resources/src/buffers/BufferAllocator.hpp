@@ -5,7 +5,7 @@
 #include <unordered_map>
 
 #include "bk/NonCopyMove.hpp"
-#include "resources/BufferCreateInfo.hpp"
+#include "common/BufferCreateInfo.hpp"
 #include "resources/BufferHandle.hpp"
 
 namespace arb {

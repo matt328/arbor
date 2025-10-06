@@ -10,6 +10,7 @@
 #include "common/ImageLifetime.hpp"
 #include "renderer/Constants.hpp"
 #include "Frame.hpp"
+#include "common/BufferCreateInfo.hpp"
 
 namespace arb {
 
@@ -29,6 +30,19 @@ void AliasRegistry::registerImageAlias(const std::string& alias, ImageCreateDesc
   }
   LOG_TRACE_L1(Log::Renderer, "Registering new alias {}", alias);
   aliasImageSpecMap.emplace(alias, desc);
+}
+
+void AliasRegistry::registerBufferAlias(const std::string& alias, const BufferCreateInfo& spec) {
+  LOG_TRACE_L1(Log::Renderer, "Registering BufferAlias {}", alias);
+  if (aliasBufferSpecMap.contains(alias)) {
+    if (!(aliasBufferSpecMap.at(alias) == spec)) {
+      throw cpptrace::runtime_error("Alias " + alias + " registered with a different spec");
+    }
+    LOG_TRACE_L1(Log::Renderer, "Alias already existed: {}", alias);
+    return;
+  }
+  LOG_TRACE_L1(Log::Renderer, "Registering new alias {}", alias);
+  aliasBufferSpecMap.emplace(alias, spec);
 }
 
 void AliasRegistry::buildResources(uint32_t frameCount) {
@@ -60,6 +74,24 @@ void AliasRegistry::buildResources(uint32_t frameCount) {
 
       aliasImageViewMap[alias].lifetime = spec.imageLifetime;
       aliasImageViewMap[alias].imageViewHandles[i] = imageViewHandle;
+    }
+  }
+
+  for (const auto& [alias, spec] : aliasBufferSpecMap) {
+    uint32_t instances = 1;
+    switch (spec.bufferLifetime) {
+      case BufferLifetime::Persistent:
+        instances = 1;
+        break;
+      case BufferLifetime::Transient:
+        instances = frameCount;
+        break;
+    }
+    aliasBufferHandleMap[alias].bufferHandles.resize(instances);
+    for (uint32_t i = 0; i < instances; ++i) {
+      const auto bufferHandle = resourceSystem.createBuffer(spec);
+      aliasBufferHandleMap[alias].lifetime = spec.bufferLifetime;
+      aliasBufferHandleMap[alias].bufferHandles[i] = bufferHandle;
     }
   }
 }
@@ -118,11 +150,24 @@ auto AliasRegistry::getImageViewHandle(const std::string& alias, Frame* frame) c
   throw cpptrace::logic_error(std::format("Requested alias {} not registered", alias));
 }
 
-auto AliasRegistry::getBufferHandle(std::string_view alias, uint32_t frameIndex) const
+auto AliasRegistry::getBufferHandle(const std::string& alias, const Frame* frame) const
     -> BufferHandle {
+  if (aliasBufferHandleMap.contains(alias)) {
+    const auto& entry = aliasBufferHandleMap.at(alias);
+    switch (entry.lifetime) {
+      case BufferLifetime::Persistent:
+        return entry.bufferHandles.front();
+      case arb::BufferLifetime::Transient:
+        assert(frame->getIndex() < entry.bufferHandles.size());
+        return entry.bufferHandles[frame->getIndex()];
+    }
+  }
+  throw cpptrace::logic_error(std::format("Requested alias has not been registered: {}", alias));
 }
 
-auto AliasRegistry::getBuffer(std::string_view alias, uint32_t frameIndex) const -> Buffer& {
+auto AliasRegistry::getBuffer(const std::string& alias, const Frame* frame) const -> Buffer& {
+  const auto bufferHandle = getBufferHandle(alias, frame);
+  return resourceSystem.getBuffer(bufferHandle);
 }
 
 auto AliasRegistry::getAttachmentInfo(const std::string& alias,

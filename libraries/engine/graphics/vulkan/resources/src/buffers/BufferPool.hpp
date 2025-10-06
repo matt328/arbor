@@ -11,7 +11,7 @@
 #include "bk/NonCopyMove.hpp"
 #include "core/AllocatorService.hpp"
 #include "engine/common/HandleGenerator.hpp"
-#include "resources/BufferCreateInfo.hpp"
+#include "common/BufferCreateInfo.hpp"
 #include "resources/BufferHandle.hpp"
 
 namespace arb {
@@ -55,6 +55,8 @@ public:
   [[nodiscard]] auto resolve(LogicalBufferHandle logicalHandle) const -> BufferHandle;
 
   [[nodiscard]] auto getVkBuffer(BufferHandle handle) const -> VkBuffer;
+
+  [[nodiscard]] auto getBuffer(BufferHandle handle) const -> Buffer&;
 
 private:
   Device& device;

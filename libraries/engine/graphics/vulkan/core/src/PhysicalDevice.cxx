@@ -15,6 +15,7 @@ namespace arb {
 DeviceFeatures PhysicalDevice::RequiredFeatures = [] {
   DeviceFeatures features;
   features.features2.features.samplerAnisotropy = VK_TRUE;
+  features.features2.features.shaderInt64 = VK_TRUE;
 
   features.vk12.drawIndirectCount = VK_TRUE;
   features.vk12.bufferDeviceAddress = VK_TRUE;

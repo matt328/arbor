@@ -50,9 +50,11 @@ auto BufferManager::resolve(LogicalBufferHandle logicalHandle, size_t frameIndex
 }
 
 auto BufferManager::getVkBuffer(BufferHandle handle) const -> VkBuffer {
+  return bufferPool->getVkBuffer(handle);
 }
 
 auto BufferManager::getBuffer(BufferHandle handle) const -> Buffer& {
+  return bufferPool->getBuffer(handle);
 }
 
 }

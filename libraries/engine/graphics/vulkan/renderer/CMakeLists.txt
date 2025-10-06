@@ -10,6 +10,7 @@ set(vulkanrenderer_SRC
   src/framegraph/FrameGraph.cxx
   src/framegraph/AliasRegistry.cxx
 
+  src/framegraph/render-pass/pass/CullingPass.cxx
   src/framegraph/render-pass/pass/ForwardPass.cxx
   src/framegraph/render-pass/pass/PresentPass.cxx
 

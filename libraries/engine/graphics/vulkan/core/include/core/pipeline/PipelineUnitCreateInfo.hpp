@@ -43,6 +43,7 @@ struct PipelineCreateInfo {
   VkCullModeFlags cullMode = VK_CULL_MODE_BACK_BIT;
   bool enableDepthTest = true;
   bool enableDepthWrite = true;
+  std::optional<std::string> debugName;
 };
 
 }
