@@ -45,6 +45,11 @@ void AliasRegistry::registerBufferAlias(const std::string& alias, const BufferCr
   aliasBufferSpecMap.emplace(alias, spec);
 }
 
+void AliasRegistry::registerBufferAlias(const std::string& alias, BufferHandle handle) {
+  aliasBufferHandleMap[alias].lifetime = BufferLifetime::Persistent;
+  aliasBufferHandleMap[alias].bufferHandles.push_back(handle);
+}
+
 void AliasRegistry::buildResources(uint32_t frameCount) {
   for (const auto& [alias, spec] : aliasImageSpecMap) {
 
@@ -162,7 +167,9 @@ auto AliasRegistry::getBufferHandle(const std::string& alias, const Frame* frame
         return entry.bufferHandles[frame->getIndex()];
     }
   }
-  throw cpptrace::logic_error(std::format("Requested alias has not been registered: {}", alias));
+  LOG_ERROR(Log::Core, "throwing cpptrace");
+  // throw cpptrace::logic_error(std::format("Requested alias has not been registered: {}", alias));
+  return BufferHandle{};
 }
 
 auto AliasRegistry::getBuffer(const std::string& alias, const Frame* frame) const -> Buffer& {

@@ -31,6 +31,7 @@ public:
 
   void registerImageAlias(const std::string& alias, ImageCreateDescription desc);
   void registerBufferAlias(const std::string& alias, const BufferCreateInfo& spec);
+  void registerBufferAlias(const std::string& alias, BufferHandle handle);
 
   void buildResources(uint32_t frameCount);
 

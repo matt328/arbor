@@ -53,7 +53,7 @@ VulkanContext::~VulkanContext() {
 }
 
 void VulkanContext::run(std::stop_token token) {
-  LOG_TRACE_L1(Log::Core, "GraphicsContext::run()");
+  LOG_TRACE_L1(Log::Core, "VulkanContext::run()");
   using Clock = std::chrono::steady_clock;
   auto currentTime = Clock::now();
 

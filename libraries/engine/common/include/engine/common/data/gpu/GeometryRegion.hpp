@@ -8,6 +8,12 @@ namespace arb::gpu {
 
 constexpr uint32_t INVALID_OFFSET = std::numeric_limits<uint32_t>::max(); // 0xFFFFFFFF
 
+/*
+  Each GeometryRegion is a single 'mesh' with multiple vertices. It has offsets into each of the
+  deinterleaved buffers of where it's data begins, and the IndexData buffer contains an additional
+  offset for each vertex
+*/
+
 struct GeometryRegion {
   uint32_t indexCount = 0;
   uint32_t indexOffset = INVALID_OFFSET;
@@ -19,6 +25,7 @@ struct GeometryRegion {
 };
 
 // Typical Index Data each index 'indexes' into the GpuVertex*Data buffer
+// vec3 pos = pc.posBuf.positions[region.positionOffset + idx];
 struct IndexData {
   uint32_t index;
 };

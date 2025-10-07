@@ -45,6 +45,7 @@ EngineContext::EngineContext(bk::NativeWindowHandle newWindowHandle, EngineOptio
           windowHandle);
       graphicsContext->run(token);
     } catch (const std::exception& e) {
+      LOG_ERROR(Log::Core, "Caught GraphicsThread Exception");
       engineError = std::current_exception();
       requestStop();
     }

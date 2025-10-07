@@ -1,14 +1,11 @@
 #pragma once
 
-#include <memory>
-
+#include "bk/NonCopyMove.hpp"
 #include "resources/ResizeRequest.hpp"
 #include "resources/BufferHandle.hpp"
 #include "resources/BufferRequest.hpp"
 #include "resources/BufferRegion.hpp"
 #include "resources/GeometryData.hpp"
-#include "common/Handles.hpp"
-#include "engine/common/Handle.hpp"
 
 namespace arb {
 
@@ -23,37 +20,32 @@ constexpr size_t NormalBufferInitialSize = 1024000;
 constexpr size_t AnimationBufferInitialSize = 1024000;
 
 /// A Facade over all of the individual buffers that store geometry information on the GPU.
-class GeometryStream {
+class GeometryStream : public NonCopyableMovable {
 public:
-  GeometryStream(ResourceSystem& newResourceFacade);
+  explicit GeometryStream(ResourceSystem& newResourceFacade);
   ~GeometryStream();
 
-  GeometryStream(const GeometryStream&) = delete;
-  GeometryStream(GeometryStream&&) = delete;
-  auto operator=(const GeometryStream&) -> GeometryStream& = delete;
-  auto operator=(GeometryStream&&) -> GeometryStream& = delete;
-
-  [[nodiscard]] auto getIndexBuffer() const -> const Handle<BufferTag>& {
+  [[nodiscard]] auto getIndexBuffer() const -> const BufferHandle& {
     return indexBuffer;
   }
 
-  [[nodiscard]] auto getPositionBuffer() const -> const Handle<BufferTag>& {
+  [[nodiscard]] auto getPositionBuffer() const -> const BufferHandle& {
     return positionBuffer;
   }
 
-  [[nodiscard]] auto getColorBuffer() const -> const Handle<BufferTag>& {
+  [[nodiscard]] auto getColorBuffer() const -> const BufferHandle& {
     return colorBuffer;
   }
 
-  [[nodiscard]] auto getTexCoordBuffer() const -> const Handle<BufferTag>& {
+  [[nodiscard]] auto getTexCoordBuffer() const -> const BufferHandle& {
     return texCoordBuffer;
   }
 
-  [[nodiscard]] auto getNormalBuffer() const -> const Handle<BufferTag>& {
+  [[nodiscard]] auto getNormalBuffer() const -> const BufferHandle& {
     return normalBuffer;
   }
 
-  [[nodiscard]] auto getAnimationBuffer() const -> const Handle<BufferTag>& {
+  [[nodiscard]] auto getAnimationBuffer() const -> const BufferHandle& {
     return animationBuffer;
   }
 
@@ -61,7 +53,7 @@ public:
   /// ResizeRequests containing each buffer that needs resized, and the buffer's new size.
   auto checkSizes(const GeometryData& data) -> std::vector<ResizeRequest>;
 
-  auto allocate(Handle<BufferTag> handle, const BufferRequest& bufferRequest) -> BufferRegion;
+  auto allocate(BufferHandle handle, const BufferRequest& bufferRequest) -> BufferRegion;
   auto allocateIndexBuffer(const BufferRequest& bufferRequest) -> BufferRegion;
   auto allocatePositionBuffer(const BufferRequest& bufferRequest) -> BufferRegion;
   auto allocateColorBuffer(const BufferRequest& bufferRequest) -> BufferRegion;

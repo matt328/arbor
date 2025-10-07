@@ -23,6 +23,7 @@ class AliasRegistry;
 class FrameGraph;
 struct FrameGraphResult;
 class FrameRenderer;
+class GeometryStream;
 
 struct RenderContextDeps {
   Device& device;
@@ -53,6 +54,9 @@ private:
   std::unique_ptr<AliasRegistry> aliasRegistry;
   std::unique_ptr<FrameGraph> frameGraph;
   std::unique_ptr<FrameRenderer> frameRenderer;
+  std::unique_ptr<GeometryStream> geometryStream;
+
+  static void registerGeometryAliases(AliasRegistry& aliasRegistry, GeometryStream& geometryStream);
 };
 
 }

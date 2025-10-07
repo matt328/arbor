@@ -44,7 +44,7 @@ struct GeometryAllocation {
 
 class VirtualAllocationManager {
 public:
-  VirtualAllocationManager(GeometryStream& newGeometryStream);
+  explicit VirtualAllocationManager(GeometryStream& newGeometryStream);
   ~VirtualAllocationManager();
 
   auto checkSizes(const GeometryData& data, size_t size) -> std::vector<ResizeRequest>;

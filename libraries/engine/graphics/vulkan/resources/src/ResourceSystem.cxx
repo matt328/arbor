@@ -42,6 +42,15 @@ auto ResourceSystem::getBuffer(BufferHandle handle) -> Buffer& {
   return bufferManager.getBuffer(handle);
 }
 
+auto ResourceSystem::checkBufferSize(BufferHandle handle, size_t size)
+    -> std::optional<ResizeRequest> {
+  return bufferManager.checkSize(handle, size);
+}
+
+auto ResourceSystem::allocateInBuffer(BufferHandle handle, size_t size) -> BufferRegion {
+  return bufferManager.allocate(handle, size);
+}
+
 auto ResourceSystem::createImage(const ImageCreateDescription& imageSpec) -> ImageHandle {
   return imageSystem.createImage(imageSpec);
 }
