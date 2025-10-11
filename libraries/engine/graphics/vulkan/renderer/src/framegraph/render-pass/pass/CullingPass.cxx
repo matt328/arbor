@@ -19,17 +19,21 @@ CullingPass::CullingPass(const CullingPassDeps& deps, const CullingPassConfig& c
       surfaceState{config.initialState} {
   LOG_TRACE_L1(Log::Renderer, "Creating CullingPass");
 
-  const auto pipelineLayoutInfo = PipelineLayoutInfo{.pushConstantInfoList = {PushConstantInfo{
-                                                         .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
-                                                         .offset = 0,
-                                                         .size = 104, // TODO(matt) sizeof()
-                                                     }}};
+  const auto pipelineLayoutInfo = PipelineLayoutInfo{
+      .pushConstantInfoList = {PushConstantInfo{
+          .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+          .offset = 0,
+          .size = 104, // TODO(matt) sizeof()
+      }},
+      .debugName = "CullingPipelineLayout",
+  };
 
   const auto shaderStageInfo = ShaderStageInfo{
       .stage = VK_SHADER_STAGE_COMPUTE_BIT,
       .shaderFile =
           (std::filesystem::current_path() / "assets" / "shaders" / "compute2.comp.spv").string(),
-      .entryPoint = "main"};
+      .entryPoint = "main",
+      .debugName = "Compute2"};
 
   const auto pipelineCreateInfo = PipelineCreateInfo{.pipelineType = PipelineType::Compute,
                                                      .pipelineLayoutInfo = pipelineLayoutInfo,

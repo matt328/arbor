@@ -18,12 +18,16 @@ ShaderModule::ShaderModule(Device* newDevice,
 }
 
 ShaderModule::~ShaderModule() {
-  LOG_TRACE_L1(Log::Core, "Destroying ShaderModule: {}", debugName);
-  cleanup();
+  if (handle != VK_NULL_HANDLE) {
+    LOG_TRACE_L1(Log::Core, "Destroying ShaderModule: {}", debugName);
+    cleanup();
+  }
 }
 
 ShaderModule::ShaderModule(ShaderModule&& other) noexcept
-    : device{other.device}, handle{std::exchange(other.handle, VK_NULL_HANDLE)} {
+    : device{other.device},
+      handle{std::exchange(other.handle, VK_NULL_HANDLE)},
+      debugName{std::move(other.debugName)} {
 }
 
 auto ShaderModule::operator=(ShaderModule&& other) noexcept -> ShaderModule& {
@@ -31,6 +35,7 @@ auto ShaderModule::operator=(ShaderModule&& other) noexcept -> ShaderModule& {
     cleanup();
     device = other.device;
     handle = std::exchange(other.handle, VK_NULL_HANDLE);
+    debugName = std::move(other.debugName);
   }
   return *this;
 }

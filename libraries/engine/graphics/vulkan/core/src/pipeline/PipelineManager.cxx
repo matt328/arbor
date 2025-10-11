@@ -58,7 +58,8 @@ auto PipelineManager::createGraphicsPipeline(const PipelineCreateInfo& createInf
       .pushConstantRangeCount = static_cast<uint32_t>(pushConstantRanges.size()),
       .pPushConstantRanges = pushConstantRanges.data()};
 
-  auto pipelineLayout = PipelineLayout{&device, layoutCreateInfo};
+  auto pipelineLayout =
+      PipelineLayout{&device, layoutCreateInfo, createInfo.pipelineLayoutInfo.debugName};
 
   // RenderingInfo
   auto pipelineRenderingInfo = VkPipelineRenderingCreateInfo{
@@ -75,7 +76,8 @@ auto PipelineManager::createGraphicsPipeline(const PipelineCreateInfo& createInf
   for (const auto& stageInfo : createInfo.shaderStageInfo) {
     shaderModules.emplace_back(SpirvShaderModuleFactory::createShaderModule(&device,
                                                                             stageInfo.stage,
-                                                                            stageInfo.shaderFile));
+                                                                            stageInfo.shaderFile,
+                                                                            stageInfo.debugName));
     shaderStages.emplace_back(VkPipelineShaderStageCreateInfo{
         .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
         .stage = stageInfo.stage,
@@ -164,7 +166,7 @@ auto PipelineManager::createGraphicsPipeline(const PipelineCreateInfo& createInf
                                    .basePipelineHandle = VK_NULL_HANDLE,
                                    .basePipelineIndex = -1};
 
-  auto pipeline = Pipeline{&device, pipelineCreateInfo};
+  auto pipeline = Pipeline{&device, pipelineCreateInfo, createInfo.debugName};
   return std::make_unique<PipelineUnit>(std::move(pipeline), std::move(pipelineLayout));
 }
 
@@ -186,7 +188,8 @@ auto PipelineManager::createComputePipeline(const PipelineCreateInfo& createInfo
       .pushConstantRangeCount = static_cast<uint32_t>(pushConstantRanges.size()),
       .pPushConstantRanges = pushConstantRanges.data()};
 
-  auto pipelineLayout = PipelineLayout{&device, layoutCreateInfo};
+  auto pipelineLayout =
+      PipelineLayout{&device, layoutCreateInfo, createInfo.pipelineLayoutInfo.debugName};
 
   // Shader Stages
   auto shaderModules = std::vector<ShaderModule>{};
@@ -194,7 +197,8 @@ auto PipelineManager::createComputePipeline(const PipelineCreateInfo& createInfo
   for (const auto& stageInfo : createInfo.shaderStageInfo) {
     shaderModules.emplace_back(SpirvShaderModuleFactory::createShaderModule(&device,
                                                                             stageInfo.stage,
-                                                                            stageInfo.shaderFile));
+                                                                            stageInfo.shaderFile,
+                                                                            stageInfo.debugName));
     shaderStages.emplace_back(VkPipelineShaderStageCreateInfo{
         .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
         .stage = stageInfo.stage,

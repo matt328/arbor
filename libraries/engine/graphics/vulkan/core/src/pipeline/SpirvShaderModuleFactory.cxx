@@ -11,14 +11,15 @@ namespace arb {
 
 auto SpirvShaderModuleFactory::createShaderModule(Device* device,
                                                   VkShaderStageFlags shaderType,
-                                                  const std::filesystem::path& filename)
+                                                  const std::filesystem::path& filename,
+                                                  const std::optional<std::string>& debugName)
     -> ShaderModule {
   const auto spirv = readSPIRVFile(filename.string());
   const auto shaderCreateInfo =
       VkShaderModuleCreateInfo{.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
                                .codeSize = 4 * spirv.size(),
                                .pCode = spirv.data()};
-  return ShaderModule{device, shaderCreateInfo};
+  return ShaderModule{device, shaderCreateInfo, debugName};
 }
 
 auto SpirvShaderModuleFactory::readSPIRVFile(const std::string& filename) -> std::vector<uint32_t> {

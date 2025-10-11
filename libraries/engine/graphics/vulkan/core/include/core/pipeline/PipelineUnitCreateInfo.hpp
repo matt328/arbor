@@ -23,12 +23,14 @@ struct PushConstantInfo {
 struct PipelineLayoutInfo {
   std::vector<PushConstantInfo> pushConstantInfoList;
   std::span<VkDescriptorSetLayout> descriptorSetLayouts;
+  std::optional<std::string> debugName = std::nullopt;
 };
 
 struct ShaderStageInfo {
   VkShaderStageFlagBits stage;
   std::string shaderFile;
   std::string entryPoint;
+  std::optional<std::string> debugName = std::nullopt;
 };
 
 struct PipelineCreateInfo {

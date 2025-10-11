@@ -25,22 +25,24 @@ ForwardPass::ForwardPass(const ForwardPassDeps& deps, const ForwardPassConfig& c
   LOG_TRACE_L1(Log::Renderer, "Creating ForwardPass");
 
   const auto pipelineLayoutInfo = PipelineLayoutInfo{
-      .pushConstantInfoList = {
-          PushConstantInfo{.stageFlags = VK_SHADER_STAGE_VERTEX_BIT, .offset = 0, .size = 36}}};
+      .pushConstantInfoList = {PushConstantInfo{.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+                                                .offset = 0,
+                                                .size = 36}},
+      .debugName = "ForwardPipelineLayout"};
 
   const auto vertexStage = ShaderStageInfo{
       .stage = VK_SHADER_STAGE_VERTEX_BIT,
       .shaderFile =
           (std::filesystem::current_path() / "assets" / "shaders" / "forward2.vert.spv").string(),
       .entryPoint = "main",
-  };
+      .debugName = "Forward2Vert"};
 
   const auto fragmentStage = ShaderStageInfo{
       .stage = VK_SHADER_STAGE_FRAGMENT_BIT,
       .shaderFile =
           (std::filesystem::current_path() / "assets" / "shaders" / "forward2.frag.spv").string(),
       .entryPoint = "main",
-  };
+      .debugName = "Forward2Frag"};
 
   const auto pipelineCreateInfo =
       PipelineCreateInfo{.pipelineType = PipelineType::Graphics,
