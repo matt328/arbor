@@ -28,6 +28,7 @@ class BufferSystem;
 class ImageSystem;
 class AllocatorService;
 class TransferSystem;
+class GlobalBufferManager;
 
 struct RenderContextDeps {
   Device& device;
@@ -63,8 +64,10 @@ private:
   std::unique_ptr<BufferSystem> bufferSystem;
   std::unique_ptr<ImageSystem> imageSystem;
   std::unique_ptr<TransferSystem> transferSystem;
+  std::unique_ptr<GlobalBufferManager> globalBufferManager;
 
-  static void registerGeometryAliases(AliasRegistry& aliasRegistry, GeometryStream& geometryStream);
+  static void registerGeometryAliases(AliasRegistry& reg, GeometryStream& gs);
+  static void registerGlobalBufferAliases(AliasRegistry& reg, GlobalBufferManager& gbm);
 };
 
 }

@@ -41,7 +41,7 @@ auto BufferSystem::registerBuffer(const BufferCreateInfo& createInfo) -> BufferH
   const auto [bci, aci] = fromCreateInfo(createInfo);
 
   auto versions = std::deque<std::unique_ptr<Buffer>>{};
-  versions.push_back(Buffer::create(allocatorService, bci, aci, name));
+  versions.push_back(std::make_unique<Buffer>(allocatorService, bci, aci, name));
 
   bufferMap.emplace(handle,
                     std::make_unique<BufferEntry>(BufferEntry{.lifetime = createInfo.bufferLifetime,
@@ -74,6 +74,15 @@ auto BufferSystem::getBuffer(BufferHandle handle) -> Buffer& {
   return getCurrentBuffer(handle);
 }
 
+auto BufferSystem::getPerFrameBuffer(LogicalBufferHandle handle, uint32_t frameIndex) -> Buffer& {
+  auto physicalHandle = bufferMapper->resolveBufferHandle(handle, frameIndex);
+  return getCurrentBuffer(physicalHandle);
+}
+
+auto BufferSystem::resolveHandle(LogicalBufferHandle handle, uint32_t frameIndex) -> BufferHandle {
+  return bufferMapper->resolveBufferHandle(handle, frameIndex);
+}
+
 auto BufferSystem::insert(BufferHandle handle, void* data, const BufferRegion& targetRegion)
     -> std::optional<BufferRegion> {
   std::optional<BufferRegion> region = std::nullopt;
@@ -81,21 +90,20 @@ auto BufferSystem::insert(BufferHandle handle, void* data, const BufferRegion& t
     return region;
   }
 
-  auto buffer = getCurrentBuffer(handle);
+  auto& buffer = getCurrentBuffer(handle);
 
-  assert(isBufferMappable(buffer));
-  if (buffer.mappedData == nullptr) {
-    auto* mappedMemory = allocatorService.mapMemory(buffer.allocation);
+  assert(buffer.isMappable());
+  if (!buffer.isMapped()) {
+    buffer.map();
     assert(data != nullptr);
-    if (targetRegion.offset + targetRegion.size > buffer.bufferMeta.bufferCreateInfo.size) {
-      LOG_WARNING(Log::Core, "Buffer {} Full", buffer.bufferMeta.debugName);
+    if (targetRegion.offset + targetRegion.size > buffer.getSize()) {
+      LOG_WARNING(Log::Core, "Buffer {} Full", buffer.getDebugName());
     }
-    assert(targetRegion.offset + targetRegion.size > buffer.bufferMeta.bufferCreateInfo.size);
+    assert(targetRegion.offset + targetRegion.size > buffer.getSize());
 
-    auto dest2 =
-        std::span{static_cast<std::byte*>(mappedMemory), buffer.bufferMeta.bufferCreateInfo.size};
+    auto dest2 = std::span{static_cast<std::byte*>(buffer.getMappedData()), buffer.getSize()};
     if (targetRegion.offset + targetRegion.size > dest2.size_bytes()) {
-      LOG_WARNING(Log::Core, "Buffer {} Full", buffer.bufferMeta.debugName);
+      LOG_WARNING(Log::Core, "Buffer {} Full", buffer.getDebugName());
       assert(false);
     }
     std::memcpy(dest2.subspan(targetRegion.offset, targetRegion.size).data(),
@@ -160,7 +168,8 @@ void BufferSystem::update() {
       continue;
     }
     auto& versions = entry->versions;
-    std::erase_if(versions, [&](auto& buffer) { return buffer->validToValue <= completedValue; });
+    std::erase_if(versions,
+                  [&](auto& buffer) { return buffer->getValidToValue() <= completedValue; });
   }
 }
 
@@ -175,7 +184,7 @@ auto BufferSystem::getCurrentBuffer(BufferHandle handle) -> Buffer& {
 
   const auto currentValue = transferSystem.getCurrentCopyValue();
   for (const auto& rec : entry->versions | std::ranges::views::reverse) {
-    if (rec->validFromValue <= currentValue && rec->validToValue > currentValue) {
+    if (rec->getValidFromValue() <= currentValue && rec->getValidToValue() > currentValue) {
       return *rec;
     }
   }
@@ -191,7 +200,7 @@ void BufferSystem::prepareResizeJobs(const std::vector<ResizeRequest>& resizeReq
     auto oldBuffer = getCurrentBuffer(resize.bufferHandle);
     LOG_TRACE_L1(Log::Renderer,
                  "Resizing Buffer: {}, newSize={}",
-                 oldBuffer.bufferMeta.debugName,
+                 oldBuffer.getDebugName(),
                  resize.newSize);
     auto newBuffer = createResizedBuffer(oldBuffer, resize.newSize);
     copyPairs.emplace_back(oldBuffer, *newBuffer);
@@ -204,22 +213,22 @@ void BufferSystem::prepareResizeJobs(const std::vector<ResizeRequest>& resizeReq
 
 auto BufferSystem::createResizedBuffer(const Buffer& oldBuffer, size_t newSize)
     -> std::unique_ptr<Buffer> {
-  auto bci = oldBuffer.bufferMeta.bufferCreateInfo;
+  auto bci = oldBuffer.getCreateInfo();
   bci.size = newSize;
-  auto aci = oldBuffer.bufferMeta.allocationCreateInfo;
-  auto newName = bk::strings::incrementVersion(oldBuffer.bufferMeta.debugName);
-  return Buffer::create(allocatorService, bci, aci, newName);
+  auto aci = oldBuffer.getAllocationCreateInfo();
+  auto newName = bk::strings::incrementVersion(oldBuffer.getDebugName());
+  return std::make_unique<Buffer>(allocatorService, bci, aci, newName);
 }
 
 void BufferSystem::finalizeResizeJobs(std::vector<ResizeJob>& jobs, uint64_t completed) {
   for (auto& job : jobs) {
-    job.newBuffer->validFromValue = completed;
-    job.oldBuffer.validToValue = completed;
+    job.newBuffer->setValidFromValue(completed);
+    job.oldBuffer.setValidToValue(completed);
 
     auto& entry = bufferMap.at(job.handle);
     entry->versions.emplace_back(std::move(job.newBuffer));
     entry->currentSize = job.newSize;
-    entry->versions.back()->bufferMeta.bufferCreateInfo.size = job.newSize;
+    entry->versions.back()->setSize(job.newSize);
 
     auto it = allocatorMap.find(job.handle);
     if (it != allocatorMap.end()) {
@@ -270,8 +279,4 @@ auto BufferSystem::fromCreateInfo(const BufferCreateInfo& createInfo)
   return {bci, aci};
 }
 
-auto BufferSystem::isBufferMappable(const Buffer& buffer) const -> bool {
-  const auto memProps = allocatorService.getAllocationMemoryProperties(buffer.allocation);
-  return (memProps & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT) != 0u;
-}
 }

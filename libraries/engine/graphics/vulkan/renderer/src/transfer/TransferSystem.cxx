@@ -50,8 +50,7 @@ auto TransferSystem::submitCopyBatch(const std::vector<std::tuple<Buffer&, Buffe
     auto region = VkBufferCopy2{.sType = VK_STRUCTURE_TYPE_COPY_BUFFER_INFO_2,
                                 .srcOffset = 0,
                                 .dstOffset = 0,
-                                .size = std::min(src.bufferMeta.bufferCreateInfo.size,
-                                                 dst.bufferMeta.bufferCreateInfo.size)};
+                                .size = std::min(src.getSize(), dst.getSize())};
     const auto copyInfo2 = VkCopyBufferInfo2{
         .sType = VK_STRUCTURE_TYPE_COPY_BUFFER_INFO_2,
         .srcBuffer = src,

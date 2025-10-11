@@ -29,13 +29,14 @@ public:
 
   [[nodiscard]] auto getGlobalBuffers() const -> const GlobalBuffers&;
 
-  [[nodiscard]] auto resolve(LogicalBufferHandle handle, uint32_t frameIndex) const -> Buffer&;
+  [[nodiscard]] auto resolve(LogicalBufferHandle handle, uint32_t frameIndex) -> Buffer&;
 
 private:
   BufferSystem& bufferSystem;
   GlobalBuffers globalBuffers;
 
   void createGlobalBuffers();
+  void destroyGlobalBuffers();
 };
 
 }

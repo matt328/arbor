@@ -11,6 +11,7 @@ set(vulkancore_SRC
   src/Image.cxx
   src/ImageView.cxx
   src/CommandBuffer.cxx
+  src/Buffer.cxx
   src/command-buffer/CommandBufferManager.cxx
   src/shader-binding/DSLayout.cxx
 

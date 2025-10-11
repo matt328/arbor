@@ -18,6 +18,7 @@
 #include "FrameManager.hpp"
 #include "FrameRenderer.hpp"
 #include "PerFrameUploader.hpp"
+#include "GlobalBufferManager.hpp"
 #include "framegraph/AliasRegistry.hpp"
 #include "geometry/VirtualGeometryAllocator.hpp"
 #include "transfer/TransferSystem.hpp"
@@ -54,6 +55,9 @@ RenderContext::RenderContext(const EngineOptions& options, const RenderContextDe
 
   geometryAllocator = std::make_unique<VirtualAllocationManager>(*geometryStream);
 
+  globalBufferManager = std::make_unique<GlobalBufferManager>(*bufferSystem);
+  registerGlobalBufferAliases(*aliasRegistry, *globalBufferManager);
+
   perFrameUploader = std::make_unique<PerFrameUploader>(
       PerFrameUploaderDeps{
           .geometryHandleMapper = deps.geometryHandleMapper,
@@ -84,17 +88,26 @@ RenderContext::~RenderContext() {
   LOG_TRACE_L1(Log::Renderer, "Destroying RenderContext");
 }
 
-void RenderContext::registerGeometryAliases(AliasRegistry& aliasRegistry,
-                                            GeometryStream& geometryStream) {
-  aliasRegistry.registerBufferAlias(GlobalBufferAlias::Index, geometryStream.getIndexBuffer());
-  aliasRegistry.registerBufferAlias(GlobalBufferAlias::Position,
-                                    geometryStream.getPositionBuffer());
-  aliasRegistry.registerBufferAlias(GlobalBufferAlias::Color, geometryStream.getColorBuffer());
-  aliasRegistry.registerBufferAlias(GlobalBufferAlias::TexCoord,
-                                    geometryStream.getTexCoordBuffer());
-  aliasRegistry.registerBufferAlias(GlobalBufferAlias::Normal, geometryStream.getNormalBuffer());
-  aliasRegistry.registerBufferAlias(GlobalBufferAlias::Animation,
-                                    geometryStream.getAnimationBuffer());
+void RenderContext::registerGeometryAliases(AliasRegistry& reg, GeometryStream& gs) {
+  reg.registerBufferAlias(GlobalBufferAlias::Index, gs.getIndexBuffer());
+  reg.registerBufferAlias(GlobalBufferAlias::Position, gs.getPositionBuffer());
+  reg.registerBufferAlias(GlobalBufferAlias::Color, gs.getColorBuffer());
+  reg.registerBufferAlias(GlobalBufferAlias::TexCoord, gs.getTexCoordBuffer());
+  reg.registerBufferAlias(GlobalBufferAlias::Normal, gs.getNormalBuffer());
+  reg.registerBufferAlias(GlobalBufferAlias::Animation, gs.getAnimationBuffer());
+}
+
+void RenderContext::registerGlobalBufferAliases(AliasRegistry& reg, GlobalBufferManager& gbm) {
+  reg.registerBufferAlias(BufferAlias::FrameData, gbm.getGlobalBuffers().frameData);
+  reg.registerBufferAlias(BufferAlias::ResourceTable, gbm.getGlobalBuffers().resourceTable);
+  reg.registerBufferAlias(BufferAlias::ObjectData, gbm.getGlobalBuffers().objectData);
+  reg.registerBufferAlias(BufferAlias::ObjectPositions, gbm.getGlobalBuffers().objectPositions);
+  reg.registerBufferAlias(BufferAlias::ObjectRotations, gbm.getGlobalBuffers().objectRotations);
+  reg.registerBufferAlias(BufferAlias::ObjectScales, gbm.getGlobalBuffers().objectScales);
+  reg.registerBufferAlias(BufferAlias::GeometryRegion, gbm.getGlobalBuffers().geometryRegion);
+  reg.registerBufferAlias(BufferAlias::Materials, gbm.getGlobalBuffers().materials);
+  reg.registerBufferAlias(BufferAlias::IndirectCommand, gbm.getGlobalBuffers().drawCommands);
+  reg.registerBufferAlias(BufferAlias::IndirectCommandCount, gbm.getGlobalBuffers().drawCounts);
 }
 
 void RenderContext::renderNextFrame() {

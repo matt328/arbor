@@ -6,6 +6,7 @@
 #include <vulkan/vulkan_core.h>
 
 #include "bk/Log.hpp"
+#include "buffers/BufferHandle.hpp"
 #include "common/ImageCreateDescription.hpp"
 #include "common/ImageLifetime.hpp"
 #include "renderer/Constants.hpp"
@@ -48,8 +49,11 @@ void AliasRegistry::registerBufferAlias(const std::string& alias, const BufferCr
 }
 
 void AliasRegistry::registerBufferAlias(const std::string& alias, BufferHandle handle) {
-  aliasBufferHandleMap[alias].lifetime = BufferLifetime::Persistent;
-  aliasBufferHandleMap[alias].bufferHandles.push_back(handle);
+  aliasBufferHandleMap[alias] = handle;
+}
+
+void AliasRegistry::registerBufferAlias(const std::string& alias, LogicalBufferHandle handle) {
+  aliasLogicalBufferHandleMap[alias] = handle;
 }
 
 void AliasRegistry::buildResources(uint32_t frameCount) {
@@ -85,20 +89,13 @@ void AliasRegistry::buildResources(uint32_t frameCount) {
   }
 
   for (const auto& [alias, spec] : aliasBufferSpecMap) {
-    uint32_t instances = 1;
     switch (spec.bufferLifetime) {
       case BufferLifetime::Persistent:
-        instances = 1;
+        aliasBufferHandleMap[alias] = bufferSystem.registerBuffer(spec);
         break;
       case BufferLifetime::Transient:
-        instances = frameCount;
+        aliasLogicalBufferHandleMap[alias] = bufferSystem.registerPerFrameBuffer(spec, 3);
         break;
-    }
-    aliasBufferHandleMap[alias].bufferHandles.resize(instances);
-    for (uint32_t i = 0; i < instances; ++i) {
-      const auto bufferHandle = bufferSystem.registerBuffer(spec);
-      aliasBufferHandleMap[alias].lifetime = spec.bufferLifetime;
-      aliasBufferHandleMap[alias].bufferHandles[i] = bufferHandle;
     }
   }
 }
@@ -159,14 +156,18 @@ auto AliasRegistry::getImageViewHandle(const std::string& alias, Frame* frame) c
 
 auto AliasRegistry::getBufferHandle(const std::string& alias, const Frame* frame) const
     -> BufferHandle {
-  assert(aliasBufferHandleMap.contains(alias));
-  const auto& entry = aliasBufferHandleMap.at(alias);
-  switch (entry.lifetime) {
-    case BufferLifetime::Persistent:
-      return entry.bufferHandles.front();
-    case arb::BufferLifetime::Transient:
-      assert(frame->getIndex() < entry.bufferHandles.size());
-      return entry.bufferHandles[frame->getIndex()];
+  // One of the maps must have this alias
+  assert(aliasBufferHandleMap.contains(alias) || aliasLogicalBufferHandleMap.contains(alias));
+
+  // Persistent Buffer
+  if (aliasBufferHandleMap.contains(alias)) {
+    return aliasBufferHandleMap.at(alias);
+  }
+
+  // PerFrame Buffer
+  if (aliasLogicalBufferHandleMap.contains(alias)) {
+    const auto logicalHandle = aliasLogicalBufferHandleMap.at(alias);
+    return bufferSystem.resolveHandle(aliasLogicalBufferHandleMap.at(alias), frame->getIndex());
   }
 }
 

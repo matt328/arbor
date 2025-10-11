@@ -56,6 +56,9 @@ public:
 
   auto getBuffer(BufferHandle handle) -> Buffer&;
 
+  auto getPerFrameBuffer(LogicalBufferHandle handle, uint32_t frameIndex) -> Buffer&;
+  auto resolveHandle(LogicalBufferHandle handle, uint32_t frameIndex) -> BufferHandle;
+
   /// Write `data` into a PerFrame buffer, specified by `handle` at the given `BufferRegion`.
   /// This is intended for PerFrame host visible buffers only. Happens synchronously and does not
   /// use a staging buffer or transfer queue.
@@ -98,8 +101,6 @@ private:
   std::unordered_map<BufferHandle, std::unique_ptr<IBufferAllocator>> allocatorMap;
 
   [[nodiscard]] auto getCurrentBuffer(BufferHandle handle) -> Buffer&;
-
-  [[nodiscard]] auto isBufferMappable(const Buffer& buffer) const -> bool;
 
   void prepareResizeJobs(const std::vector<ResizeRequest>& resizeRequests,
                          std::vector<ResizeJob>& jobs,

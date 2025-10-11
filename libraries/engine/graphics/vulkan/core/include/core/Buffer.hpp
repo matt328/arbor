@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/AllocatorService.hpp"
-#include <memory>
+#include <limits>
+#include <optional>
 #include <string>
 #include <vulkan/vulkan_core.h>
 
@@ -19,42 +19,77 @@ struct BufferMeta {
   std::string debugName;
 };
 
-struct Buffer {
-  VkBuffer vkBuffer;
-  BufferMeta bufferMeta;
-  VmaAllocation allocation;
-  void* mappedData = nullptr;
+class AllocatorService;
 
-  uint64_t generation{};
-
-  uint64_t validFromValue{0};
-  uint64_t validToValue{std::numeric_limits<uint64_t>::max()};
-
-  static auto create(AllocatorService& allocatorService,
-                     const VkBufferCreateInfo& bci,
-                     const VmaAllocationCreateInfo& aci,
-                     std::string name) -> std::unique_ptr<Buffer> {
-    VkBuffer vkBuffer{};
-    VmaAllocation vmaAllocation{};
-    VmaAllocationInfo vmaAllocationInfo{};
-    allocatorService.createBuffer(bci, aci, vkBuffer, vmaAllocation, &vmaAllocationInfo);
-
-    return std::make_unique<Buffer>(Buffer{
-        .vkBuffer = vkBuffer,
-        .bufferMeta =
-            BufferMeta{
-                .bufferCreateInfo = bci,
-                .allocationInfo = vmaAllocationInfo,
-                .allocationCreateInfo = aci,
-                .debugName = std::move(name),
-            },
-        .allocation = vmaAllocation,
-    });
-  }
+class Buffer {
+public:
+  Buffer(AllocatorService& newAllocatorService,
+         const VkBufferCreateInfo& bci,
+         const VmaAllocationCreateInfo& aci,
+         const std::optional<std::string>& debugName);
+  ~Buffer();
 
   operator VkBuffer() const noexcept {
-    return vkBuffer;
+    return handle;
   }
+
+  [[nodiscard]] auto getSize() const {
+    return bufferMeta.bufferCreateInfo.size;
+  }
+
+  void setSize(VkDeviceSize size) {
+    bufferMeta.bufferCreateInfo.size = size;
+  }
+
+  [[nodiscard]] auto getValidFromValue() const {
+    return validFromValue;
+  }
+
+  void setValidFromValue(uint64_t value) {
+    validFromValue = value;
+  }
+
+  [[nodiscard]] auto getValidToValue() const {
+    return validToValue;
+  }
+
+  void setValidToValue(uint64_t value) {
+    validToValue = value;
+  }
+
+  [[nodiscard]] auto getMappedData() const {
+    return mappedData;
+  }
+
+  [[nodiscard]] auto getDebugName() const {
+    return bufferMeta.debugName;
+  }
+
+  [[nodiscard]] auto getCreateInfo() const {
+    return bufferMeta.bufferCreateInfo;
+  }
+
+  [[nodiscard]] auto getAllocationCreateInfo() const {
+    return bufferMeta.allocationCreateInfo;
+  }
+
+  [[nodiscard]] auto isMappable() const -> bool;
+
+  void map();
+
+  [[nodiscard]] auto isMapped() const -> bool;
+
+private:
+  AllocatorService& allocatorService;
+  VkBuffer handle{VK_NULL_HANDLE};
+  BufferMeta bufferMeta{};
+  VmaAllocation allocation{VK_NULL_HANDLE};
+  VmaAllocationInfo allocationInfo{};
+  void* mappedData = nullptr;
+
+  uint64_t generation{0};
+  uint64_t validFromValue{0};
+  uint64_t validToValue{std::numeric_limits<uint64_t>::max()};
 };
 
 }

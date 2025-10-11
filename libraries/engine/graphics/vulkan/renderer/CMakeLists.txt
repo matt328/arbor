@@ -6,6 +6,7 @@ set(vulkanrenderer_SRC
   src/PerFrameUploader.cxx
   src/RenderContext.cxx
   src/FrameRenderer.cxx
+  src/GlobalBufferManager.cxx
 
   src/buffers/ArenaAllocator.cxx
   src/buffers/BufferSystem.cxx
