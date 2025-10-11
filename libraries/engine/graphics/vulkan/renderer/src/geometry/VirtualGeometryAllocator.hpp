@@ -2,13 +2,13 @@
 
 #include <optional>
 
-#include "resources/BufferRegion.hpp"
-#include "resources/ResizeRequest.hpp"
+#include "buffers/BufferRegion.hpp"
+#include "buffers/ResizeRequest.hpp"
 #include "engine/common/HandleGenerator.hpp"
-#include "resources/BufferHandle.hpp"
-#include "resources/GeometryData.hpp"
+#include "buffers/BufferHandle.hpp"
+#include "buffers/GeometryData.hpp"
 #include "engine/common/data/gpu/GeometryRegion.hpp"
-#include "resources/GeometryHandle.hpp"
+#include "buffers/GeometryHandle.hpp"
 
 namespace arb {
 

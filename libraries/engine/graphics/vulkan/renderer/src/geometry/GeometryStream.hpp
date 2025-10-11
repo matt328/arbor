@@ -1,15 +1,15 @@
 #pragma once
 
 #include "bk/NonCopyMove.hpp"
-#include "resources/ResizeRequest.hpp"
-#include "resources/BufferHandle.hpp"
-#include "resources/BufferRequest.hpp"
-#include "resources/BufferRegion.hpp"
-#include "resources/GeometryData.hpp"
+#include "buffers/ResizeRequest.hpp"
+#include "buffers/BufferHandle.hpp"
+#include "buffers/BufferRequest.hpp"
+#include "buffers/BufferRegion.hpp"
+#include "buffers/GeometryData.hpp"
 
 namespace arb {
 
-class ResourceSystem;
+class BufferSystem;
 
 // Set these 1 byte larger than the test model so we can force a resize when loading 1 model
 constexpr size_t IndexBufferInitialSize = 45937;
@@ -22,7 +22,7 @@ constexpr size_t AnimationBufferInitialSize = 1024000;
 /// A Facade over all of the individual buffers that store geometry information on the GPU.
 class GeometryStream : public NonCopyableMovable {
 public:
-  explicit GeometryStream(ResourceSystem& newResourceFacade);
+  explicit GeometryStream(BufferSystem& newBufferSystem);
   ~GeometryStream();
 
   [[nodiscard]] auto getIndexBuffer() const -> const BufferHandle& {
@@ -62,7 +62,7 @@ public:
   auto allocateAnimationBuffer(const BufferRequest& bufferRequest) -> BufferRegion;
 
 private:
-  ResourceSystem& resourceSystem;
+  BufferSystem& bufferSystem;
 
   BufferHandle indexBuffer;
   BufferHandle positionBuffer;

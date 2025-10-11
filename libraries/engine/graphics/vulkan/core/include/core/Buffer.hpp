@@ -3,7 +3,6 @@
 #include "core/AllocatorService.hpp"
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include <vulkan/vulkan_core.h>
 
 #pragma clang diagnostic push
@@ -27,7 +26,9 @@ struct Buffer {
   void* mappedData = nullptr;
 
   uint64_t generation{};
-  std::unordered_map<VkSemaphore, uint64_t> pendingValues;
+
+  uint64_t validFromValue{0};
+  uint64_t validToValue{std::numeric_limits<uint64_t>::max()};
 
   static auto create(AllocatorService& allocatorService,
                      const VkBufferCreateInfo& bci,

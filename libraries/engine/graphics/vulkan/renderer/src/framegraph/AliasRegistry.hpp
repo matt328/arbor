@@ -9,17 +9,21 @@
 #include "common/ImageLifetime.hpp"
 #include "core/Swapchain.hpp"
 #include "common/BufferCreateInfo.hpp"
-#include "resources/BufferHandle.hpp"
+#include "buffers/BufferHandle.hpp"
 #include "core/Image.hpp"
 #include "core/ImageHandle.hpp"
-#include "resources/ResourceSystem.hpp"
+#include "core/Buffer.hpp"
+#include "images/ImageViewSpec.hpp"
 
 namespace arb {
 
 class Frame;
+class BufferSystem;
+class ImageSystem;
 
 struct AliasRegistryDeps {
-  ResourceSystem& resourceSystem;
+  BufferSystem& bufferSystem;
+  ImageSystem& imageSystem;
   Swapchain& swapchain;
 };
 
@@ -54,7 +58,8 @@ public:
   void logAliases() const;
 
 private:
-  ResourceSystem& resourceSystem;
+  BufferSystem& bufferSystem;
+  ImageSystem& imageSystem;
   Swapchain& swapchain;
 
   [[nodiscard]] auto getSwapchainImage(uint32_t index) const -> Image&;

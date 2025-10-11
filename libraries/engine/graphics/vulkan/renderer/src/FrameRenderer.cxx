@@ -65,7 +65,7 @@ void FrameRenderer::renderNextFrame() {
 
   auto* frame = *frameResult;
 
-  perFrameUploader.upload();
+  perFrameUploader.upload(frame);
 
   auto results = frameGraph.execute(frame);
 

@@ -2,8 +2,10 @@
 
 #include <string>
 
-#include "resources/BufferRegion.hpp"
-#include "IBufferAllocator.hpp"
+#include "buffers/BufferRegion.hpp"
+#include "buffers/IBufferAllocator.hpp"
+#include "buffers/BufferHandle.hpp"
+#include "buffers/BufferRequest.hpp"
 
 namespace arb {
 

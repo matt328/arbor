@@ -1,16 +1,15 @@
 #include "vulkan/base/VulkanContext.hpp"
 
-#include <thread>
+#include <stop_token>
 #include "Tracy.hpp"
 #include <memory>
 
 #include "bk/Log.hpp"
 #include "bk/IEventQueue.hpp"
+#include "common/HandleMapperTypes.hpp"
 #include "core/CoreContext.hpp"
 #include "engine/common/SimState.hpp"
 #include "renderer/RenderContext.hpp"
-#include "resources/ResourceContext.hpp"
-#include "common/SemaphorePack.hpp"
 #include "assets/AssetContext.hpp"
 
 namespace arb {
@@ -24,15 +23,9 @@ VulkanContext::VulkanContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
 
   // TODO: Consider promoting to a SharedContext if too many of these start to accumulate here
   geometryHandleMapper = std::make_unique<GeometryHandleMapper>();
+  textureHandleMapper = std::make_unique<TextureHandleMapper>();
 
   coreContext = std::make_shared<CoreContext>(eventQueue, newOptions, newWindowHandle);
-
-  resourceContext = std::make_unique<ResourceContext>(
-      coreContext->getDevice(),
-      coreContext->getAllocatorService(),
-      SemaphorePack{.graphics = coreContext->getGraphicsSemaphore(),
-                    .transfer = coreContext->getTransferSemaphore(),
-                    .compute = coreContext->getComputeSemaphore()});
 
   renderContext = std::make_unique<RenderContext>(
       newOptions,
@@ -40,10 +33,11 @@ VulkanContext::VulkanContext(std::shared_ptr<bk::IEventQueue> newEventQueue,
                         .swapchain = coreContext->getSwapchain(),
                         .simStateBuffer = simStateBuffer,
                         .geometryHandleMapper = *geometryHandleMapper,
+                        .textureHandleMapper = *textureHandleMapper,
                         .commandBufferManager = coreContext->getCommandBufferManager(),
-                        .resourceSystem = resourceContext->getResourceFacade(),
                         .pipelineManager = coreContext->getPipelineManager(),
-                        .eventQueue = *eventQueue});
+                        .eventQueue = *eventQueue,
+                        .allocatorService = coreContext->getAllocatorService()});
 
   assetContext = std::make_unique<AssetContext>();
 }

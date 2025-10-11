@@ -3,13 +3,15 @@
 #include "ResourceAliases.hpp"
 #include "bk/Log.hpp"
 
+#include "buffers/BufferSystem.hpp"
+#include "images/ImageSystem.hpp"
+
 #include "core/Device.hpp"
 #include "core/Swapchain.hpp"
 #include "core/command-buffers/CommandBufferManager.hpp"
 #include "engine/common/EngineOptions.hpp"
 #include "engine/common/RenderSurfaceState.hpp"
 #include "geometry/GeometryStream.hpp"
-#include "resources/ResourceSystem.hpp"
 
 #include "framegraph/FrameGraph.hpp"
 
@@ -17,29 +19,48 @@
 #include "FrameRenderer.hpp"
 #include "PerFrameUploader.hpp"
 #include "framegraph/AliasRegistry.hpp"
-#include "geometry/GeometryStream.hpp"
+#include "geometry/VirtualGeometryAllocator.hpp"
+#include "transfer/TransferSystem.hpp"
 
 namespace arb {
 
 // Pass eventQueue in here and subscribe to resize events and call method on frameRenderer and let
 // it call resize on frameGraph
 RenderContext::RenderContext(const EngineOptions& options, const RenderContextDeps& deps)
-    : device{deps.device},
-      swapchain{deps.swapchain},
-      pipelineManager{deps.pipelineManager},
-      resourceSystem{deps.resourceSystem} {
+    : device{deps.device}, swapchain{deps.swapchain}, pipelineManager{deps.pipelineManager} {
   LOG_TRACE_L1(Log::Renderer, "Creating RenderContext");
 
   frameManager = std::make_unique<FrameManager>(options, device, swapchain);
 
-  perFrameUploader =
-      std::make_unique<PerFrameUploader>(deps.simStateBuffer, deps.geometryHandleMapper);
+  transferSystem = std::make_unique<TransferSystem>(TransferSystemDeps{
+      .device = device,
+      .commandBufferManager = deps.commandBufferManager,
+  });
 
-  aliasRegistry = std::make_unique<AliasRegistry>(
-      AliasRegistryDeps{.resourceSystem = deps.resourceSystem, .swapchain = swapchain});
+  bufferSystem = std::make_unique<BufferSystem>(BufferSystemDeps{
+      .device = device,
+      .allocatorService = deps.allocatorService,
+      .transferSystem = *transferSystem,
+  });
 
-  geometryStream = std::make_unique<GeometryStream>(deps.resourceSystem);
+  imageSystem = std::make_unique<ImageSystem>(device, deps.allocatorService);
+
+  aliasRegistry = std::make_unique<AliasRegistry>(AliasRegistryDeps{.bufferSystem = *bufferSystem,
+                                                                    .imageSystem = *imageSystem,
+                                                                    .swapchain = swapchain});
+
+  geometryStream = std::make_unique<GeometryStream>(*bufferSystem);
   registerGeometryAliases(*aliasRegistry, *geometryStream);
+
+  geometryAllocator = std::make_unique<VirtualAllocationManager>(*geometryStream);
+
+  perFrameUploader = std::make_unique<PerFrameUploader>(
+      PerFrameUploaderDeps{
+          .geometryHandleMapper = deps.geometryHandleMapper,
+          .textureHandleMapper = deps.textureHandleMapper,
+          .allocationManager = *geometryAllocator,
+      },
+      PerFrameUploaderConfig{.stateBuffer = deps.simStateBuffer});
 
   frameGraph = std::make_unique<FrameGraph>(
       FrameGraphDeps{.commandBufferManager = deps.commandBufferManager,
@@ -56,7 +77,7 @@ RenderContext::RenderContext(const EngineOptions& options, const RenderContextDe
                         .frameGraph = *frameGraph},
       FrameRendererCreateInfo{.renderSurfaceState = options.initialSurfaceState});
   frameRenderer->setOnSwapchainResized(
-      [&](RenderSurfaceState state) { resourceSystem.resize(state); });
+      [&](RenderSurfaceState state) { imageSystem->resize(state); });
 }
 
 RenderContext::~RenderContext() {

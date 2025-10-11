@@ -48,6 +48,9 @@ public:
       -> void;
   auto getImageTransitionInfo(uint8_t index) -> std::vector<ImageTransitionInfo>;
 
+  void setObjectCount(uint8_t index, uint32_t newObjectCount);
+  auto getObjectCount(uint8_t index) -> uint32_t;
+
 private:
   static constexpr uint8_t FramesInFlight = 3;
 
@@ -64,6 +67,7 @@ private:
   std::vector<std::unordered_map<std::string, LastImageUse>> lastImageUses;
   std::vector<std::unordered_map<std::string, LastBufferUse>> lastBufferUses;
   std::vector<std::vector<ImageTransitionInfo>> imageTransitionInfo;
+  std::vector<uint32_t> objectCount;
 };
 
 }

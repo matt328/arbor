@@ -3,10 +3,10 @@
 #include <optional>
 
 #include "bk/NonCopyMove.hpp"
-#include "resources/BufferHandle.hpp"
-#include "resources/ResizeRequest.hpp"
-#include "resources/BufferRegion.hpp"
-#include "resources/BufferRequest.hpp"
+#include "buffers/BufferHandle.hpp"
+#include "buffers/ResizeRequest.hpp"
+#include "buffers/BufferRegion.hpp"
+#include "buffers/BufferRequest.hpp"
 
 namespace arb {
 

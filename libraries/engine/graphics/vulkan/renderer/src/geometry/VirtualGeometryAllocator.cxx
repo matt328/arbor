@@ -1,6 +1,8 @@
 #include "VirtualGeometryAllocator.hpp"
 
 #include "bk/Log.hpp"
+#include "buffers/GeometryHandle.hpp"
+#include "engine/common/data/gpu/GeometryRegion.hpp"
 #include "geometry/GeometryStream.hpp"
 
 namespace arb {
@@ -85,6 +87,11 @@ auto VirtualAllocationManager::buildAllocationPlan(const GeometryData& data) -> 
   const auto handle = regionGenerator.requestHandle();
   // regionTable.try_emplace(handle, geometryRegion);
   return {.regionHandle = handle, .bufferAllocations = uploadList};
+}
+
+auto VirtualAllocationManager::getRegionData(GeometryRegionHandle handle) const
+    -> gpu::GeometryRegion {
+  return gpu::GeometryRegion{};
 }
 
 }

@@ -7,6 +7,11 @@ set(vulkanrenderer_SRC
   src/RenderContext.cxx
   src/FrameRenderer.cxx
 
+  src/buffers/ArenaAllocator.cxx
+  src/buffers/BufferSystem.cxx
+  src/buffers/LinearAllocator.cxx
+  src/buffers/LogicalBufferMapper.cxx
+
   src/framegraph/FrameGraph.cxx
   src/framegraph/AliasRegistry.cxx
 
@@ -17,6 +22,16 @@ set(vulkanrenderer_SRC
   src/geometry/VirtualGeometryAllocator.cxx
   src/geometry/VirtualGeometryAllocator.cxx
   src/geometry/GeometryStream.cxx
+
+  src/images/ImageManager.cxx
+  src/images/ImageSystem.cxx
+  src/images/ImageViewManager.cxx
+  src/images/LogicalImageAllocator.cxx
+  src/images/LogicalImageViewAllocator.cxx
+  src/images/Sampler.cxx
+  src/images/SamplerManager.cxx
+
+  src/transfer/TransferSystem.cxx
 )
 
 add_library(${PROJECT_NAME} STATIC ${vulkanrenderer_SRC})
@@ -36,7 +51,6 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
   PRIVATE
   base-kit
-  vulkan::resources
   vulkan::common
   vulkan::core
   graphics::common

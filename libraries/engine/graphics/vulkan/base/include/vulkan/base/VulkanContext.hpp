@@ -8,7 +8,6 @@ namespace arb {
 
 class CoreContext;
 class RenderContext;
-class ResourceContext;
 class AssetContext;
 
 class VulkanContext : public IGraphicsContext {
@@ -25,8 +24,8 @@ private:
   std::shared_ptr<bk::IEventQueue> eventQueue;
   std::shared_ptr<CoreContext> coreContext;
   std::unique_ptr<GeometryHandleMapper> geometryHandleMapper;
+  std::unique_ptr<TextureHandleMapper> textureHandleMapper;
   std::unique_ptr<RenderContext> renderContext;
-  std::unique_ptr<ResourceContext> resourceContext;
   std::unique_ptr<AssetContext> assetContext;
 
   static const uint32_t MaxFrameTime = 250;

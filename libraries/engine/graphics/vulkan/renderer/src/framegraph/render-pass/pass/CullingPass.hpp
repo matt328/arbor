@@ -4,7 +4,7 @@
 #include "engine/common/RenderSurfaceState.hpp"
 #include "framegraph/AliasRegistry.hpp"
 #include "framegraph/render-pass/IRenderPass.hpp"
-#include "resources/BufferHandle.hpp"
+#include "buffers/BufferHandle.hpp"
 
 namespace arb {
 

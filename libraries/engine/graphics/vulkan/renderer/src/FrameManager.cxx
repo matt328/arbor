@@ -26,6 +26,7 @@ FrameManager::FrameManager(const EngineOptions& options, Device& newDevice, Swap
   lastImageUses.reserve(FramesInFlight);
   lastBufferUses.reserve(FramesInFlight);
   imageTransitionInfo.reserve(FramesInFlight);
+  objectCount.reserve(FramesInFlight);
 
   for (uint8_t i = 0; i < FramesInFlight; ++i) {
     const auto fenceName = std::format("Fence-InFlight-Frame-{}", i);
@@ -45,6 +46,7 @@ FrameManager::FrameManager(const EngineOptions& options, Device& newDevice, Swap
     lastImageUses.emplace_back();
     lastBufferUses.emplace_back();
     imageTransitionInfo.emplace_back();
+    objectCount.emplace_back();
 
     frames.push_back(std::make_unique<Frame>(this, i));
   }
@@ -153,6 +155,14 @@ auto FrameManager::setImageTransitionInfo(uint8_t index,
 
 auto FrameManager::getImageTransitionInfo(uint8_t index) -> std::vector<ImageTransitionInfo> {
   return imageTransitionInfo[index];
+}
+
+void FrameManager::setObjectCount(uint8_t index, uint32_t newObjectCount) {
+  objectCount[index] = newObjectCount;
+}
+
+auto FrameManager::getObjectCount(uint8_t index) -> uint32_t {
+  return objectCount[index];
 }
 
 }

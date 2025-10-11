@@ -21,7 +21,6 @@ target_link_libraries(${PROJECT_NAME}
   engine::common
   vulkan::renderer
   vulkan::common
-  vulkan::resources
   vulkan::assets
   ${TRACY_LIB}
 )

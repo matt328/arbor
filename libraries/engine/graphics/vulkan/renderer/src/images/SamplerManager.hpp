@@ -4,7 +4,7 @@
 #include "core/Device.hpp"
 #include "engine/common/HandleGenerator.hpp"
 #include "core/ImageHandle.hpp"
-#include "resources/images/Sampler.hpp"
+#include "images/Sampler.hpp"
 
 #include <string>
 

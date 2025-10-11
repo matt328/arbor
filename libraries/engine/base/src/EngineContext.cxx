@@ -33,8 +33,8 @@ EngineContext::EngineContext(bk::NativeWindowHandle newWindowHandle, EngineOptio
   });
 
   graphicsThread = std::jthread([this, engineOptions](std::stop_token token) {
-    SetThreadDescription(GetCurrentThread(), L"Graphics");
     try {
+      SetThreadDescription(GetCurrentThread(), L"Graphics");
       LOG_TRACE_L1(Log::Core, "Graphics Thread Started");
       auto graphicsContext = makeGraphicsContext(
           eventQueue,
@@ -46,6 +46,10 @@ EngineContext::EngineContext(bk::NativeWindowHandle newWindowHandle, EngineOptio
       graphicsContext->run(token);
     } catch (const std::exception& e) {
       LOG_ERROR(Log::Core, "Caught GraphicsThread Exception");
+      engineError = std::current_exception();
+      requestStop();
+    } catch (...) {
+      LOG_ERROR(Log::Core, "Caught unknown exception in GraphicsThread");
       engineError = std::current_exception();
       requestStop();
     }

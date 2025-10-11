@@ -64,6 +64,14 @@ public:
     return frameManager->getImageTransitionInfo(index);
   }
 
+  void setObjectCount(uint32_t newObjectCount) {
+    frameManager->setObjectCount(index, newObjectCount);
+  }
+
+  auto getObjectCount() -> uint32_t {
+    return frameManager->getObjectCount(index);
+  }
+
 private:
   uint8_t index;
   FrameManager* frameManager;

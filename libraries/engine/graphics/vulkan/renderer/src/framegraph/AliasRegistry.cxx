@@ -11,11 +11,13 @@
 #include "renderer/Constants.hpp"
 #include "Frame.hpp"
 #include "common/BufferCreateInfo.hpp"
+#include "buffers/BufferSystem.hpp"
+#include "images/ImageSystem.hpp"
 
 namespace arb {
 
 AliasRegistry::AliasRegistry(const AliasRegistryDeps& deps)
-    : resourceSystem{deps.resourceSystem}, swapchain{deps.swapchain} {
+    : bufferSystem{deps.bufferSystem}, imageSystem{deps.imageSystem}, swapchain{deps.swapchain} {
   LOG_TRACE_L1(Log::Renderer, "Creating AliasRegistry");
 }
 
@@ -70,12 +72,12 @@ void AliasRegistry::buildResources(uint32_t frameCount) {
     aliasImageHandleMap[alias].imageHandles.resize(instances);
     for (uint32_t i = 0; i < instances; ++i) {
 
-      const auto imgHandle = resourceSystem.createImage(spec);
+      const auto imgHandle = imageSystem.createImage(spec);
       aliasImageHandleMap[alias].lifetime = spec.imageLifetime;
       aliasImageHandleMap[alias].imageHandles[i] = imgHandle;
 
       const auto imageViewSpec = createImageViewSpec(imgHandle, spec);
-      const auto imageViewHandle = resourceSystem.createImageView(imageViewSpec);
+      const auto imageViewHandle = imageSystem.createImageView(imageViewSpec);
 
       aliasImageViewMap[alias].lifetime = spec.imageLifetime;
       aliasImageViewMap[alias].imageViewHandles[i] = imageViewHandle;
@@ -94,7 +96,7 @@ void AliasRegistry::buildResources(uint32_t frameCount) {
     }
     aliasBufferHandleMap[alias].bufferHandles.resize(instances);
     for (uint32_t i = 0; i < instances; ++i) {
-      const auto bufferHandle = resourceSystem.createBuffer(spec);
+      const auto bufferHandle = bufferSystem.registerBuffer(spec);
       aliasBufferHandleMap[alias].lifetime = spec.bufferLifetime;
       aliasBufferHandleMap[alias].bufferHandles[i] = bufferHandle;
     }
@@ -106,7 +108,7 @@ auto AliasRegistry::getImage(const std::string& alias, Frame* frame) const -> co
     return getSwapchainImage(frame->getSwapchainImageIndex());
   }
   const auto imgHandle = getImageHandle(alias, frame);
-  return resourceSystem.getImage(imgHandle);
+  return imageSystem.getImage(imgHandle);
 }
 
 auto AliasRegistry::getImageHandle(const std::string& alias, Frame* frame) const -> ImageHandle {
@@ -157,24 +159,20 @@ auto AliasRegistry::getImageViewHandle(const std::string& alias, Frame* frame) c
 
 auto AliasRegistry::getBufferHandle(const std::string& alias, const Frame* frame) const
     -> BufferHandle {
-  if (aliasBufferHandleMap.contains(alias)) {
-    const auto& entry = aliasBufferHandleMap.at(alias);
-    switch (entry.lifetime) {
-      case BufferLifetime::Persistent:
-        return entry.bufferHandles.front();
-      case arb::BufferLifetime::Transient:
-        assert(frame->getIndex() < entry.bufferHandles.size());
-        return entry.bufferHandles[frame->getIndex()];
-    }
+  assert(aliasBufferHandleMap.contains(alias));
+  const auto& entry = aliasBufferHandleMap.at(alias);
+  switch (entry.lifetime) {
+    case BufferLifetime::Persistent:
+      return entry.bufferHandles.front();
+    case arb::BufferLifetime::Transient:
+      assert(frame->getIndex() < entry.bufferHandles.size());
+      return entry.bufferHandles[frame->getIndex()];
   }
-  LOG_ERROR(Log::Core, "throwing cpptrace");
-  // throw cpptrace::logic_error(std::format("Requested alias has not been registered: {}", alias));
-  return BufferHandle{};
 }
 
 auto AliasRegistry::getBuffer(const std::string& alias, const Frame* frame) const -> Buffer& {
   const auto bufferHandle = getBufferHandle(alias, frame);
-  return resourceSystem.getBuffer(bufferHandle);
+  return bufferSystem.getBuffer(bufferHandle);
 }
 
 auto AliasRegistry::getAttachmentInfo(const std::string& alias,
@@ -190,7 +188,7 @@ auto AliasRegistry::getAttachmentInfo(const std::string& alias,
       return swapchain.getImageView(frame->getSwapchainImageIndex());
     }
     const auto& imageViewHandle = getImageViewHandle(alias, frame);
-    return resourceSystem.getImageView(imageViewHandle);
+    return imageSystem.getImageView(imageViewHandle);
   };
 
   const auto& vkView = getView();

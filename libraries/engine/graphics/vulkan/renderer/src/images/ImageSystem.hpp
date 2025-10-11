@@ -12,7 +12,7 @@
 #include "core/Image.hpp"
 #include "core/ImageHandle.hpp"
 #include "engine/common/RenderSurfaceState.hpp"
-#include "resources/images/Sampler.hpp"
+#include "images/Sampler.hpp"
 
 namespace arb {
 

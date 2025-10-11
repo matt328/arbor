@@ -3,43 +3,44 @@
 #include <glm/glm.hpp>
 
 #include "bk/Log.hpp"
-#include "resources/ResourceSystem.hpp"
+
+#include "buffers/BufferSystem.hpp"
 
 namespace arb {
 
-GeometryStream::GeometryStream(ResourceSystem& newResourceFacade)
-    : resourceSystem{newResourceFacade},
-      indexBuffer{resourceSystem.createBuffer(
+GeometryStream::GeometryStream(BufferSystem& newBufferSystem)
+    : bufferSystem{newBufferSystem},
+      indexBuffer{bufferSystem.registerBuffer(
           BufferCreateInfo{.allocationStrategy = AllocationStrategy::Arena,
                            .bufferLifetime = BufferLifetime::Persistent,
                            .initialSize = IndexBufferInitialSize,
                            .itemStride = sizeof(uint32_t),
                            .debugName = "Buffer-GeometryIndex"})},
-      positionBuffer{resourceSystem.createBuffer(
+      positionBuffer{bufferSystem.registerBuffer(
           BufferCreateInfo{.allocationStrategy = AllocationStrategy::Arena,
                            .bufferLifetime = BufferLifetime::Persistent,
                            .initialSize = PositionBufferInitialSize,
                            .itemStride = sizeof(glm::vec3),
                            .debugName = "Buffer-GeometryPosition"})},
-      colorBuffer{resourceSystem.createBuffer(
+      colorBuffer{bufferSystem.registerBuffer(
           BufferCreateInfo{.allocationStrategy = AllocationStrategy::Arena,
                            .bufferLifetime = BufferLifetime::Persistent,
                            .initialSize = ColorBufferInitialSize,
                            .itemStride = sizeof(glm::vec4),
                            .debugName = "Buffer-GeometryColors"})},
-      texCoordBuffer{resourceSystem.createBuffer(
+      texCoordBuffer{bufferSystem.registerBuffer(
           BufferCreateInfo{.allocationStrategy = AllocationStrategy::Arena,
                            .bufferLifetime = BufferLifetime::Persistent,
                            .initialSize = TexCoordBufferInitialSize,
                            .itemStride = sizeof(glm::vec2),
                            .debugName = "Buffer-GeometryTexCoords"})},
-      normalBuffer{resourceSystem.createBuffer(
+      normalBuffer{bufferSystem.registerBuffer(
           BufferCreateInfo{.allocationStrategy = AllocationStrategy::Arena,
                            .bufferLifetime = BufferLifetime::Persistent,
                            .initialSize = NormalBufferInitialSize,
                            .itemStride = sizeof(glm::vec3),
                            .debugName = "Buffer-GeometryNormal"})},
-      animationBuffer{resourceSystem.createBuffer(
+      animationBuffer{bufferSystem.registerBuffer(
           BufferCreateInfo{.allocationStrategy = AllocationStrategy::Arena,
                            .bufferLifetime = BufferLifetime::Persistent,
                            .initialSize = AnimationBufferInitialSize,
@@ -59,7 +60,7 @@ auto GeometryStream::checkSizes(const GeometryData& data) -> std::vector<ResizeR
     if (size == 0) {
       return;
     }
-    if (auto maybe = resourceSystem.checkBufferSize(handle, size)) {
+    if (auto maybe = bufferSystem.checkSize(handle, size)) {
       resizes.push_back(*maybe);
     }
   };
@@ -76,32 +77,32 @@ auto GeometryStream::checkSizes(const GeometryData& data) -> std::vector<ResizeR
 
 auto GeometryStream::allocate(BufferHandle handle, const BufferRequest& bufferRequest)
     -> BufferRegion {
-  return resourceSystem.allocateInBuffer(handle, bufferRequest.size);
+  return bufferSystem.allocate(handle, bufferRequest.size);
 };
 
 /// Allocates space in the existing index buffer
 auto GeometryStream::allocateIndexBuffer(const BufferRequest& bufferRequest) -> BufferRegion {
-  return resourceSystem.allocateInBuffer(indexBuffer, bufferRequest.size);
+  return bufferSystem.allocate(indexBuffer, bufferRequest.size);
 }
 
 auto GeometryStream::allocatePositionBuffer(const BufferRequest& bufferRequest) -> BufferRegion {
-  return resourceSystem.allocateInBuffer(positionBuffer, bufferRequest.size);
+  return bufferSystem.allocate(positionBuffer, bufferRequest.size);
 }
 
 auto GeometryStream::allocateColorBuffer(const BufferRequest& bufferRequest) -> BufferRegion {
-  return resourceSystem.allocateInBuffer(colorBuffer, bufferRequest.size);
+  return bufferSystem.allocate(colorBuffer, bufferRequest.size);
 }
 
 auto GeometryStream::allocateTexCoordBuffer(const BufferRequest& bufferRequest) -> BufferRegion {
-  return resourceSystem.allocateInBuffer(texCoordBuffer, bufferRequest.size);
+  return bufferSystem.allocate(texCoordBuffer, bufferRequest.size);
 }
 
 auto GeometryStream::allocateNormalBuffer(const BufferRequest& bufferRequest) -> BufferRegion {
-  return resourceSystem.allocateInBuffer(normalBuffer, bufferRequest.size);
+  return bufferSystem.allocate(normalBuffer, bufferRequest.size);
 }
 
 auto GeometryStream::allocateAnimationBuffer(const BufferRequest& bufferRequest) -> BufferRegion {
-  return resourceSystem.allocateInBuffer(animationBuffer, bufferRequest.size);
+  return bufferSystem.allocate(animationBuffer, bufferRequest.size);
 }
 
 }

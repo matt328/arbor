@@ -18,22 +18,27 @@ class Frame;
 class PerFrameUploader;
 class FrameGraph;
 class CommandBufferManager;
-class ResourceSystem;
 class AliasRegistry;
 class FrameGraph;
 struct FrameGraphResult;
 class FrameRenderer;
 class GeometryStream;
+class VirtualAllocationManager;
+class BufferSystem;
+class ImageSystem;
+class AllocatorService;
+class TransferSystem;
 
 struct RenderContextDeps {
   Device& device;
   Swapchain& swapchain;
   IStateBuffer<SimState>& simStateBuffer;
   GeometryHandleMapper& geometryHandleMapper;
+  TextureHandleMapper& textureHandleMapper;
   CommandBufferManager& commandBufferManager;
-  ResourceSystem& resourceSystem;
   PipelineManager& pipelineManager;
   bk::IEventQueue& eventQueue;
+  AllocatorService& allocatorService;
 };
 
 class RenderContext : public NonCopyableMovable {
@@ -47,7 +52,6 @@ private:
   Device& device;
   Swapchain& swapchain;
   PipelineManager& pipelineManager;
-  ResourceSystem& resourceSystem;
   bool resizePending{false};
   std::unique_ptr<FrameManager> frameManager;
   std::unique_ptr<PerFrameUploader> perFrameUploader;
@@ -55,6 +59,10 @@ private:
   std::unique_ptr<FrameGraph> frameGraph;
   std::unique_ptr<FrameRenderer> frameRenderer;
   std::unique_ptr<GeometryStream> geometryStream;
+  std::unique_ptr<VirtualAllocationManager> geometryAllocator;
+  std::unique_ptr<BufferSystem> bufferSystem;
+  std::unique_ptr<ImageSystem> imageSystem;
+  std::unique_ptr<TransferSystem> transferSystem;
 
   static void registerGeometryAliases(AliasRegistry& aliasRegistry, GeometryStream& geometryStream);
 };

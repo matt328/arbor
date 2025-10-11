@@ -1,4 +1,4 @@
-#include "resources/images/Sampler.hpp"
+#include "Sampler.hpp"
 
 #include "bk/Log.hpp"
 #include "common/ErrorUtils.hpp"

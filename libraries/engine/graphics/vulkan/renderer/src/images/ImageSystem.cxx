@@ -1,12 +1,11 @@
-#include "resources/images/ImageSystem.hpp"
-
-#include "LogicalImageAllocator.hpp"
-#include "LogicalImageViewAllocator.hpp"
+#include "images/ImageSystem.hpp"
+#include "images/LogicalImageAllocator.hpp"
+#include "images/LogicalImageViewAllocator.hpp"
 
 #include "bk/Log.hpp"
-#include "ImageManager.hpp"
-#include "ImageViewManager.hpp"
-#include "SamplerManager.hpp"
+#include "images/ImageManager.hpp"
+#include "images/ImageViewManager.hpp"
+#include "images/SamplerManager.hpp"
 
 #include <vulkan/vulkan_core.h>
 

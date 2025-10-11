@@ -1,6 +1,6 @@
 #pragma once
 
-#include "resources/BufferHandle.hpp"
+#include "buffers/BufferHandle.hpp"
 
 namespace arb {
 
