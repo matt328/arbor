@@ -1,0 +1,22 @@
+BasedOnStyle: Microsoft
+PointerAlignment: Left
+Standard: c++17
+AlwaysBreakTemplateDeclarations: Yes
+NamespaceIndentation: None
+ForEachMacros: [TEST_CLASS, TEST_METHOD]
+IndentWidth: 2
+IndentCaseLabels: true
+
+BinPackArguments: false
+BinPackParameters: false
+ExperimentalAutoDetectBinPacking: false
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowAllArgumentsOnNextLine: false
+
+BreakBeforeBraces: Attach
+AllowShortBlocksOnASingleLine: Always
+ColumnLimit: 100
+FixNamespaceComments: false
+SortIncludes: Never
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+InsertNewlineAtEOF: true

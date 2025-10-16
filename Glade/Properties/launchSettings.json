@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Glade (Package)": {
+      "commandName": "MsixPackage",
+      "nativeDebugging": true
+    },
+    "Glade (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

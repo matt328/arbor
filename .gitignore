@@ -1,0 +1,74 @@
+# =====================
+# Visual Studio / IDE
+# =====================
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# =====================
+# Build outputs
+# =====================
+[Bb]in/
+[Oo]bj/
+Debug*/
+Release*/
+x64/
+x86/
+build/
+
+# =====================
+# C++ specific
+# =====================
+*.idb
+*.pdb
+*.ipch
+*.iobj
+*.iuser
+*.iuserlist
+*.aps
+*.ncb
+*.sdf
+*.cache
+*.VC.db
+*.VC.VC.opendb
+
+# =====================
+# C# / NuGet
+# =====================
+*.dll
+*.exe
+*.app
+*.cache
+*.config
+*.log
+packages/
+*.nupkg
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# =====================
+# WinUI / UWP / XAML
+# =====================
+Generated Files/
+*.xaml.cs
+
+# =====================
+# vcpkg (if submoduled, keep the submodule folder but ignore installed binaries)
+# =====================
+vcpkg/installed/
+vcpkg/buildtrees/
+vcpkg/packages/
+vcpkg/downloads/
+
+# =====================
+# Misc / temp
+# =====================
+*.swp
+*.tmp
+*.bak
+*.orig
+*.log
+*.DS_Store
