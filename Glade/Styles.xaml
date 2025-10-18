@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="using:Glade">
+  <Style x:Key="LogTextStyle"
+         TargetType="TextBlock">
+    <Setter Property="FontFamily"
+            Value="JetBrainsMono NF" />
+    <Setter Property="FontSize"
+            Value="15" />
+    <Setter Property="FontWeight"
+            Value="Normal" />
+  </Style>
+</ResourceDictionary>

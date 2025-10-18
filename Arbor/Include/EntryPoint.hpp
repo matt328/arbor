@@ -14,7 +14,8 @@ namespace Arbor {
 class EngineContext;
 
 ARBOR_API void initialize();
-
+ARBOR_API void initializeLogging();
+ARBOR_API void registerLogCallback(void (*callback)(int, const wchar_t*));
 ARBOR_API void shutdown();
 
 }

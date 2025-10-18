@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl x:Class="Glade.Controls.LogViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:Glade.Logging"
+             xmlns:local2="using:Glade.Converters"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             d:DataContext="{d:DesignInstance Type=local:LogStore}"
+             mc:Ignorable="d">
+  <UserControl.Resources>
+    <local2:LogLevelToBrush x:Key="LogLevelToBrush" />
+  </UserControl.Resources>
+  <ItemsRepeater ItemsSource="{x:Bind LogStore.Entries, Mode=OneWay}">
+    <ItemsRepeater.ItemTemplate>
+      <DataTemplate x:DataType="local:LogEntry">
+        <TextBlock Text="{x:Bind Message}"
+                   Foreground="{x:Bind Level, Converter={StaticResource LogLevelToBrush}}"
+                   Style="{StaticResource LogTextStyle}" />
+      </DataTemplate>
+    </ItemsRepeater.ItemTemplate>
+  </ItemsRepeater>
+</UserControl>

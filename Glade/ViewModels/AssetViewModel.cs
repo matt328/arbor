@@ -1,4 +1,5 @@
-﻿using Glade.Store;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Glade.Store;
 using System;
 
 namespace Glade.ViewModels

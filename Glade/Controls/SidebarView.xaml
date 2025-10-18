@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl x:Class="Glade.Controls.SidebarView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:Glade.Controls"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+  <Grid>
+
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <SelectorBar x:Name="SelectorBarControl"
+                 Grid.Row="0"
+                 SelectionChanged="SelectionChanged">
+      <SelectorBarItem Text="Game Objects"
+                       IsSelected="True" />
+      <SelectorBarItem Text="Project Assets" />
+      <SelectorBarItem Text="Asset Tool" />
+    </SelectorBar>
+    
+    <Frame x:Name="ContentFrame"
+           Grid.Row="1"
+           HorizontalAlignment="Stretch"
+           VerticalAlignment="Stretch"
+           IsNavigationStackEnabled="False" />
+    
+  </Grid>
+</UserControl>

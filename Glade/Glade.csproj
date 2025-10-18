@@ -15,9 +15,13 @@
   <ItemGroup>
     <None Remove="Arbor.dll" />
     <None Remove="Dialog\AssetDialog.xaml" />
+    <None Remove="Styles.xaml" />
     <None Remove="Views\BlankPage1.xaml" />
     <None Remove="Views\GameObjectPage.xaml" />
+    <None Remove="Views\LogViewer.xaml" />
     <None Remove="Views\ProjectAssets.xaml" />
+    <None Remove="Views\SidebarView.xaml" />
+    <None Remove="Views\Titlebar.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -50,6 +54,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="CommunityToolkit.WinUI.Controls.Sizers" Version="8.2.250402" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.10" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.6584" />
@@ -86,6 +91,21 @@
     <Compile Update="C:\Users\matt\.nuget\packages\microsoft.windowsappsdk.runtime\1.8.251003001\buildTransitive\..\include\WindowsAppSDK-VersionInfo.cs" Link="Generated\WindowsAppSDK-VersionInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Page Update="Views\SidebarView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Titlebar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\LogViewer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
     <Page Update="Dialog\AssetDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -102,6 +122,14 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\GameObjectPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Controls\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Styles.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
